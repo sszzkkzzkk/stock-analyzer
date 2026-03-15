@@ -26,10 +26,10 @@ def is_trading_day(d):
     return True
 
 def call_claude(prompt):
-    res = client.messages.create(
+        res = client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=3000,
-        tools=[{"type": "web_search_20250305", "name": "web_search"}],
+        tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": 5}],
         messages=[{"role": "user", "content": prompt}],
     )
     return "".join(b.text for b in res.content if b.type == "text")
