@@ -1,6 +1,6 @@
 """
-株式AI自動分析 — main.py（通知なし・ダッシュボードのみ版）
-GitHub Actions から SESSION=730 or 830 で呼ばれる
+株式AI自動分析 — main.py
+SESSION=730 / 830 / 1600 で呼ばれる
 """
 import os, sys, json, re
 from datetime import datetime, timezone, timedelta
@@ -43,11 +43,14 @@ def save(filename, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
     print(f"保存: {p}")
 
+def load(filename):
+    p = DATA / filename
+    if not p.exists(): return None
+    with open(p, encoding="utf-8") as f: return json.load(f)
+
 def load_learning_ctx():
-    p = DATA / "accuracy_log.json"
-    if not p.exists(): return "（初回）"
-    with open(p, encoding="utf-8") as f: logs = json.load(f)
-    if not logs: return "（データなし）"
+    logs = load("accuracy_log.json")
+    if not logs: return "（初回）"
     recent = logs[-10:]
     avg = sum(r["accuracy_score"] for r in recent) / len(recent)
     weak = list({r.get("weakest_theme","") for r in recent if r.get("weakest_theme")})
@@ -57,11 +60,13 @@ def load_learning_ctx():
 
 def fetch_yahoo():
     H = {"User-Agent": "Mozilla/5.0", "Accept-Language": "ja"}
-    out = {"top_gainers": [], "volume_surge": []}
-    for key, url in [
-        ("top_gainers", "https://finance.yahoo.co.jp/stocks/ranking/rateUp?market=tse&term=daily&page=1"),
-        ("volume_surge", "https://finance.yahoo.co.jp/stocks/ranking/volumeUp?market=tse&term=daily&page=1"),
-    ]:
+    out = {"top_gainers": [], "volume_surge": [], "top_losers": []}
+    urls = {
+        "top_gainers": "https://finance.yahoo.co.jp/stocks/ranking/rateUp?market=tse&term=daily&page=1",
+        "volume_surge": "https://finance.yahoo.co.jp/stocks/ranking/volumeUp?market=tse&term=daily&page=1",
+        "top_losers":  "https://finance.yahoo.co.jp/stocks/ranking/rateDown?market=tse&term=daily&page=1",
+    }
+    for key, url in urls.items():
         try:
             r = requests.get(url, headers=H, timeout=15)
             soup = BeautifulSoup(r.text, "html.parser")
@@ -74,6 +79,7 @@ def fetch_yahoo():
             print(f"Yahoo({key})エラー: {e}")
     return out
 
+# ── 7:30 予測 ────────────────────────────────────────────────
 def run_730(today):
     ctx = load_learning_ctx()
     prompt = f"""今日は{today.strftime('%Y年%m月%d日')}（東証営業日）です。
@@ -96,14 +102,14 @@ themes は confidence_score 降順で5〜7件。"""
     save("latest_730.json", result)
     return result
 
+# ── 8:30 気配検証 ────────────────────────────────────────────
 def run_830(today):
-    p = DATA / "latest_730.json"
-    if not p.exists(): raise FileNotFoundError("latest_730.json がありません")
-    with open(p, encoding="utf-8") as f: pred = json.load(f)
+    pred = load("latest_730.json")
+    if not pred: raise FileNotFoundError("latest_730.json がありません")
     theme_names = [t["name"] for t in pred.get("themes", [])]
     market = fetch_yahoo()
     prompt = f"""今日は{today.strftime('%Y年%m月%d日')} 8:30です。
-7:30予測: {theme_names}
+7:30予測テーマ: {theme_names}
 詳細: {json.dumps(pred.get('themes',[]), ensure_ascii=False)}
 Yahoo値上がりTOP15: {json.dumps(market['top_gainers'][:15], ensure_ascii=False)}
 出来高急増TOP10: {json.dumps(market['volume_surge'][:10], ensure_ascii=False)}
@@ -118,18 +124,93 @@ JSONのみ返してください（説明文・```不要）:
     print("[8:30] Claude 呼び出し中...")
     result = parse_json(call_claude(prompt))
     save("latest_830.json", result)
-    log_p = DATA / "accuracy_log.json"
-    logs = json.load(open(log_p, encoding="utf-8")) if log_p.exists() else []
-    logs.append({"date": result["date"], "accuracy_score": result.get("accuracy_score", 0),
-                 "strongest_theme": result.get("strongest_theme", ""), "weakest_theme": result.get("weakest_theme", ""),
-                 "improvement_hints": result.get("improvement_hints", [])})
+    return result
+
+# ── 16:00 大引け総括 ─────────────────────────────────────────
+def run_1600(today):
+    pred_730 = load("latest_730.json")
+    pred_830 = load("latest_830.json")
+    if not pred_730: raise FileNotFoundError("latest_730.json がありません")
+
+    market = fetch_yahoo()
+
+    themes_730 = pred_730.get("themes", [])
+    eval_830   = pred_830.get("evaluation", []) if pred_830 else []
+
+    prompt = f"""今日は{today.strftime('%Y年%m月%d日')} 16:00、東証の大引け後です。
+本日の相場を総括してください。
+
+【7:30の予測テーマ】
+{json.dumps(themes_730, ensure_ascii=False)}
+
+【8:30時点の評価】
+{json.dumps(eval_830, ensure_ascii=False)}
+
+【Yahoo!ファイナンス 大引け値上がりTOP15】
+{json.dumps(market['top_gainers'][:15], ensure_ascii=False)}
+
+【値下がりTOP10】
+{json.dumps(market['top_losers'][:10], ensure_ascii=False)}
+
+【出来高急増TOP10】
+{json.dumps(market['volume_surge'][:10], ensure_ascii=False)}
+
+ウェブ検索で以下を調べてください:
+1. 本日の日経平均の終値・変化率
+2. 場中に出た重要ニュース（相場に影響したもの）
+3. 注目銘柄（7:30予測のkey_stocks）の実際の終値と動き
+
+以下の観点で総括してください:
+- 朝の予測テーマは最終的に当たったか
+- 注目銘柄は実際にどう動いたか
+- 場中のニュースと相場の関係
+- 翌日に活かせる学習ポイント
+
+JSONのみ返してください（説明文・```不要）:
+{{"date":"{today.isoformat()}","session":"1600","generated_at":"{datetime.now(JST).strftime('%H:%M')}",
+"closing":{{"nikkei":"終値と変化率","topix":"終値と変化率","total_assessment":"全体評価ひとこと"}},
+"theme_results":[{{"name":"テーマ名","morning_score":85,"final_result":"的中/外れ/部分的中","detail":"50字以内"}}],
+"stock_results":[{{"name":"銘柄名","code":"コード","open":"寄り付き","close":"終値","change":"変化率","comment":"30字以内"}}],
+"news_impact":[{{"news":"場中ニュース","impact":"相場への影響50字以内"}}],
+"final_accuracy_score":75,
+"strongest_theme":"最も当たったテーマ",
+"weakest_theme":"最も外れたテーマ",
+"learning_points":["翌日に活かす学習ポイント1","翌日に活かす学習ポイント2","翌日に活かす学習ポイント3"],
+"tomorrow_hint":"明日の相場への示唆100字以内",
+"summary":"本日の総括150字以内"}}"""
+
+    print("[16:00] Claude 呼び出し中...")
+    result = parse_json(call_claude(prompt))
+    save("latest_1600.json", result)
+
+    # 学習ログ更新（16:00の最終スコアで上書き）
+    logs = load("accuracy_log.json") or []
+    # 同じ日のエントリがあれば更新、なければ追加
+    today_str = today.isoformat()
+    existing = next((i for i,r in enumerate(logs) if r["date"]==today_str), None)
+    entry = {
+        "date": today_str,
+        "accuracy_score": result.get("final_accuracy_score", 0),
+        "strongest_theme": result.get("strongest_theme", ""),
+        "weakest_theme": result.get("weakest_theme", ""),
+        "improvement_hints": result.get("learning_points", []),
+    }
+    if existing is not None:
+        logs[existing] = entry
+    else:
+        logs.append(entry)
     save("accuracy_log.json", logs[-90:])
     return result
 
+# ── エントリーポイント ────────────────────────────────────────
 if __name__ == "__main__":
     now_jst = datetime.now(JST)
     today = now_jst.date()
-    session = os.environ.get("SESSION", "").strip() or ("730" if now_jst.hour < 8 else "830")
+    session = os.environ.get("SESSION", "").strip() or (
+        "730" if now_jst.hour < 8 else
+        "830" if now_jst.hour < 9 else
+        "1600"
+    )
     print(f"SESSION={session} date={today}")
     if not is_trading_day(today):
         print("非営業日 — スキップ"); sys.exit(0)
@@ -137,6 +218,8 @@ if __name__ == "__main__":
         run_730(today)
     elif session == "830":
         run_830(today)
+    elif session == "1600":
+        run_1600(today)
     else:
         print(f"不明: {session}"); sys.exit(1)
     print(f"[{session}] 完了")
