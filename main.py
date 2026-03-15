@@ -1,9 +1,6 @@
 """
 株式AI自動分析 v3
 SESSION=600 / 905 / 1535
-6:00  データ収集 + テーマ予測
-9:05  寄り付き確認 + 予測差分を即学習 → 当日15:35に反映
-15:35 大引け総括 + 最終学習 → 翌日6:00に反映
 """
 import os, sys, json, re
 from datetime import datetime, timezone, timedelta
@@ -26,7 +23,7 @@ def is_trading_day(d):
     return True
 
 def call_claude(prompt):
-        res = client.messages.create(
+    res = client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=3000,
         tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": 5}],
@@ -56,7 +53,7 @@ def load_learning_ctx():
     if not logs: return "（初回 — 学習データなし）"
     recent = logs[-10:]
     avg = sum(r["accuracy_score"] for r in recent) / len(recent)
-    weak  = list({r.get("weakest_theme","")   for r in recent if r.get("weakest_theme")})
+    weak  = list({r.get("weakest_theme","") for r in recent if r.get("weakest_theme")})
     strong= list({r.get("strongest_theme","") for r in recent if r.get("strongest_theme")})
     hints = []
     for r in recent[-3:]: hints.extend(r.get("improvement_hints", []))
@@ -65,7 +62,7 @@ def load_learning_ctx():
 的中しやすいテーマ: {', '.join(strong[:3]) or 'なし'}
 外れやすいテーマ: {', '.join(weak[:3]) or 'なし'}
 改善ヒント: {' / '.join(hints[-4:]) or 'なし'}
-→ 外れやすいテーマは confidence_score を低めに、rationale を慎重に記述すること"""
+→ 外れやすいテーマは confidence_score を低めに設定すること"""
 
 def fetch_yahoo():
     H = {"User-Agent": "Mozilla/5.0", "Accept-Language": "ja"}
@@ -106,21 +103,17 @@ def run_600(today):
     prompt = f"""今日は{today.strftime('%Y年%m月%d日')}（東証営業日）です。
 以下を全てウェブ検索して収集し、本日の東証テーマ予測まで行ってください。
 
-【収集項目 — 株式市場に関わる情報を全て取得】
 1. 米国株式（S&P500・NASDAQ・ダウ・Russell2000 終値・変化率）
-2. 米国主要セクターの動き（テック・金融・エネルギー・ヘルスケア・素材等）
+2. 米国主要セクターの動き
 3. 先物（日経225先物・SGX・CME）
 4. 為替（USD/JPY・EUR/JPY）
 5. 商品（原油WTI・金・銅）
-6. 債券・金利（米10年国債利回り・日本10年国債・VIX）
+6. 債券・金利（米10年国債・日本10年国債・VIX）
 7. 米国株で特に動いた銘柄とその理由
-8. 本日の重要ニュース（地政学・金利・決算・政策）
-9. 本日の経済指標スケジュール（日米）
+8. 本日の重要ニュース
+9. 本日の経済指標スケジュール
 
 {ctx}
-
-上記を全て収集した上で、本日の東証テーマ予測を行ってください。
-資金が集まりそうなテーマ・銘柄を具体的に示してください。
 
 JSONのみ返してください（説明文・```不要）:
 {{
@@ -166,13 +159,13 @@ def run_905(today):
     theme_names = [t["name"] for t in themes_600]
     prompt = f"""今日は{today.strftime('%Y年%m月%d日')} 9:05、東証が寄り付いた直後です。
 
-【6:00の予測テーマ（信頼度順）】
+【6:00の予測テーマ】
 {json.dumps(theme_names, ensure_ascii=False)}
 
 【6:00の詳細予測】
 {json.dumps(themes_600, ensure_ascii=False)}
 
-【Yahoo!ファイナンス 寄り付き後 値上がりTOP20】
+【値上がりTOP20】
 {json.dumps(market['top_gainers'][:20], ensure_ascii=False)}
 
 【出来高急増TOP20】
@@ -183,42 +176,36 @@ def run_905(today):
 
 ウェブ検索で寄り付き後のニュース・日経平均の動きも確認してください。
 
-【分析指示】
-1. 実際に資金が入ったテーマ・銘柄を特定する
-2. 6:00予測との差を分析する
-3. 外れた理由を具体的に特定する
-4. 15:35分析への修正ヒントを生成する
-
 JSONのみ返してください（説明文・```不要）:
 {{
   "date": "{today.isoformat()}",
   "session": "905",
   "generated_at": "{datetime.now(JST).strftime('%H:%M')}",
   "opening": {{
-    "nikkei_open": "寄り付き値",
-    "nikkei_change": "変化率",
+    "nikkei_open": "",
+    "nikkei_change": "",
     "market_tone": "強い/弱い/中立",
-    "dominant_theme": "寄り付きで最も資金が入ったテーマ"
+    "dominant_theme": ""
   }},
   "actual_flow": [
-    {{"theme": "実際に動いたテーマ", "evidence": "根拠となる銘柄・出来高", "strength": "high/medium/low"}}
+    {{"theme": "", "evidence": "", "strength": "high/medium/low"}}
   ],
   "prediction_gap": [
     {{
-      "predicted_theme": "予測テーマ名",
+      "predicted_theme": "",
       "predicted_score": 85,
       "actual_result": "的中/外れ/部分的中",
-      "gap_reason": "差が生じた理由50字以内",
-      "missed_factor": "見落としたファクター30字以内"
+      "gap_reason": "",
+      "missed_factor": ""
     }}
   ],
   "intraday_correction": {{
-    "themes_to_watch": ["午後も継続しそうなテーマ1", "テーマ2"],
-    "themes_faded": ["朝だけで終わりそうなテーマ"],
-    "correction_hints": ["15:35分析への修正ヒント1", "ヒント2", "ヒント3"]
+    "themes_to_watch": ["", ""],
+    "themes_faded": [""],
+    "correction_hints": ["", "", ""]
   }},
   "morning_accuracy_score": 70,
-  "summary": "寄り付き総評120字以内"
+  "summary": ""
 }}"""
     print("[9:05] Claude 呼び出し中...")
     result = parse_json(call_claude(prompt))
@@ -231,18 +218,18 @@ def run_1535(today):
     if not pred_600: raise FileNotFoundError("latest_600.json がありません")
     market = fetch_yahoo()
     themes_600 = pred_600.get("themes", [])
-    gap_905    = pred_905.get("prediction_gap", []) if pred_905 else []
+    gap_905 = pred_905.get("prediction_gap", []) if pred_905 else []
     correction = pred_905.get("intraday_correction", {}) if pred_905 else {}
     prompt = f"""今日は{today.strftime('%Y年%m月%d日')} 15:35、東証の大引け直後です。
 
 【6:00の予測テーマ】
 {json.dumps(themes_600, ensure_ascii=False)}
 
-【9:05時点の予測差分・修正ヒント】
-差分: {json.dumps(gap_905, ensure_ascii=False)}
-修正ヒント: {json.dumps(correction, ensure_ascii=False)}
+【9:05時点の差分・修正ヒント】
+{json.dumps(gap_905, ensure_ascii=False)}
+{json.dumps(correction, ensure_ascii=False)}
 
-【Yahoo!ファイナンス 大引け値上がりTOP20】
+【値上がりTOP20】
 {json.dumps(market['top_gainers'][:20], ensure_ascii=False)}
 
 【値下がりTOP10】
@@ -254,11 +241,7 @@ def run_1535(today):
 【業種別騰落】
 {json.dumps(market['sector'], ensure_ascii=False)}
 
-ウェブ検索で以下を調べてください:
-1. 日経平均・TOPIXの終値・変化率
-2. 場中の重要ニュース
-3. 6:00予測のkey_stocksの実際の終値・変化率
-4. 明日に影響しそうなニュース・イベント
+ウェブ検索で日経平均終値・場中ニュース・key_stocksの終値を調べてください。
 
 JSONのみ返してください（説明文・```不要）:
 {{
@@ -266,30 +249,30 @@ JSONのみ返してください（説明文・```不要）:
   "session": "1535",
   "generated_at": "{datetime.now(JST).strftime('%H:%M')}",
   "closing": {{
-    "nikkei": "終値と変化率",
-    "topix": "終値と変化率",
-    "total_assessment": "全体評価ひとこと"
+    "nikkei": "",
+    "topix": "",
+    "total_assessment": ""
   }},
   "theme_results": [
-    {{"name": "テーマ名", "morning_score": 85, "final_result": "的中/外れ/部分的中", "detail": "50字以内"}}
+    {{"name": "", "morning_score": 85, "final_result": "的中/外れ/部分的中", "detail": ""}}
   ],
   "stock_results": [
-    {{"name": "銘柄名", "code": "コード", "close": "終値", "change": "変化率", "comment": "30字以内"}}
+    {{"name": "", "code": "", "close": "", "change": "", "comment": ""}}
   ],
   "news_impact": [
-    {{"news": "場中ニュース", "impact": "相場への影響50字以内"}}
+    {{"news": "", "impact": ""}}
   ],
-  "correction_evaluation": "9:05の修正ヒントが活きたか評価60字以内",
+  "correction_evaluation": "",
   "tomorrow_outlook": {{
-    "key_events": ["明日の重要イベント1", "イベント2"],
-    "watch_themes": ["明日注目すべきテーマ1", "テーマ2"],
-    "hint": "明日の相場への示唆100字以内"
+    "key_events": ["", ""],
+    "watch_themes": ["", ""],
+    "hint": ""
   }},
   "final_accuracy_score": 75,
-  "strongest_theme": "最も当たったテーマ",
-  "weakest_theme": "最も外れたテーマ",
-  "learning_points": ["学習ポイント1", "学習ポイント2", "学習ポイント3"],
-  "summary": "本日の総括150字以内"
+  "strongest_theme": "",
+  "weakest_theme": "",
+  "learning_points": ["", "", ""],
+  "summary": ""
 }}"""
     print("[15:35] Claude 呼び出し中...")
     result = parse_json(call_claude(prompt))
