@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0e1a">
+<title>株式AI分析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0a0e1a;
+  --bg2:      #111627;
+  --bg3:      #1a2035;
+  --border:   #1f2d4a;
+  --dim:      #3a4f72;
+  --muted:    #6b82a8;
+  --text:     #c8d8f0;
+  --bright:   #e8f2ff;
+  --accent:   #3b82f6;
+  --accent2:  #06b6d4;
+  --green:    #22d3a0;
+  --red:      #f87171;
+  --amber:    #fbbf24;
+  --mono:     'DM Mono', monospace;
+  --sans:     'Noto Sans JP', sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;-webkit-text-size-adjust:100%}
+body{min-height:100dvh;padding-bottom:env(safe-area-inset-bottom)}
+
+/* ── Header ── */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,14,26,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:12px 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{font-family:var(--mono);font-size:13px;color:var(--accent2);letter-spacing:.12em}
+.logo span{color:var(--muted)}
+.header-right{display:flex;align-items:center;gap:10px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,211,160,.4)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(34,211,160,0)}}
+.update-time{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.refresh-btn{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  font-size:16px;width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.refresh-btn:active{background:var(--bg3)}
+
+/* ── Tabs ── */
+.tabs{
+  display:flex;background:var(--bg);
+  border-bottom:1px solid var(--border);
+  padding:0 4px;
+  position:sticky;top:53px;z-index:90;
+  backdrop-filter:blur(12px);
+  background:rgba(10,14,26,.92);
+}
+.tab{
+  flex:1;padding:10px 4px;font-size:12px;color:var(--muted);
+  border:none;background:none;cursor:pointer;
+  font-family:var(--sans);border-bottom:2px solid transparent;
+  transition:color .15s,border-color .15s;letter-spacing:.02em;
+}
+.tab.active{color:var(--accent2);border-bottom-color:var(--accent2)}
+
+/* ── Page container ── */
+.page{display:none;padding:12px 12px 24px;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── Section label ── */
+.section-label{
+  font-family:var(--mono);font-size:10px;color:var(--dim);
+  letter-spacing:.15em;text-transform:uppercase;
+  margin:16px 0 8px;
+}
+.section-label:first-child{margin-top:4px}
+
+/* ── Market strip ── */
+.market-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:4px}
+.mcard{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:10px 10px 8px;
+}
+.mcard-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:4px}
+.mcard-val{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--bright)}
+.mcard-val.up{color:var(--green)}
+.mcard-val.down{color:var(--red)}
+
+/* ── News items ── */
+.news-list{display:flex;flex-direction:column;gap:6px}
+.news-item{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;font-size:12px;line-height:1.6;color:var(--text);
+  border-left:2px solid var(--accent);
+}
+
+/* ── Theme cards ── */
+.theme-list{display:flex;flex-direction:column;gap:8px}
+.theme-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:14px 14px 12px;position:relative;overflow:hidden;
+}
+.theme-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:var(--accent);
+  border-radius:3px 0 0 3px;
+}
+.theme-card.rank-1::before{background:var(--amber)}
+.theme-card.rank-2::before{background:var(--accent2)}
+.theme-card.rank-3::before{background:var(--green)}
+.theme-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.theme-name{font-size:15px;font-weight:500;color:var(--bright)}
+.theme-rank{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+.score-badge{
+  font-family:var(--mono);font-size:12px;font-weight:500;
+  padding:3px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0;
+}
+.score-high{background:rgba(251,191,36,.15);color:var(--amber)}
+.score-mid{background:rgba(59,130,246,.15);color:var(--accent)}
+.score-low{background:rgba(107,130,168,.1);color:var(--muted)}
+.score-bar{height:2px;background:var(--bg3);border-radius:2px;margin-bottom:8px}
+.score-bar-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .6s ease}
+.theme-rationale{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px}
+.stocks-row{display:flex;flex-wrap:wrap;gap:4px}
+.stock-pill{
+  font-family:var(--mono);font-size:10px;
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--text);padding:2px 7px;border-radius:5px;
+}
+.risk-tag{
+  font-size:10px;color:var(--red);margin-top:6px;
+  display:flex;align-items:center;gap:4px;
+}
+.risk-tag::before{content:'⚠';font-size:10px}
+
+/* ── Summary box ── */
+.summary-box{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:14px;font-size:13px;line-height:1.75;color:var(--text);
+  border-top:2px solid var(--accent2);
+}
+
+/* ── Evaluation cards ── */
+.eval-list{display:flex;flex-direction:column;gap:6px}
+.eval-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:12px;display:flex;align-items:flex-start;gap:10px;
+}
+.eval-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.eval-theme{font-size:13px;font-weight:500;color:var(--bright);margin-bottom:2px}
+.eval-detail{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* ── Score ring ── */
+.score-section{
+  display:flex;align-items:center;gap:16px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:16px;margin-bottom:4px;
+}
+.score-ring{position:relative;width:64px;height:64px;flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring .ring-bg{stroke:var(--bg3)}
+.score-ring .ring-fill{stroke:var(--accent2);stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.score-num{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:var(--mono);font-size:17px;font-weight:500;color:var(--bright);
+}
+.score-info{flex:1}
+.score-title{font-size:13px;font-weight:500;color:var(--bright);margin-bottom:4px}
+.score-sub{font-size:11px;color:var(--muted);line-height:1.6}
+
+/* ── Actual themes ── */
+.actual-list{display:flex;flex-direction:column;gap:6px}
+.actual-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;display:flex;align-items:center;gap:10px;
+}
+.strength-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.strength-high{background:var(--red)}
+.strength-mid{background:var(--amber)}
+.strength-low{background:var(--dim)}
+.actual-name{font-size:13px;font-weight:500;color:var(--bright);margin-bottom:2px}
+.actual-evidence{font-size:11px;color:var(--muted)}
+
+/* ── Hint cards ── */
+.hint-list{display:flex;flex-direction:column;gap:6px}
+.hint-card{
+  background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);
+  border-radius:10px;padding:10px 12px;
+  font-size:12px;color:var(--text);line-height:1.6;
+}
+.hint-card::before{content:'💡 ';font-size:12px}
+
+/* ── Accuracy chart ── */
+.chart-wrap{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:14px;
+}
+.chart-bars{display:flex;align-items:flex-end;gap:5px;height:80px;margin-bottom:6px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:3px 3px 0 0;background:var(--accent);min-height:3px;transition:height .4s ease}
+.bar-date{font-family:var(--mono);font-size:9px;color:var(--dim);white-space:nowrap}
+.bar-score{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.avg-line{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
+.avg-val{color:var(--accent2)}
+
+/* ── No data ── */
+.no-data{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:32px 16px;text-align:center;color:var(--muted);font-size:13px;
+}
+.no-data .icon{font-size:32px;margin-bottom:12px;display:block}
+
+/* ── Loading ── */
+.loading{
+  padding:48px 16px;text-align:center;color:var(--muted);font-size:13px;
+}
+.spinner{
+  width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent2);
+  border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Settings ── */
+.settings-form{display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:.08em}
+.field input{
+  background:var(--bg2);border:1px solid var(--border);color:var(--bright);
+  border-radius:8px;padding:10px 12px;font-size:13px;font-family:var(--sans);
+  outline:none;transition:border-color .15s;
+}
+.field input:focus{border-color:var(--accent)}
+.save-btn{
+  background:var(--accent);color:#fff;border:none;border-radius:10px;
+  padding:12px;font-size:14px;font-family:var(--sans);font-weight:500;
+  cursor:pointer;margin-top:4px;
+}
+.save-btn:active{opacity:.85}
+.info-box{
+  background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7;
+  margin-top:8px;
+}
+.info-box a{color:var(--accent2)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">AI<span>/</span>MARKET</div>
+  <div class="header-right">
+    <div class="live-dot"></div>
+    <span class="update-time" id="update-time">—</span>
+    <button class="refresh-btn" onclick="loadAll()" title="更新">↻</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('morning')">7:30 予測</button>
+  <button class="tab" onclick="switchTab('eval')">8:30 評価</button>
+  <button class="tab" onclick="switchTab('history')">精度履歴</button>
+  <button class="tab" onclick="switchTab('settings')">設定</button>
+</div>
+
+<!-- ── 7:30 予測 ── -->
+<div id="page-morning" class="page active">
+  <div id="morning-content"><div class="loading"><div class="spinner"></div>読み込み中...</div></div>
+</div>
+
+<!-- ── 8:30 評価 ── -->
+<div id="page-eval" class="page">
+  <div id="eval-content"><div class="loading"><div class="spinner"></div>読み込み中...</div></div>
+</div>
+
+<!-- ── 精度履歴 ── -->
+<div id="page-history" class="page">
+  <div id="history-content"><div class="loading"><div class="spinner"></div>読み込み中...</div></div>
+</div>
+
+<!-- ── 設定 ── -->
+<div id="page-settings" class="page">
+  <div class="section-label">データソース設定</div>
+  <div class="settings-form">
+    <div class="field">
+      <label>GitHub ユーザー名</label>
+      <input type="text" id="gh-user" placeholder="yourusername">
+    </div>
+    <div class="field">
+      <label>リポジトリ名</label>
+      <input type="text" id="gh-repo" placeholder="stock-analyzer">
+    </div>
+    <button class="save-btn" onclick="saveSettings()">保存して接続</button>
+  </div>
+  <div class="info-box">
+    GitHub Pages が有効なリポジトリの <code>data/</code> フォルダを参照します。<br><br>
+    設定後、7:30・8:30 タブに分析結果が自動で表示されます。<br><br>
+    GitHub Pages の有効化:<br>
+    リポジトリ → Settings → Pages → Source: <strong>main branch</strong>
+  </div>
+</div>
+
+<script>
+// ── State ──
+let data730 = null, data830 = null, dataHistory = null;
+const BASE_URL_KEY = 'stock_base_url';
+const GH_USER_KEY  = 'stock_gh_user';
+const GH_REPO_KEY  = 'stock_gh_repo';
+
+function getBaseUrl() {
+  const u = localStorage.getItem(GH_USER_KEY) || '';
+  const r = localStorage.getItem(GH_REPO_KEY) || '';
+  if (u && r) return `https://${u}.github.io/${r}`;
+  // デモ用フォールバック（同じディレクトリの data/）
+  return './data';
+}
+
+// ── Tab switching ──
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active', ['morning','eval','history','settings'][i]===name);
+  });
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+}
+
+// ── Load all data ──
+async function loadAll() {
+  const base = getBaseUrl();
+  document.getElementById('update-time').textContent = '更新中...';
+  await Promise.all([
+    fetchJSON(`${base}/data/latest_730.json`).then(d=>{data730=d; render730();}),
+    fetchJSON(`${base}/data/latest_830.json`).then(d=>{data830=d; render830();}),
+    fetchJSON(`${base}/data/accuracy_log.json`).then(d=>{dataHistory=d; renderHistory();}),
+  ]);
+  document.getElementById('update-time').textContent =
+    new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+}
+
+async function fetchJSON(url) {
+  try {
+    const r = await fetch(url + '?t=' + Date.now());
+    if (!r.ok) throw new Error(r.status);
+    return await r.json();
+  } catch(e) {
+    console.warn('fetch failed:', url, e);
+    return null;
+  }
+}
+
+// ── Render 7:30 ──
+function render730() {
+  const el = document.getElementById('morning-content');
+  const d = data730;
+  if (!d) {
+    el.innerHTML = noData('まだ本日の7:30分析がありません', '毎朝7:30に自動更新されます');
+    return;
+  }
+  const ov = d.market_overview || {};
+  const sp = ov.sp500 || '—';
+  const nd = ov.nikkei_futures || '—';
+  const fx = ov.usdjpy || '—';
+  const spClass = sp.startsWith('+') ? 'up' : sp.startsWith('-') ? 'down' : '';
+  const news = (ov.key_news || []).map(n=>
+    `<div class="news-item">${esc(n)}</div>`).join('');
+  const themes = (d.themes || []).map(t => themeCard(t)).join('');
+
+  el.innerHTML = `
+    <div class="section-label">マーケット概況 — ${esc(d.date || '')}</div>
+    <div class="market-strip">
+      <div class="mcard"><div class="mcard-label">S&P500</div><div class="mcard-val ${spClass}">${esc(sp)}</div></div>
+      <div class="mcard"><div class="mcard-label">日経先物</div><div class="mcard-val">${esc(nd)}</div></div>
+      <div class="mcard"><div class="mcard-label">USD/JPY</div><div class="mcard-val">${esc(fx)}</div></div>
+    </div>
+    <div class="section-label">注目ニュース</div>
+    <div class="news-list">${news || '<div class="no-data">ニュースなし</div>'}</div>
+    <div class="section-label">本日のテーマ予測</div>
+    <div class="theme-list">${themes}</div>
+    <div class="section-label">相場展望</div>
+    <div class="summary-box">${esc(d.summary || '—')}</div>
+  `;
+  animateBars();
+}
+
+function themeCard(t) {
+  const score = t.confidence_score || 0;
+  const rankClass = t.rank <= 3 ? `rank-${t.rank}` : '';
+  const badgeClass = score >= 80 ? 'score-high' : score >= 60 ? 'score-mid' : 'score-low';
+  const stocks = (t.key_stocks || []).map(s =>
+    `<span class="stock-pill">${esc(s)}</span>`).join('');
+  const risk = t.risk_factors
+    ? `<div class="risk-tag">${esc(t.risk_factors)}</div>` : '';
+  return `
+    <div class="theme-card ${rankClass}">
+      <div class="theme-top">
+        <div>
+          <div class="theme-name">${esc(t.name)}</div>
+          <div class="theme-rank">#${t.rank}</div>
+        </div>
+        <div class="score-badge ${badgeClass}">${score}点</div>
+      </div>
+      <div class="score-bar"><div class="score-bar-fill" data-score="${score}" style="width:0%"></div></div>
+      <div class="theme-rationale">${esc(t.rationale || '')}</div>
+      <div class="stocks-row">${stocks}</div>
+      ${risk}
+    </div>`;
+}
+
+function animateBars() {
+  requestAnimationFrame(()=>{
+    document.querySelectorAll('.score-bar-fill').forEach(el=>{
+      const s = el.dataset.score || 0;
+      setTimeout(()=>{ el.style.width = s + '%'; }, 100);
+    });
+  });
+}
+
+// ── Render 8:30 ──
+function render830() {
+  const el = document.getElementById('eval-content');
+  const d = data830;
+  if (!d) {
+    el.innerHTML = noData('まだ本日の8:30評価がありません', '8:30以降に自動更新されます');
+    return;
+  }
+  const score = d.accuracy_score || 0;
+  const scoreColor = score >= 70 ? '#22d3a0' : score >= 50 ? '#fbbf24' : '#f87171';
+  const circ = 2 * Math.PI * 24; // r=24
+  const offset = circ * (1 - score / 100);
+  const actuals = (d.actual_themes || []).map(a => {
+    const dotClass = a.strength === 'high' ? 'strength-high' : a.strength === 'medium' ? 'strength-mid' : 'strength-low';
+    return `<div class="actual-card">
+      <div class="strength-dot ${dotClass}"></div>
+      <div><div class="actual-name">${esc(a.name)}</div>
+      <div class="actual-evidence">${esc(a.evidence || '')}</div></div>
+    </div>`;
+  }).join('');
+  const evals = (d.evaluation || []).map(e => {
+    const icon = e.hit ? '✅' : '❌';
+    return `<div class="eval-card">
+      <div class="eval-icon">${icon}</div>
+      <div><div class="eval-theme">${esc(e.predicted_theme)}</div>
+      <div class="eval-detail">${esc(e.accuracy_detail || '')}</div></div>
+    </div>`;
+  }).join('');
+  const hits = (d.evaluation || []).filter(e=>e.hit).length;
+  const total = (d.evaluation || []).length;
+  const hints = (d.improvement_hints || []).map(h =>
+    `<div class="hint-card">${esc(h)}</div>`).join('');
+
+  el.innerHTML = `
+    <div class="section-label">精度スコア — ${esc(d.date || '')}</div>
+    <div class="score-section">
+      <div class="score-ring">
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <circle class="ring-bg" cx="32" cy="32" r="24" fill="none" stroke-width="5"/>
+          <circle class="ring-fill" cx="32" cy="32" r="24" fill="none" stroke-width="5"
+            stroke="${scoreColor}"
+            stroke-dasharray="${circ.toFixed(1)}"
+            stroke-dashoffset="${circ.toFixed(1)}"
+            id="ring-fill-el"/>
+        </svg>
+        <div class="score-num">${score}</div>
+      </div>
+      <div class="score-info">
+        <div class="score-title">本日の予測精度</div>
+        <div class="score-sub">
+          的中 ${hits}/${total} テーマ<br>
+          強み: ${esc(d.strongest_theme || '—')}<br>
+          課題: ${esc(d.weakest_theme || '—')}
+        </div>
+      </div>
+    </div>
+    <div class="section-label">実際に動いたテーマ</div>
+    <div class="actual-list">${actuals || noData('データなし','')}</div>
+    <div class="section-label">予測評価</div>
+    <div class="eval-list">${evals || noData('データなし','')}</div>
+    <div class="section-label">次回への改善ポイント</div>
+    <div class="hint-list">${hints || noData('ヒントなし','')}</div>
+    <div class="section-label">総評</div>
+    <div class="summary-box">${esc(d.summary || '—')}</div>
+  `;
+  // アニメーション
+  requestAnimationFrame(()=>{
+    const ring = document.getElementById('ring-fill-el');
+    if (ring) {
+      setTimeout(()=>{
+        ring.style.transition = 'stroke-dashoffset .9s ease';
+        ring.setAttribute('stroke-dashoffset', offset.toFixed(1));
+      }, 150);
+    }
+  });
+}
+
+// ── Render history ──
+function renderHistory() {
+  const el = document.getElementById('history-content');
+  const logs = dataHistory;
+  if (!logs || !logs.length) {
+    el.innerHTML = noData('精度履歴がまだありません', '8:30評価が蓄積されると表示されます');
+    return;
+  }
+  const recent = logs.slice(-12);
+  const avg = Math.round(recent.reduce((s,r)=>s+r.accuracy_score,0)/recent.length);
+  const maxScore = Math.max(...recent.map(r=>r.accuracy_score));
+  const bars = recent.map(r=>{
+    const h = Math.round((r.accuracy_score / 100) * 68) + 4;
+    const col = r.accuracy_score >= 70 ? '#3b82f6' : r.accuracy_score >= 50 ? '#fbbf24' : '#f87171';
+    const d = r.date ? r.date.slice(5) : '';
+    return `<div class="bar-col">
+      <div class="bar-score">${r.accuracy_score}</div>
+      <div class="bar" style="height:${h}px;background:${col}"></div>
+      <div class="bar-date">${d}</div>
+    </div>`;
+  }).join('');
+
+  // theme frequency
+  const themeCount = {};
+  logs.forEach(r=>{
+    if(r.strongest_theme) themeCount[r.strongest_theme] = (themeCount[r.strongest_theme]||0)+1;
+  });
+  const topThemes = Object.entries(themeCount)
+    .sort((a,b)=>b[1]-a[1]).slice(0,5)
+    .map(([name,cnt])=>`<div class="actual-card">
+      <div class="strength-dot strength-high"></div>
+      <div><div class="actual-name">${esc(name)}</div>
+      <div class="actual-evidence">${cnt}回 的中テーマ首位</div></div>
+    </div>`).join('');
+
+  el.innerHTML = `
+    <div class="section-label">精度トレンド（直近${recent.length}営業日）</div>
+    <div class="chart-wrap">
+      <div class="chart-bars">${bars}</div>
+      <div class="avg-line">平均精度: <span class="avg-val">${avg}/100</span></div>
+    </div>
+    <div class="section-label">的中しやすいテーマ TOP5</div>
+    <div class="actual-list">${topThemes || noData('データ蓄積中','')}</div>
+  `;
+}
+
+// ── Settings ──
+function saveSettings() {
+  const u = document.getElementById('gh-user').value.trim();
+  const r = document.getElementById('gh-repo').value.trim();
+  if (!u || !r) { alert('ユーザー名とリポジトリ名を入力してください'); return; }
+  localStorage.setItem(GH_USER_KEY, u);
+  localStorage.setItem(GH_REPO_KEY, r);
+  switchTab('morning');
+  loadAll();
+}
+
+// ── Helpers ──
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function noData(msg, sub) {
+  return `<div class="no-data"><span class="icon">📭</span>${esc(msg)}<br><span style="font-size:11px">${esc(sub)}</span></div>`;
+}
+
+// ── Init ──
+window.addEventListener('DOMContentLoaded', ()=>{
+  // 設定を復元
+  const u = localStorage.getItem(GH_USER_KEY) || '';
+  const r = localStorage.getItem(GH_REPO_KEY) || '';
+  if (u) document.getElementById('gh-user').value = u;
+  if (r) document.getElementById('gh-repo').value = r;
+  loadAll();
+});
+</script>
+</body>
+</html>
