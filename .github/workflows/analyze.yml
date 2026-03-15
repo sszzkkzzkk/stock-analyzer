@@ -2,16 +2,17 @@ name: 株式AI自動分析
 
 on:
   schedule:
-    - cron: "30 22 * * 0-4"
-    - cron: "30 23 * * 0-4"
+    - cron: "30 22 * * 0-4"  # JST 7:30
+    - cron: "30 23 * * 0-4"  # JST 8:30
+    - cron: "0 7 * * 1-5"    # JST 16:00
   workflow_dispatch:
     inputs:
       session:
-        description: "730 or 830"
+        description: "730 or 830 or 1600"
         required: true
         default: "730"
         type: choice
-        options: ["730", "830"]
+        options: ["730", "830", "1600"]
 
 permissions:
   contents: write
