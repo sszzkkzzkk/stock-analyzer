@@ -1,7 +1,7 @@
 name: 株式AI自動分析
 
 on:
-  :
+schedule:
     - cron: "0 21 * * 0-4"
     - cron: "5 0 * * 1-5"
     - cron: "35 6 * * 1-5"   # JST 15:35
