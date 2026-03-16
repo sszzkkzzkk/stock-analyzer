@@ -280,11 +280,9 @@ def run_1535(today):
 if __name__ == "__main__":
     now_jst = datetime.now(JST)
     today = now_jst.date()
-    session = os.environ.get("SESSION", "").strip() or (
-        "600"  if now_jst.hour < 7  else
-        "905"  if now_jst.hour < 10 else
-        "1535"
-    )
+    session = os.environ.get("SESSION", "").strip()
+    if not session:
+        raise ValueError("SESSIONが設定されていません。workflow_dispatchまたはcronで設定してください。")
     print(f"SESSION={session} date={today}")
     if not is_trading_day(today):
         print("非営業日 — スキップ")
