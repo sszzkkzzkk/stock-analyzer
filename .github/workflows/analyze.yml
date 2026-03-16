@@ -46,11 +46,28 @@ jobs:
             git checkout origin/gh-pages -- data/ 2>/dev/null || true
           fi
 
+      - name: セッション判定
+        id: session
+        run: |
+          if [ -n "${{ github.event.inputs.session }}" ]; then
+            echo "session=${{ github.event.inputs.session }}" >> $GITHUB_OUTPUT
+          else
+            HOUR=$(TZ='Asia/Tokyo' date +%H)
+            if [ "$HOUR" -lt 7 ]; then
+              echo "session=600" >> $GITHUB_OUTPUT
+            elif [ "$HOUR" -lt 10 ]; then
+              echo "session=905" >> $GITHUB_OUTPUT
+            else
+              echo "session=1535" >> $GITHUB_OUTPUT
+            fi
+          fi
+
       - name: 分析実行
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          SESSION: ${{ github.event.inputs.session }}
+          SESSION: ${{ steps.session.outputs.session }}
         run: python main.py
+
 
       - name: データ確認
         run: |
