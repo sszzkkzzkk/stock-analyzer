@@ -34,7 +34,26 @@ def parse_json(raw):
     clean = re.sub(r"```json|```", "", raw).strip()
     m = re.search(r"\{[\s\S]*\}", clean)
     if not m: raise ValueError(f"JSON not found: {raw[:300]}")
-    return json.loads(m.group())
+    text = m.group()
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        # 不完全なJSONを修復して再試行
+        text = re.sub(r',\s*}', '}', text)
+        text = re.sub(r',\s*]', ']', text)
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            # それでも失敗したら最小限のデータを返す
+            today = datetime.now(JST).date().isoformat()
+            now = datetime.now(JST).strftime("%H:%M")
+            return {
+                "date": today,
+                "generated_at": now,
+                "summary": "JSON解析エラー — 再実行してください",
+                "themes": [],
+                "market_data": {}
+            }
 
 def save(filename, data):
     p = DATA / filename
