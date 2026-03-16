@@ -56,7 +56,8 @@ jobs:
         run: |
           TEMP=$(mktemp -d)
           cp index.html "$TEMP/"
-          cp -r data/ "$TEMP/data/"
+          mkdir -p "$TEMP/data"
+          cp -r data/. "$TEMP/data/"
           cd "$TEMP"
           git init
           git config user.name "github-actions[bot]"
