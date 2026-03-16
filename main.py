@@ -113,7 +113,24 @@ def run_600(today):
     now = datetime.now(JST).strftime("%H:%M")
     ymd = today.strftime("%Y年%m月%d日")
 
-    prompt = f"""あなたは株式アナリストです。{ymd}の東証相場予測を行ってください。
+    prompt = f"""IMPORTANT: Return ONLY valid JSON. No explanation. No markdown. Just JSON.
+
+Today is {ymd}. Predict Tokyo Stock Exchange themes for today.
+
+Return this exact JSON structure:
+{{
+  "date": "{iso}",
+  "session": "600",
+  "generated_at": "{now}",
+  "market_data": {{"us_stocks": {{"sp500": "value", "nasdaq": "value", "dow": "value"}}, "futures": {{"nikkei225": "value"}}, "forex": {{"usdjpy": "value"}}, "bonds": {{"vix": "value"}}, "key_news": [{{"title": "news", "impact": "high", "detail": "detail"}}]}},
+  "themes": [{{"rank": 1, "name": "theme", "confidence_score": 85, "rationale": "reason", "key_stocks": [{{"name": "stock", "code": "code", "reason": "reason"}}], "risk_factors": "risk", "us_connection": "connection"}}],
+  "big_picture": "key factor today",
+  "summary": "market outlook"
+}}
+
+学習データ: {ctx}
+Return 6-8 themes. ONLY JSON, nothing else.
+
 
 学習データ: {ctx}
 
