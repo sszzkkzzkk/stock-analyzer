@@ -57,7 +57,13 @@ jobs:
           TEMP=$(mktemp -d)
           cp index.html "$TEMP/"
           mkdir -p "$TEMP/data"
-          cp -r data/. "$TEMP/data/"
+          for f in latest_600.json latest_905.json latest_1535.json accuracy_log.json; do
+            if [ -f "data/$f" ]; then
+              cp "data/$f" "$TEMP/data/$f"
+            elif [ -f "$f" ]; then
+              cp "$f" "$TEMP/data/$f"
+            fi
+          done
           cd "$TEMP"
           git init
           git config user.name "github-actions[bot]"
