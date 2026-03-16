@@ -1,8 +1,0 @@
-[
-  { "date": "2025-03-10", "accuracy_score": 65, "strongest_theme": "銀行・金融", "weakest_theme": "小売・消費" },
-  { "date": "2025-03-11", "accuracy_score": 70, "strongest_theme": "AI・半導体", "weakest_theme": "不動産" },
-  { "date": "2025-03-12", "accuracy_score": 58, "strongest_theme": "資源・鉱山", "weakest_theme": "防衛・宇宙" },
-  { "date": "2025-03-13", "accuracy_score": 75, "strongest_theme": "輸出・自動車", "weakest_theme": "銀行・金融" },
-  { "date": "2025-03-14", "accuracy_score": 80, "strongest_theme": "AI・半導体", "weakest_theme": "資源・鉱山" },
-  { "date": "2025-03-17", "accuracy_score": 72, "strongest_theme": "AI・半導体", "weakest_theme": "銀行・金融" }
-]
