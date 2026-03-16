@@ -38,7 +38,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: 過去データを復元
+      - name: gh-pagesからデータ復元
         run: |
           git fetch origin gh-pages 2>/dev/null || true
           mkdir -p data
@@ -52,19 +52,17 @@ jobs:
           SESSION: ${{ github.event.inputs.session }}
         run: python main.py
 
+      - name: データ確認
+        run: |
+          echo "=== latest_600.json ==="
+          cat data/latest_600.json | head -3
+
       - name: GitHub Pagesに公開
         run: |
-          git add data/
-          git stash
-          git fetch origin gh-pages 2>/dev/null || true
           TEMP=$(mktemp -d)
           cp index.html "$TEMP/"
-          mkdir -p "$TEMP/data"
-          git stash pop
-          cp data/latest_600.json "$TEMP/data/" 2>/dev/null || true
-          cp data/latest_905.json "$TEMP/data/" 2>/dev/null || true
-          cp data/latest_1535.json "$TEMP/data/" 2>/dev/null || true
-          cp data/accuracy_log.json "$TEMP/data/" 2>/dev/null || true
+          cp -r data "$TEMP/data"
+          ls -la "$TEMP/data/"
           cd "$TEMP"
           git init
           git config user.name "github-actions[bot]"
