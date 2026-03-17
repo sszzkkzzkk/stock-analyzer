@@ -206,6 +206,10 @@ def normalize_market_items(items):
     return out
 
 
+def is_complete_quote(item):
+    return bool(item.get("name") and item.get("value") and item.get("change") and item.get("time"))
+
+
 def extract_market_from_mobile_top(lines, source_name):
     candidates = {
         "indices": [],
@@ -329,12 +333,16 @@ def fetch_kabutan_home():
 
             if source_name == "mobile":
                 mobile = extract_market_from_mobile_top(lines, source_name)
-                all_indices.extend(mobile["indices"])
-                all_world.extend(mobile["world_indices"])
-                all_forex.extend(mobile["forex"])
+                valid_i = [x for x in mobile["indices"] if is_complete_quote(x)]
+                valid_w = [x for x in mobile["world_indices"] if is_complete_quote(x)]
+                valid_f = [x for x in mobile["forex"] if is_complete_quote(x)]
+
+                all_indices.extend(valid_i)
+                all_world.extend(valid_w)
+                all_forex.extend(valid_f)
 
                 search_results.append(
-                    f"{source_name}: 国内{len(mobile['indices'])}件 / 海外{len(mobile['world_indices'])}件 / 為替{len(mobile['forex'])}件"
+                    f"{source_name}: 国内{len(valid_i)}件 / 海外{len(valid_w)}件 / 為替{len(valid_f)}件"
                 )
             else:
                 desktop = extract_market_from_desktop_text(lines, source_name)
