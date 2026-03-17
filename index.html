@@ -20,7 +20,6 @@
       --warn: #f7b731;
       --danger-bg: rgba(255, 107, 107, 0.12);
       --danger-line: rgba(255, 107, 107, 0.35);
-      --radius: 18px;
     }
 
     * { box-sizing: border-box; }
@@ -35,7 +34,7 @@
     .wrap {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 14px;
     }
 
     .header {
@@ -44,7 +43,7 @@
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .brand {
@@ -54,8 +53,8 @@
     }
 
     .logo {
-      width: 46px;
-      height: 46px;
+      width: 44px;
+      height: 44px;
       border-radius: 12px;
       display: grid;
       place-items: center;
@@ -90,10 +89,10 @@
     }
 
     .status-banner {
-      margin-bottom: 12px;
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 14px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
       line-height: 1.6;
     }
 
@@ -106,104 +105,114 @@
     .hero {
       background: rgba(17,26,52,.96);
       border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 18px;
-      margin-bottom: 14px;
-    }
-
-    .quote-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(160px, 1fr));
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .quote {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
+      border-radius: 20px;
       padding: 14px;
-      min-width: 0;
+      margin-bottom: 14px;
     }
-
-    .quote-name {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .quote-value {
-      font-size: 26px;
-      font-weight: 800;
-      line-height: 1.1;
-      word-break: break-word;
-    }
-
-    .quote-change {
-      margin-top: 6px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .quote-time {
-      margin-top: 6px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .good { color: var(--good); }
-    .bad { color: var(--bad); }
-    .warn { color: var(--warn); }
 
     .hero-main-grid {
       display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
+      grid-template-columns: 1.15fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .hero-mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .decision-card {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 16px;
+      border-radius: 14px;
+      padding: 12px;
+      min-width: 0;
     }
 
     .decision-label {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .decision-main {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 800;
-      line-height: 1.4;
+      line-height: 1.35;
+      word-break: break-word;
     }
 
     .decision-sub {
-      margin-top: 10px;
+      margin-top: 8px;
       color: var(--muted);
-      line-height: 1.7;
-      font-size: 14px;
+      line-height: 1.6;
+      font-size: 13px;
+      word-break: break-word;
     }
 
     .stance-chip {
       display: inline-block;
-      padding: 7px 10px;
+      padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid var(--line);
       background: var(--chip);
       font-size: 12px;
-      margin-right: 8px;
-      margin-top: 8px;
+      margin-right: 6px;
+      margin-top: 6px;
     }
 
-    .hero-bottom-grid {
+    .quote-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
     }
+
+    .quote {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .quote-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+
+    .quote-name {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .quote-time {
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .quote-value {
+      font-size: 19px;
+      font-weight: 800;
+      line-height: 1.15;
+      word-break: break-word;
+    }
+
+    .quote-change {
+      margin-top: 4px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+    .warn { color: var(--warn); }
 
     .tabs {
       display: flex;
@@ -231,8 +240,8 @@
       display: none;
       background: rgba(17,26,52,.96);
       border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 18px;
+      border-radius: 20px;
+      padding: 16px;
       margin-bottom: 16px;
     }
 
@@ -249,8 +258,8 @@
     .card {
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 16px;
+      border-radius: 16px;
+      padding: 14px;
       min-width: 0;
     }
 
@@ -267,7 +276,7 @@
     .item {
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 14px;
+      border-radius: 12px;
       padding: 12px;
     }
 
@@ -315,8 +324,8 @@
 
     .empty {
       border: 1px dashed var(--line);
-      border-radius: 14px;
-      padding: 18px;
+      border-radius: 12px;
+      padding: 16px;
       text-align: center;
       color: var(--muted);
     }
@@ -324,7 +333,7 @@
     .table-wrap {
       overflow: auto;
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 12px;
     }
 
     table {
@@ -378,19 +387,19 @@
     }
 
     @media (max-width: 900px) {
-      .quote-grid,
       .hero-main-grid,
-      .hero-bottom-grid,
+      .hero-mini-grid,
+      .quote-grid,
       .grid.two,
       .grid.three {
         grid-template-columns: 1fr;
       }
 
-      .quote-value {
-        font-size: 24px;
+      .decision-main {
+        font-size: 18px;
       }
 
-      .decision-main {
+      .quote-value {
         font-size: 18px;
       }
     }
@@ -628,23 +637,6 @@
       els.heroPanel.innerHTML = `
         ${failedBanner}
 
-        <div class="quote-grid">
-          ${quotes.length ? quotes.map(item => `
-            <div class="quote">
-              <div class="quote-name">${esc(item.name || "-")}</div>
-              <div class="quote-value">${esc(item.value || "—")}</div>
-              <div class="quote-change ${quoteClass(item.change)}">${esc(item.change || "—")} ${esc(item.percent || "")}</div>
-              <div class="quote-time">${esc(item.time || "")}</div>
-            </div>
-          `).join("") : `
-            <div class="quote">
-              <div class="quote-name">主要指標</div>
-              <div class="quote-value">—</div>
-              <div class="quote-change warn">未取得</div>
-            </div>
-          `}
-        </div>
-
         <div class="hero-main-grid">
           <div class="decision-card">
             <div class="decision-label">今日の相場判定</div>
@@ -663,13 +655,13 @@
           </div>
 
           <div class="decision-card">
-            <div class="decision-label">本命監視銘柄3つ</div>
+            <div class="decision-label">本命監視銘柄</div>
             <div class="decision-main">${esc(topStocks.join(" / ") || "なし")}</div>
-            <div class="decision-sub">本命と連想1軍を優先表示</div>
+            <div class="decision-sub">先導株と連想1軍を優先</div>
           </div>
         </div>
 
-        <div class="hero-bottom-grid">
+        <div class="hero-mini-grid">
           <div class="decision-card">
             <div class="decision-label">今日はやらないこと</div>
             <div class="decision-sub">${arr(d600.skip_conditions).map(esc).join("<br>") || "なし"}</div>
@@ -679,6 +671,27 @@
             <div class="decision-label">危険パターン</div>
             <div class="decision-sub">${arr(d600.danger_patterns).map(esc).join("<br>") || "なし"}</div>
           </div>
+        </div>
+
+        <div class="quote-grid">
+          ${quotes.length ? quotes.map(item => `
+            <div class="quote">
+              <div class="quote-head">
+                <div class="quote-name">${esc(item.name || "-")}</div>
+                <div class="quote-time">${esc(item.time || "")}</div>
+              </div>
+              <div class="quote-value">${esc(item.value || "—")}</div>
+              <div class="quote-change ${quoteClass(item.change)}">${esc(item.change || "—")} ${esc(item.percent || "")}</div>
+            </div>
+          `).join("") : `
+            <div class="quote">
+              <div class="quote-head">
+                <div class="quote-name">主要指標</div>
+              </div>
+              <div class="quote-value">—</div>
+              <div class="quote-change warn">未取得</div>
+            </div>
+          `}
         </div>
       `;
     }
