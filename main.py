@@ -1,7 +1,6 @@
 """
 株式AI自動分析 v5
 SESSION=600 / 905 / 1535
-データソース: かぶたん + NHK + ロイター
 """
 import os, sys, json, re, time
 from datetime import datetime, timezone, timedelta
@@ -48,7 +47,7 @@ def parse_json(raw):
             return {
                 "date": datetime.now(JST).date().isoformat(),
                 "generated_at": datetime.now(JST).strftime("%H:%M"),
-                "summary": "JSON解析エラー — 再実行してください",
+                "summary": "JSON解析エラー",
                 "themes": [], "market_data": {}, "data_sources": []
             }
 
@@ -74,7 +73,7 @@ def load_learning_ctx():
     for r in recent[-3:]: hints.extend(r.get("improvement_hints", []))
     return f"過去{len(recent)}日平均精度:{avg:.0f}点 的中:{','.join(strong[:2])} 外れ:{','.join(weak[:2])} ヒント:{' / '.join(hints[-2:])}"
 
-H = {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15", "Accept-Language": "ja"}
+H = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36", "Accept-Language": "ja,en;q=0.9"}
 
 def fetch_kabutan():
     result = {
@@ -83,178 +82,34 @@ def fetch_kabutan():
         "volume_surge": [], "themes": [], "news": [],
         "source": "kabutan.jp"
     }
-    
+
     urls_to_check = [
-        "https://kabutan.jp/news/?b=n1",
-        "https://kabutan.jp/stock/ranking/?type=increase_rate&market=1",
-        "https://kabutan.jp/stock/ranking/?type=decrease_rate&market=1",
-        "https://kabutan.jp/stock/ranking/?type=volume&market=1",
-        "https://kabutan.jp/theme/",
+        ("news", "https://kabutan.jp/news/?b=n1"),
+        ("gainers", "https://kabutan.jp/stock/ranking/?type=increase_rate&market=1"),
+        ("losers", "https://kabutan.jp/stock/ranking/?type=decrease_rate&market=1"),
+        ("volume", "https://kabutan.jp/stock/ranking/?type=volume&market=1"),
+        ("theme", "https://kabutan.jp/theme/"),
+        ("sector", "https://kabutan.jp/market/sector/"),
     ]
-    
-    for url in urls_to_check:
+
+    for key, url in urls_to_check:
         try:
             r = requests.get(url, headers=H, timeout=15)
             soup = BeautifulSoup(r.text, "html.parser")
-            print(f"\n=== {url} (status:{r.status_code}) ===")
+            print(f"\n=== {key} (status:{r.status_code}) ===")
             for i, t in enumerate(soup.find_all("table")[:5]):
                 cls = t.get("class", [])
                 rows = t.find_all("tr")
                 print(f"  table[{i}] class={cls} rows={len(rows)}")
                 if rows and len(rows) > 1:
                     print(f"  row1: {rows[1].get_text(strip=True)[:80]}")
-            for tag in ["div.news_list", "ul.news", "div.rankingTable"]:
-                items = soup.select(tag)
-                if items:
-                    print(f"  {tag}: {len(items)}件")
             time.sleep(1)
         except Exception as e:
-            print(f"エラー {url}: {e}")
-    
-    return result
-
-    try:
-        r = requests.get("https://kabutan.jp/market/", headers=H, timeout=15)
-        soup = BeautifulSoup(r.text, "html.parser")
-        
-        # 国内指数
-        for row in soup.select("table.market_index tr")[:10]:
-            cols = row.select("td")
-            if len(cols) >= 3:
-                result["indices"].append({
-                    "name": cols[0].get_text(strip=True),
-                    "price": cols[1].get_text(strip=True),
-                    "change": cols[2].get_text(strip=True)
-                })
-        
-        # 海外指数
-        for row in soup.select("table.world_index tr")[:10]:
-            cols = row.select("td")
-            if len(cols) >= 3:
-                result["world_indices"].append({
-                    "name": cols[0].get_text(strip=True),
-                    "price": cols[1].get_text(strip=True),
-                    "change": cols[2].get_text(strip=True)
-                })
-        
-        # 為替
-        for row in soup.select("table.forex tr")[:8]:
-            cols = row.select("td")
-            if len(cols) >= 2:
-                result["forex"].append({
-                    "pair": cols[0].get_text(strip=True),
-                    "rate": cols[1].get_text(strip=True)
-                })
-        
-        print(f"かぶたん市場データ: 国内{len(result['indices'])}件 海外{len(result['world_indices'])}件 為替{len(result['forex'])}件")
-        time.sleep(1)
-    except Exception as e:
-        print(f"かぶたん市場エラー: {e}")
-
-    # 業種別騰落
-    try:
-        r = requests.get("https://kabutan.jp/market/sector/", headers=H, timeout=15)
-        soup = BeautifulSoup(r.text, "html.parser")
-        for row in soup.select("table tr")[1:35]:
-            cols = row.select("td")
-            if len(cols) >= 3:
-                result["sector"].append({
-                    "name": cols[0].get_text(strip=True),
-                    "change": cols[1].get_text(strip=True),
-                    "change_pct": cols[2].get_text(strip=True)
-                })
-        print(f"かぶたん業種: {len(result['sector'])}件")
-        time.sleep(1)
-    except Exception as e:
-        print(f"かぶたん業種エラー: {e}")
-
-    # 値上がりランキング
-    try:
-        r = requests.get("https://kabutan.jp/stock/ranking/?type=increase_rate", headers=H, timeout=15)
-        soup = BeautifulSoup(r.text, "html.parser")
-        for row in soup.select("table.stock_ranking tr")[1:21]:
-            cols = row.select("td")
-            if len(cols) >= 4:
-                result["top_gainers"].append({
-                    "code": cols[0].get_text(strip=True),
-                    "name": cols[1].get_text(strip=True),
-                    "price": cols[2].get_text(strip=True),
-                    "change": cols[3].get_text(strip=True)
-                })
-        print(f"かぶたん値上がり: {len(result['top_gainers'])}件")
-        time.sleep(1)
-    except Exception as e:
-        print(f"かぶたん値上がりエラー: {e}")
-
-    # 値下がりランキング
-    try:
-        r = requests.get("https://kabutan.jp/stock/ranking/?type=decrease_rate", headers=H, timeout=15)
-        soup = BeautifulSoup(r.text, "html.parser")
-        for row in soup.select("table.stock_ranking tr")[1:11]:
-            cols = row.select("td")
-            if len(cols) >= 4:
-                result["top_losers"].append({
-                    "code": cols[0].get_text(strip=True),
-                    "name": cols[1].get_text(strip=True),
-                    "price": cols[2].get_text(strip=True),
-                    "change": cols[3].get_text(strip=True)
-                })
-        print(f"かぶたん値下がり: {len(result['top_losers'])}件")
-        time.sleep(1)
-    except Exception as e:
-        print(f"かぶたん値下がりエラー: {e}")
-
-    # 出来高急増
-    try:
-        r = requests.get("https://kabutan.jp/stock/ranking/?type=volume_increase", headers=H, timeout=15)
-        soup = BeautifulSoup(r.text, "html.parser")
-        for row in soup.select("table.stock_ranking tr")[1:16]:
-            cols = row.select("td")
-            if len(cols) >= 4:
-                result["volume_surge"].append({
-                    "code": cols[0].get_text(strip=True),
-                    "name": cols[1].get_text(strip=True),
-                    "price": cols[2].get_text(strip=True),
-                    "change": cols[3].get_text(strip=True)
-                })
-        print(f"かぶたん出来高: {len(result['volume_surge'])}件")
-        time.sleep(1)
-    except Exception as e:
-        print(f"かぶたん出来高エラー: {e}")
-
-    # テーマ別ランキング
-    try:
-        r = requests.get("https://kabutan.jp/theme/", headers=H, timeout=15)
-        soup = BeautifulSoup(r.text, "html.parser")
-        for row in soup.select("table tr")[1:21]:
-            cols = row.select("td")
-            if len(cols) >= 2:
-                result["themes"].append({
-                    "name": cols[0].get_text(strip=True),
-                    "change": cols[1].get_text(strip=True) if len(cols) > 1 else ""
-                })
-        print(f"かぶたんテーマ: {len(result['themes'])}件")
-        time.sleep(1)
-    except Exception as e:
-        print(f"かぶたんテーマエラー: {e}")
-
-    # ニュース
-    try:
-        r = requests.get("https://kabutan.jp/news/", headers=H, timeout=15)
-        soup = BeautifulSoup(r.text, "html.parser")
-        for item in soup.select("div.news_list li, table.news tr")[:15]:
-            text = item.get_text(strip=True)
-            if len(text) > 10:
-                result["news"].append(text[:100])
-        print(f"かぶたんニュース: {len(result['news'])}件")
-        time.sleep(1)
-    except Exception as e:
-        print(f"かぶたんニュースエラー: {e}")
+            print(f"エラー {key}: {e}")
 
     return result
 
 def fetch_nhk_news():
-    """NHKニュースから重要ニュースを取得"""
     news = []
     try:
         r = requests.get("https://www3.nhk.or.jp/news/catnew.html", headers=H, timeout=15)
@@ -269,7 +124,6 @@ def fetch_nhk_news():
     return news
 
 def fetch_reuters_news():
-    """ロイター日本語版からニュースを取得"""
     news = []
     try:
         r = requests.get("https://jp.reuters.com/news/archive/businessNews", headers=H, timeout=15)
@@ -284,11 +138,9 @@ def fetch_reuters_news():
     return news
 
 def build_data_sources_summary(kabutan, nhk, reuters):
-    """何を見て分析したかのサマリーを生成"""
     sources = []
     if kabutan.get("indices"): sources.append(f"かぶたん国内指数{len(kabutan['indices'])}件")
     if kabutan.get("world_indices"): sources.append(f"かぶたん海外指数{len(kabutan['world_indices'])}件")
-    if kabutan.get("forex"): sources.append(f"為替{len(kabutan['forex'])}件")
     if kabutan.get("sector"): sources.append(f"業種別騰落{len(kabutan['sector'])}件")
     if kabutan.get("top_gainers"): sources.append(f"値上がり{len(kabutan['top_gainers'])}件")
     if kabutan.get("top_losers"): sources.append(f"値下がり{len(kabutan['top_losers'])}件")
@@ -298,7 +150,6 @@ def build_data_sources_summary(kabutan, nhk, reuters):
     if nhk: sources.append(f"NHKニュース{len(nhk)}件")
     if reuters: sources.append(f"ロイター{len(reuters)}件")
     return sources
-
 def run_600(today):
     ctx = load_learning_ctx()
     iso = today.isoformat()
@@ -314,24 +165,9 @@ def run_600(today):
     prompt = f"""IMPORTANT: Return ONLY valid JSON. No explanation. No markdown. Just JSON.
 
 Today is {ymd}. You are a Japanese stock market analyst.
-Analyze the following real market data and predict today's TSE themes.
+Based on your knowledge, predict today's TSE themes.
 
-=== MARKET DATA (kabutan.jp) ===
-Domestic Indices: {json.dumps(kabutan['indices'][:8], ensure_ascii=False)}
-World Indices: {json.dumps(kabutan['world_indices'][:8], ensure_ascii=False)}
-Forex: {json.dumps(kabutan['forex'][:6], ensure_ascii=False)}
-Sector Performance: {json.dumps(kabutan['sector'][:20], ensure_ascii=False)}
-Top Gainers: {json.dumps(kabutan['top_gainers'][:15], ensure_ascii=False)}
-Volume Surge: {json.dumps(kabutan['volume_surge'][:10], ensure_ascii=False)}
-Hot Themes: {json.dumps(kabutan['themes'][:15], ensure_ascii=False)}
-Market News: {json.dumps(kabutan['news'][:10], ensure_ascii=False)}
-
-=== NEWS ===
-NHK: {json.dumps(nhk[:8], ensure_ascii=False)}
-Reuters: {json.dumps(reuters[:8], ensure_ascii=False)}
-
-=== LEARNING DATA ===
-{ctx}
+Learning data: {ctx}
 
 Return this JSON (6-8 themes, descending confidence):
 {{
@@ -343,7 +179,6 @@ Return this JSON (6-8 themes, descending confidence):
     "indices": {json.dumps(kabutan['indices'][:6], ensure_ascii=False)},
     "world_indices": {json.dumps(kabutan['world_indices'][:6], ensure_ascii=False)},
     "forex": {json.dumps(kabutan['forex'][:4], ensure_ascii=False)},
-    "sector_top3": {json.dumps(sorted(kabutan['sector'], key=lambda x: x.get('change',''), reverse=True)[:3] if kabutan['sector'] else [], ensure_ascii=False)},
     "key_news": ["ニュース1", "ニュース2", "ニュース3"]
   }},
   "themes": [
@@ -489,7 +324,6 @@ ONLY JSON."""
     else: logs.append(entry)
     save("accuracy_log.json", logs[-90:])
     return result
-
 if __name__ == "__main__":
     now_jst = datetime.now(JST)
     today = now_jst.date()
