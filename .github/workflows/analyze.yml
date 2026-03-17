@@ -1,0 +1,135 @@
+name: 株式AI自動分析
+
+on:
+  schedule:
+    - cron: "0 21 * * 0-4"   # JST 06:00
+    - cron: "10 0 * * 1-5"   # JST 09:10
+    - cron: "0 3 * * 1-5"    # JST 12:00
+    - cron: "35 6 * * 1-5"   # JST 15:35
+  workflow_dispatch:
+    inputs:
+      session:
+        description: "600 or 905 or 1200 or 1535"
+        required: true
+        default: "600"
+        type: choice
+        options:
+          - "600"
+          - "905"
+          - "1200"
+          - "1535"
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: install deps
+        run: pip install -r requirements.txt
+
+      - name: git config
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: prepare gh-pages worktree
+        run: |
+          git fetch origin gh-pages || true
+
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git worktree add gh-pages-worktree origin/gh-pages
+          else
+            git checkout --orphan gh-pages
+            git rm -rf . || true
+            echo "<!DOCTYPE html><html><body>init</body></html>" > index.html
+            mkdir -p data
+            touch .nojekyll
+            git add .
+            git commit -m "init gh-pages"
+            git push origin gh-pages
+            git checkout main
+            git worktree add gh-pages-worktree origin/gh-pages
+          fi
+
+      - name: restore data from gh-pages
+        run: |
+          mkdir -p data
+          if [ -d gh-pages-worktree/data ]; then
+            cp -r gh-pages-worktree/data/. data/ 2>/dev/null || true
+          fi
+
+      - name: decide session
+        id: session
+        run: |
+          if [ -n "${{ github.event.inputs.session }}" ]; then
+            echo "session=${{ github.event.inputs.session }}" >> "$GITHUB_OUTPUT"
+          else
+            HM=$(TZ='Asia/Tokyo' date +%H%M)
+
+            if [ "$HM" -lt 700 ]; then
+              echo "session=600" >> "$GITHUB_OUTPUT"
+            elif [ "$HM" -lt 1130 ]; then
+              echo "session=905" >> "$GITHUB_OUTPUT"
+            elif [ "$HM" -lt 1300 ]; then
+              echo "session=1200" >> "$GITHUB_OUTPUT"
+            else
+              echo "session=1535" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+      - name: run analyzer
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SESSION: ${{ steps.session.outputs.session }}
+        run: python main.py
+
+      - name: inspect generated files
+        run: |
+          echo "=== data files ==="
+          ls -la data || true
+
+          echo "=== latest_600.json ==="
+          test -f data/latest_600.json && head -40 data/latest_600.json || true
+
+          echo "=== latest_905.json ==="
+          test -f data/latest_905.json && head -40 data/latest_905.json || true
+
+          echo "=== latest_1200.json ==="
+          test -f data/latest_1200.json && head -40 data/latest_1200.json || true
+
+          echo "=== latest_1535.json ==="
+          test -f data/latest_1535.json && head -40 data/latest_1535.json || true
+
+          echo "=== review_log.json ==="
+          test -f data/review_log.json && head -40 data/review_log.json || true
+
+      - name: copy publish files to gh-pages
+        run: |
+          rm -rf gh-pages-worktree/*
+          cp index.html gh-pages-worktree/index.html
+          mkdir -p gh-pages-worktree/data
+          cp -r data/. gh-pages-worktree/data/
+          touch gh-pages-worktree/.nojekyll
+
+      - name: commit and push gh-pages
+        run: |
+          cd gh-pages-worktree
+          git add index.html data .nojekyll
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "update site data: ${{ steps.session.outputs.session }}"
+          git push origin HEAD:gh-pages
