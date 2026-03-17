@@ -196,13 +196,15 @@ def yahoo_quote(symbol, label):
 
         change = round(float(price) - float(prev), 2)
         sign = "+" if change >= 0 else ""
+        pct = round((change / float(prev)) * 100, 2) if float(prev) != 0 else 0
+        pct_sign = "+" if pct >= 0 else ""
         jst_time = datetime.fromtimestamp(int(market_time), JST).strftime("%H:%M")
 
         return {
             "name": label,
             "value": f"{float(price):,.2f}",
             "change": f"{sign}{change:,.2f}",
-            "percent": "",
+            "percent": f"{pct_sign}{pct:.2f}%",
             "time": jst_time,
             "source": f"Yahoo Finance:{symbol}",
         }
@@ -303,14 +305,14 @@ def fetch_kabutan_theme_news():
             t = clean_text(a.get_text(" ", strip=True))
             if 2 <= len(t) <= 30:
                 theme_candidates.append(t)
-        result["themes"] = list(dict.fromkeys(theme_candidates))[:10]
+        result["themes"] = list(dict.fromkeys(theme_candidates))[:12]
 
         news_candidates = []
         for a in soup.select("a[href]"):
             t = clean_text(a.get_text(" ", strip=True))
             if is_valid_news_text(t):
                 news_candidates.append(t)
-        result["news"] = list(dict.fromkeys(news_candidates))[:12]
+        result["news"] = list(dict.fromkeys(news_candidates))[:14]
 
     except Exception as e:
         print(f"kabutan home error: {e}")
@@ -395,9 +397,40 @@ def fetch_reuters_news():
     return news[:10]
 
 
+def classify_news(news_items):
+    classified = {
+        "macro": [],
+        "industry": [],
+        "stock_specific": [],
+        "supply_demand": [],
+        "noise": [],
+    }
+
+    for text in news_items:
+        t = clean_text(text)
+        lower = t.lower()
+
+        if any(k in t for k in ["米国", "金利", "FOMC", "雇用", "CPI", "為替", "原油", "地政学", "中東", "関税"]):
+            classified["macro"].append(t)
+        elif any(k in t for k in ["半導体", "AI", "電力", "防衛", "資源", "原油", "量子", "データセンター"]):
+            classified["industry"].append(t)
+        elif any(k in t for k in ["上方修正", "受注", "提携", "承認", "決算", "受賞", "新製品"]):
+            classified["stock_specific"].append(t)
+        elif any(k in lower for k in ["自社株", "増担", "売り禁", "大量保有", "需給", "ストップ高", "出来高"]):
+            classified["supply_demand"].append(t)
+        else:
+            classified["noise"].append(t)
+
+    for k in classified:
+        classified[k] = list(dict.fromkeys(classified[k]))[:6]
+
+    return classified
+
+
 def fetch_all_market_data():
     strict = fetch_strict_market_quotes()
     kabu = fetch_kabutan_theme_news()
+    combined_news = kabu["news"]
 
     result = {
         "indices": strict["indices"],
@@ -411,7 +444,8 @@ def fetch_all_market_data():
         "top_losers": kabu["top_losers"],
         "volume_surge": kabu["volume_surge"],
         "themes": kabu["themes"],
-        "news": kabu["news"],
+        "news": combined_news,
+        "classified_news": classify_news(combined_news),
         "search_results": strict["search_results"],
         "source": "Yahoo Finance + kabutan.jp",
     }
@@ -463,14 +497,13 @@ def build_data_sources_summary(market, nhk, reuters):
     return sources
 
 
-def build_trader_focus_from_decision(result):
-    decision = result.get("decision", {}) or {}
-    strong = result.get("strong_themes", []) or []
+def build_trader_focus_from_strategy(result):
+    strategy = result.get("strategy", {}) or {}
     watch = result.get("watchlist", []) or []
 
     result["trader_focus"] = {
-        "headline": decision.get("conclusion", "") or result.get("summary", ""),
-        "top_themes": [x.get("name", "") for x in strong[:3] if x.get("name")],
+        "headline": strategy.get("conclusion", "") or result.get("summary", ""),
+        "top_themes": [x.get("name", "") for x in result.get("priority_themes", [])[:3] if x.get("name")],
         "top_stocks": [
             {
                 "name": x.get("name", ""),
@@ -489,44 +522,40 @@ def validate_600_analysis_json(obj):
         raise ValueError("rootがdictではありません")
 
     required = [
-        "decision",
-        "strong_themes",
-        "weak_themes",
+        "strategy",
+        "priority_themes",
+        "avoid_themes",
         "watchlist",
-        "action_plan",
-        "risk_notes",
+        "entry_conditions",
+        "skip_conditions",
+        "danger_patterns",
     ]
     for k in required:
         if k not in obj:
             raise ValueError(f"必須キー不足: {k}")
 
-    decision = obj.get("decision")
-    if not isinstance(decision, dict):
-        raise ValueError("decisionがdictではありません")
+    strategy = obj.get("strategy")
+    if not isinstance(strategy, dict):
+        raise ValueError("strategyがdictではありません")
 
-    for k in ["stance", "market_tone", "trading_style", "conclusion"]:
-        if k not in decision:
-            raise ValueError(f"decision 必須キー不足: {k}")
+    for k in ["market_regime", "market_regime_label", "entry_style", "entry_style_label", "danger_level", "conclusion"]:
+        if k not in strategy:
+            raise ValueError(f"strategy 必須キー不足: {k}")
 
-    if decision["stance"] not in ["攻めやすい", "慎重", "見送り寄り"]:
-        raise ValueError("stanceが規定値外です")
+    if strategy["market_regime"] not in ["attack", "selective", "avoid"]:
+        raise ValueError("market_regimeが規定値外です")
+    if strategy["market_regime_label"] not in ["攻めやすい", "選別相場", "見送り寄り"]:
+        raise ValueError("market_regime_labelが規定値外です")
+    if strategy["entry_style"] not in ["breakout", "pullback", "rebound", "skip"]:
+        raise ValueError("entry_styleが規定値外です")
+    if strategy["entry_style_label"] not in ["初動ブレイク狙い", "寄り後押し目待ち", "リバ狙い", "見送り"]:
+        raise ValueError("entry_style_labelが規定値外です")
+    if strategy["danger_level"] not in ["低", "中", "高"]:
+        raise ValueError("danger_levelが規定値外です")
 
-    if decision["market_tone"] not in ["強め", "中立", "弱め"]:
-        raise ValueError("market_toneが規定値外です")
-
-    if decision["trading_style"] not in ["順張り向き", "様子見寄り", "個別材料だけ見る日"]:
-        raise ValueError("trading_styleが規定値外です")
-
-    if not isinstance(obj.get("strong_themes"), list):
-        raise ValueError("strong_themesがlistではありません")
-    if not isinstance(obj.get("weak_themes"), list):
-        raise ValueError("weak_themesがlistではありません")
-    if not isinstance(obj.get("watchlist"), list):
-        raise ValueError("watchlistがlistではありません")
-    if not isinstance(obj.get("action_plan"), list):
-        raise ValueError("action_planがlistではありません")
-    if not isinstance(obj.get("risk_notes"), list):
-        raise ValueError("risk_notesがlistではありません")
+    for key in ["priority_themes", "avoid_themes", "watchlist", "entry_conditions", "skip_conditions", "danger_patterns"]:
+        if not isinstance(obj.get(key), list):
+            raise ValueError(f"{key}がlistではありません")
 
     return True
 
@@ -541,40 +570,52 @@ def build_analysis_prompt_600(today_str, learning_ctx, market, key_news):
         "top_gainers": market["top_gainers"][:8],
         "top_losers": market["top_losers"][:8],
         "volume_surge": market["volume_surge"][:6],
-        "recent_themes": market["themes"][:8],
-        "key_news": key_news[:8],
+        "recent_themes": market["themes"][:10],
+        "news": key_news[:10],
+        "classified_news": market["classified_news"],
     }
 
     schema = {
-        "decision": {
-            "stance": "攻めやすい",
-            "market_tone": "強め",
-            "trading_style": "順張り向き",
+        "strategy": {
+            "market_regime": "selective",
+            "market_regime_label": "選別相場",
+            "entry_style": "pullback",
+            "entry_style_label": "寄り後押し目待ち",
+            "danger_level": "中",
             "conclusion": "120字以内"
         },
-        "strong_themes": [
-            {"name": "半導体", "reason": "60字以内"}
+        "priority_themes": [
+            {"name": "半導体", "reason": "60字以内", "priority": "A"}
         ],
-        "weak_themes": [
+        "avoid_themes": [
             {"name": "材料小型", "reason": "60字以内"}
         ],
         "watchlist": [
-            {"role": "本命", "name": "銘柄名", "code": "1234", "reason": "50字以内"}
+            {
+                "bucket": "先導株",
+                "name": "銘柄名",
+                "code": "1234",
+                "reason": "50字以内",
+                "trigger": "50字以内",
+                "invalidation": "50字以内",
+                "time_window": "9:00-9:20"
+            }
         ],
-        "action_plan": ["寄りで飛び乗らない"],
-        "risk_notes": ["GUしすぎなら見送り"],
+        "entry_conditions": ["60字以内"],
+        "skip_conditions": ["60字以内"],
+        "danger_patterns": ["60字以内"],
         "summary": "160字以内"
     }
 
     return f"""
-You are a Japanese stock trader's personal morning assistant.
+You are a Japanese short-term stock trader's personal strategy assistant.
 Today is {today_str}.
 
 Purpose:
-- reduce hesitation
-- narrow what to watch
-- help skip dangerous days
-- output only practical trading judgment
+- reduce hesitation in the morning
+- decide what to watch
+- decide what not to do
+- define entry and skip conditions
 
 Learning context:
 {learning_ctx}
@@ -583,23 +624,26 @@ Market data:
 {json.dumps(compact_market, ensure_ascii=False)}
 
 Important priorities:
-- half semiconductor / AI / electric power / defense / geopolitics / oil-resources
-- then index heavyweights / supply-demand stocks / material small caps
+- priority high: 半導体 / AI / 電力 / 防衛 / 地政学 / 原油資源
+- priority mid: 指数寄与大型 / 材料小型 / 需給主導株
 
 Rules:
 - Return ONLY valid JSON
 - No markdown
 - No explanation outside JSON
 - Keep strings short
-- strong_themes: max 3
-- weak_themes: max 3
+- priority_themes: max 3
+- avoid_themes: max 3
 - watchlist: max 5
-- action_plan: max 3
-- risk_notes: max 3
-- watchlist roles should be chosen from 本命 / 次点 / 地合い確認用
-- stance must be one of: 攻めやすい / 慎重 / 見送り寄り
-- market_tone must be one of: 強め / 中立 / 弱め
-- trading_style must be one of: 順張り向き / 様子見寄り / 個別材料だけ見る日
+- entry_conditions: max 3
+- skip_conditions: max 3
+- danger_patterns: max 3
+- watchlist bucket should be one of: 先導株 / 連想1軍 / 連想2軍 / 危険株
+- market_regime must be one of: attack / selective / avoid
+- market_regime_label must be one of: 攻めやすい / 選別相場 / 見送り寄り
+- entry_style must be one of: breakout / pullback / rebound / skip
+- entry_style_label must be one of: 初動ブレイク狙い / 寄り後押し目待ち / リバ狙い / 見送り
+- danger_level must be one of: 低 / 中 / 高
 
 Required JSON schema:
 {json.dumps(schema, ensure_ascii=False)}
@@ -613,7 +657,7 @@ def run_claude_analysis_600(today, now, market, data_sources, key_news):
     today_str = today.strftime("%Y年%m月%d日")
     prompt = build_analysis_prompt_600(today_str, learning_ctx, market, key_news)
 
-    raw = call_claude(prompt, max_tokens=1800)
+    raw = call_claude(prompt, max_tokens=2200)
     save_text("claude_raw_600.txt", raw)
 
     parsed = parse_json(raw)
@@ -633,17 +677,19 @@ def run_claude_analysis_600(today, now, market, data_sources, key_news):
             "oil": market["oil"][:2],
             "search_results": market["search_results"][:10],
             "key_news": key_news[:10],
+            "classified_news": market["classified_news"],
         },
-        "decision": parsed["decision"],
-        "strong_themes": parsed["strong_themes"][:3],
-        "weak_themes": parsed["weak_themes"][:3],
+        "strategy": parsed["strategy"],
+        "priority_themes": parsed["priority_themes"][:3],
+        "avoid_themes": parsed["avoid_themes"][:3],
         "watchlist": parsed["watchlist"][:5],
-        "action_plan": parsed["action_plan"][:3],
-        "risk_notes": parsed["risk_notes"][:3],
+        "entry_conditions": parsed["entry_conditions"][:3],
+        "skip_conditions": parsed["skip_conditions"][:3],
+        "danger_patterns": parsed["danger_patterns"][:3],
         "summary": parsed.get("summary", ""),
     }
 
-    return build_trader_focus_from_decision(result)
+    return build_trader_focus_from_strategy(result)
 
 
 def build_analysis_failure_600(today, now, market, data_sources, key_news, reason):
@@ -661,50 +707,60 @@ def build_analysis_failure_600(today, now, market, data_sources, key_news, reaso
             "oil": market["oil"][:2],
             "search_results": market["search_results"][:10],
             "key_news": key_news[:10],
+            "classified_news": market["classified_news"],
         },
-        "decision": {
-            "stance": "慎重",
-            "market_tone": "中立",
-            "trading_style": "様子見寄り",
-            "conclusion": "AI分析に失敗したため、今日は無理に攻めず主要指標とニュース確認を優先。",
+        "strategy": {
+            "market_regime": "avoid",
+            "market_regime_label": "見送り寄り",
+            "entry_style": "skip",
+            "entry_style_label": "見送り",
+            "danger_level": "高",
+            "conclusion": "AI分析に失敗したため、今日は無理に攻めず主要指標とニュース確認を優先。"
         },
-        "strong_themes": [],
-        "weak_themes": [],
+        "priority_themes": [],
+        "avoid_themes": [],
         "watchlist": [],
-        "action_plan": ["無理に飛び乗らない", "主要指標確認を優先", "見送り寄り"],
-        "risk_notes": [f"AI分析失敗: {reason}"],
+        "entry_conditions": ["主要指標が揃っても分析失敗日は無理に入らない"],
+        "skip_conditions": ["AI分析失敗時は見送り寄り"],
+        "danger_patterns": [f"AI分析失敗: {reason}"],
         "summary": f"AI分析に失敗しました: {reason}",
         "analysis_status": "failed",
     }
 
 
-def build_analysis_prompt_905(today_str, theme_names, market, news):
+def build_analysis_prompt_905(today_str, morning_data, market, news):
     compact = {
-        "predicted_themes": theme_names[:3],
+        "morning_strategy": morning_data.get("strategy", {}),
+        "morning_priority_themes": morning_data.get("priority_themes", [])[:3],
+        "morning_watchlist": morning_data.get("watchlist", [])[:5],
         "top_gainers": market["top_gainers"][:10],
-        "volume_surge": market["volume_surge"][:6],
-        "recent_themes": market["themes"][:8],
-        "news": news[:8],
+        "volume_surge": market["volume_surge"][:8],
+        "recent_themes": market["themes"][:10],
+        "news": news[:10],
     }
 
     schema = {
-        "correction_memo": {
-            "actual_leader": "テーマ名",
-            "gap_from_morning": "80字以内",
-            "tradable_now": "80字以内",
-            "skip_or_not": "80字以内"
+        "action_judgement": {
+            "opening_state": "予測通りで継続監視",
+            "best_current_theme": "テーマ名",
+            "best_current_stock": "銘柄名",
+            "action_now": "80字以内",
+            "do_not_chase": "80字以内"
         },
+        "theme_status": [
+            {"name": "テーマ名", "type": "継続上昇型", "comment": "60字以内"}
+        ],
         "summary": "120字以内"
     }
 
     return f"""
-You are a Japanese stock trader's opening memo assistant.
+You are a Japanese short-term stock trader's opening action assistant.
 Today is {today_str} 9:05.
 
 Task:
-- make a short correction memo
-- do not write a report
-- focus on action correction only
+- decide what to do now
+- do not explain too much
+- prioritize action judgement
 
 Data:
 {json.dumps(compact, ensure_ascii=False)}
@@ -713,6 +769,11 @@ Rules:
 - Return ONLY valid JSON
 - No markdown
 - Keep strings short
+- theme_status max 4
+- opening_state should be one of:
+  予測通りで継続監視 / 予測より強く押し目待ち / 予測より弱く見送り / 予測外テーマ浮上 / 主役交代中
+- theme_status.type should be one of:
+  継続上昇型 / 寄り天警戒型 / 一発材料型 / 指数連動型
 
 Required JSON schema:
 {json.dumps(schema, ensure_ascii=False)}
@@ -723,34 +784,40 @@ Return ONLY JSON.
 
 def build_analysis_prompt_1535(today_str, pred_600, pred_905, market, news):
     compact = {
-        "morning_decision": pred_600.get("decision", {}),
-        "morning_strong_themes": pred_600.get("strong_themes", [])[:3],
-        "opening_correction": pred_905.get("correction_memo", {}) if pred_905 else {},
+        "morning_strategy": pred_600.get("strategy", {}),
+        "morning_priority_themes": pred_600.get("priority_themes", [])[:3],
+        "morning_watchlist": pred_600.get("watchlist", [])[:5],
+        "opening_action": pred_905.get("action_judgement", {}) if pred_905 else {},
         "top_gainers": market["top_gainers"][:10],
         "top_losers": market["top_losers"][:8],
-        "volume_surge": market["volume_surge"][:6],
+        "volume_surge": market["volume_surge"][:8],
         "recent_themes": market["themes"][:10],
-        "news": news[:8],
+        "news": news[:10],
     }
 
     schema = {
         "review": {
-            "actually_strong": ["テーマ1", "テーマ2"],
-            "morning_gap": "100字以内",
-            "easy_pattern": "80字以内",
-            "danger_pattern": "80字以内",
-            "next_note": "80字以内"
+            "actually_best_theme": "テーマ名",
+            "danger_theme_in_morning": "テーマ名",
+            "best_leader_stock": "銘柄名",
+            "weak_secondary_stock": "銘柄名",
+            "wrong_hypothesis": "100字以内",
+            "next_ban_rule": "80字以内",
+            "next_focus": "80字以内",
+            "theme_score": 0,
+            "execution_score": 0,
+            "skip_score": 0
         },
         "summary": "120字以内"
     }
 
     return f"""
-You are a Japanese stock trader's end-of-day review assistant.
+You are a Japanese short-term stock trader's end-of-day learning assistant.
 Today is {today_str} 15:35.
 
 Task:
-- write a short memo that helps tomorrow morning
-- focus on what was useful, dangerous, and what to note next day
+- create a practical learning memo
+- focus on what worked, what failed, and what to ban next
 
 Data:
 {json.dumps(compact, ensure_ascii=False)}
@@ -759,6 +826,7 @@ Rules:
 - Return ONLY valid JSON
 - No markdown
 - Keep strings short
+- scores must be integers between 0 and 100
 
 Required JSON schema:
 {json.dumps(schema, ensure_ascii=False)}
@@ -775,7 +843,7 @@ def run_600(today):
     nhk = fetch_nhk_news()
     reuters = fetch_reuters_news()
     data_sources = build_data_sources_summary(market, nhk, reuters)
-    key_news = (market["news"] + nhk + reuters)[:10]
+    key_news = (market["news"] + nhk + reuters)[:12]
 
     try:
         print("[6:00] Claude分析中...")
@@ -790,8 +858,8 @@ def run_600(today):
 
 
 def run_905(today):
-    pred = load("latest_600.json")
-    if not pred:
+    morning = load("latest_600.json")
+    if not morning:
         raise FileNotFoundError("latest_600.json なし")
 
     print("[9:05] データ収集中...")
@@ -804,11 +872,11 @@ def run_905(today):
     try:
         prompt = build_analysis_prompt_905(
             today_str,
-            [x.get("name", "") for x in pred.get("strong_themes", [])],
+            morning,
             market,
             market["news"] + nhk,
         )
-        raw = call_claude(prompt, max_tokens=1200)
+        raw = call_claude(prompt, max_tokens=1400)
         save_text("claude_raw_905.txt", raw)
         parsed = parse_json(raw)
 
@@ -817,7 +885,8 @@ def run_905(today):
             "session": "905",
             "generated_at": now,
             "data_sources": data_sources,
-            "correction_memo": parsed["correction_memo"],
+            "action_judgement": parsed["action_judgement"],
+            "theme_status": parsed["theme_status"][:4],
             "summary": parsed["summary"],
         }
     except Exception as e:
@@ -827,12 +896,14 @@ def run_905(today):
             "session": "905",
             "generated_at": now,
             "data_sources": data_sources,
-            "correction_memo": {
-                "actual_leader": "",
-                "gap_from_morning": "",
-                "tradable_now": "",
-                "skip_or_not": "",
+            "action_judgement": {
+                "opening_state": "予測より弱く見送り",
+                "best_current_theme": "",
+                "best_current_stock": "",
+                "action_now": "",
+                "do_not_chase": "",
             },
+            "theme_status": [],
             "summary": f"AI分析に失敗しました: {e}",
             "analysis_status": "failed",
         }
@@ -865,7 +936,7 @@ def run_1535(today):
             market,
             market["news"] + nhk + reuters,
         )
-        raw = call_claude(prompt, max_tokens=1200)
+        raw = call_claude(prompt, max_tokens=1400)
         save_text("claude_raw_1535.txt", raw)
         parsed = parse_json(raw)
 
@@ -886,11 +957,16 @@ def run_1535(today):
             "generated_at": now,
             "data_sources": data_sources,
             "review": {
-                "actually_strong": [],
-                "morning_gap": "",
-                "easy_pattern": "",
-                "danger_pattern": "",
-                "next_note": "",
+                "actually_best_theme": "",
+                "danger_theme_in_morning": "",
+                "best_leader_stock": "",
+                "weak_secondary_stock": "",
+                "wrong_hypothesis": "",
+                "next_ban_rule": "",
+                "next_focus": "",
+                "theme_score": 0,
+                "execution_score": 0,
+                "skip_score": 0,
             },
             "summary": f"AI分析に失敗しました: {e}",
             "analysis_status": "failed",
@@ -904,9 +980,12 @@ def run_1535(today):
     logs.append({
         "date": today.isoformat(),
         "usefulness": result.get("summary", ""),
-        "easy_pattern": review.get("easy_pattern", ""),
-        "danger_pattern": review.get("danger_pattern", ""),
-        "next_note": review.get("next_note", ""),
+        "easy_pattern": review.get("best_leader_stock", ""),
+        "danger_pattern": review.get("next_ban_rule", ""),
+        "next_note": review.get("next_focus", ""),
+        "theme_score": review.get("theme_score", 0),
+        "execution_score": review.get("execution_score", 0),
+        "skip_score": review.get("skip_score", 0),
     })
     save("review_log.json", logs[-90:])
     return result
