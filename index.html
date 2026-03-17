@@ -6,15 +6,18 @@
   <title>株式AI分析</title>
   <style>
     :root {
-      --bg: #0b1020;
-      --panel: #121933;
+      --bg: #09101f;
+      --panel: #111a34;
       --panel2: #182145;
       --text: #eef2ff;
       --muted: #9aa6c7;
-      --line: #2c396b;
+      --line: #2d3968;
       --accent: #6ea8fe;
       --accent2: #8b5cf6;
       --chip: #23305e;
+      --good: #31d158;
+      --bad: #ff6b6b;
+      --warn: #f7b731;
       --radius: 18px;
     }
 
@@ -23,12 +26,12 @@
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
-      background: linear-gradient(180deg, #07101d 0%, #0d1630 100%);
+      background: linear-gradient(180deg, #07101d 0%, #0c1530 100%);
       color: var(--text);
     }
 
     .wrap {
-      max-width: 1100px;
+      max-width: 1180px;
       margin: 0 auto;
       padding: 16px;
     }
@@ -49,8 +52,8 @@
     }
 
     .logo {
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       border-radius: 12px;
       display: grid;
       place-items: center;
@@ -96,7 +99,7 @@
     }
 
     .stat {
-      background: rgba(18,25,51,.95);
+      background: rgba(17,26,52,.96);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       padding: 14px;
@@ -113,6 +116,62 @@
       font-weight: 700;
       word-break: break-word;
     }
+
+    .hero {
+      background: rgba(17,26,52,.96);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .hero h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .quote {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .quote-name {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .quote-value {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+      word-break: break-word;
+    }
+
+    .quote-change {
+      margin-top: 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .quote-time {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+    .warn { color: var(--warn); }
 
     .tabs {
       display: flex;
@@ -138,7 +197,7 @@
 
     .panel {
       display: none;
-      background: rgba(18,25,51,.95);
+      background: rgba(17,26,52,.96);
       border: 1px solid var(--line);
       border-radius: 22px;
       padding: 18px;
@@ -246,6 +305,20 @@
       font-size: 12px;
     }
 
+    .search-box {
+      margin-bottom: 14px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel2);
+      color: var(--text);
+      font: inherit;
+    }
+
     .empty {
       border: 1px dashed var(--line);
       border-radius: 14px;
@@ -317,6 +390,7 @@
 
     @media (max-width: 900px) {
       .statusbar,
+      .hero-grid,
       .grid.two,
       .grid.three {
         grid-template-columns: 1fr;
@@ -324,6 +398,10 @@
 
       .kv {
         grid-template-columns: 1fr;
+      }
+
+      .quote-value {
+        font-size: 24px;
       }
     }
   </style>
@@ -360,6 +438,8 @@
       </div>
     </div>
 
+    <section class="hero" id="heroPanel"></section>
+
     <div class="tabs">
       <button class="tab active" data-tab="tab600">6:00 予測</button>
       <button class="tab" data-tab="tab905">9:05 確認</button>
@@ -384,6 +464,7 @@
       status600: document.getElementById("status600"),
       status905: document.getElementById("status905"),
       status1535: document.getElementById("status1535"),
+      heroPanel: document.getElementById("heroPanel"),
       tab600: document.getElementById("tab600"),
       tab905: document.getElementById("tab905"),
       tab1535: document.getElementById("tab1535"),
@@ -464,8 +545,14 @@
       `;
     }
 
-    function renderThemeCards(themes) {
-      const list = arr(themes);
+    function renderThemeCards(themes, keyword = "") {
+      let list = arr(themes);
+      if (keyword) {
+        list = list.filter(t =>
+          JSON.stringify(t).toLowerCase().includes(keyword.toLowerCase())
+        );
+      }
+
       if (!list.length) return `<div class="empty">テーマ予測がまだありません</div>`;
 
       return `
@@ -679,6 +766,65 @@
       el.textContent = `${data.date || "-"} ${data.generated_at || "-"}`;
     }
 
+    function quoteClass(change) {
+      const s = String(change || "");
+      if (s.startsWith("+")) return "good";
+      if (s.startsWith("-")) return "bad";
+      return "warn";
+    }
+
+    function firstMatchItem(data, names) {
+      const market = data?.market_data || {};
+      const merged = [
+        ...arr(market.indices),
+        ...arr(market.world_indices),
+        ...arr(market.forex),
+      ];
+      return merged.find(x => names.includes(x.name)) || null;
+    }
+
+    function renderHero(d600, d905, d1535) {
+      const base = d600 || d905 || d1535;
+      if (!base) {
+        els.heroPanel.innerHTML = `<div class="empty">速報データがまだありません</div>`;
+        return;
+      }
+
+      const nikkei = firstMatchItem(d600, ["日経平均"]);
+      const usdjpy = firstMatchItem(d600, ["米ドル円", "ドル円"]);
+      const nydow = firstMatchItem(d600, ["NYダウ", "ＮＹダウ"]);
+      const shanghai = firstMatchItem(d600, ["上海総合"]);
+
+      const cards = [nikkei, usdjpy, nydow, shanghai].map((item, idx) => {
+        const names = ["日経平均", "ドル円", "NYダウ", "上海総合"];
+        const fallback = names[idx];
+        if (!item) {
+          return `
+            <div class="quote">
+              <div class="quote-name">${esc(fallback)}</div>
+              <div class="quote-value">—</div>
+              <div class="quote-change warn">データなし</div>
+            </div>
+          `;
+        }
+        return `
+          <div class="quote">
+            <div class="quote-name">${esc(item.name || fallback)}</div>
+            <div class="quote-value">${esc(item.value || "—")}</div>
+            <div class="quote-change ${quoteClass(item.change)}">${esc(item.change || "—")} ${esc(item.percent || "")}</div>
+            <div class="quote-time">${esc(item.time || "")}</div>
+          </div>
+        `;
+      }).join("");
+
+      els.heroPanel.innerHTML = `
+        <h2>マーケット速報</h2>
+        <div class="hero-grid">
+          ${cards}
+        </div>
+      `;
+    }
+
     function render600(data) {
       if (!data) {
         els.tab600.innerHTML = `<div class="empty">6:00データがありません</div>`;
@@ -686,6 +832,7 @@
       }
 
       const market = data.market_data || {};
+
       els.tab600.innerHTML = `
         <div class="grid two">
           <div class="card">
@@ -701,6 +848,11 @@
             <h3>データソース</h3>
             ${chipList(data.data_sources)}
           </div>
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <h3>検索結果</h3>
+          ${renderSimpleList(market.search_results, "検索結果なし")}
         </div>
 
         <div class="grid three" style="margin-top:14px;">
@@ -729,9 +881,22 @@
 
         <div class="card" style="margin-top:14px;">
           <h3>予測テーマ</h3>
-          ${renderThemeCards(data.themes)}
+          <div class="search-box">
+            <input id="themeSearchInput" placeholder="テーマ・銘柄・根拠で検索">
+          </div>
+          <div id="themeSearchResult">
+            ${renderThemeCards(data.themes)}
+          </div>
         </div>
       `;
+
+      const themeInput = document.getElementById("themeSearchInput");
+      const resultBox = document.getElementById("themeSearchResult");
+      if (themeInput && resultBox) {
+        themeInput.addEventListener("input", (e) => {
+          resultBox.innerHTML = renderThemeCards(data.themes, e.target.value.trim());
+        });
+      }
     }
 
     function render905(data) {
@@ -881,6 +1046,7 @@
         localStorage.removeItem(STORAGE_USER);
         localStorage.removeItem(STORAGE_REPO);
         updateRepoStatus();
+        renderHero(null, null, null);
         render600(null);
         render905(null);
         render1535(null);
@@ -901,6 +1067,7 @@
       updateRepoStatus();
 
       if (!baseUrl()) {
+        renderHero(null, null, null);
         render600(null);
         render905(null);
         render1535(null);
@@ -909,6 +1076,7 @@
         return;
       }
 
+      els.heroPanel.innerHTML = `<div class="empty">読み込み中...</div>`;
       els.tab600.innerHTML = `<div class="empty">読み込み中...</div>`;
       els.tab905.innerHTML = `<div class="empty">読み込み中...</div>`;
       els.tab1535.innerHTML = `<div class="empty">読み込み中...</div>`;
@@ -925,6 +1093,7 @@
       setStatus(els.status905, d905);
       setStatus(els.status1535, d1535);
 
+      renderHero(d600, d905, d1535);
       render600(d600);
       render905(d905);
       render1535(d1535);
