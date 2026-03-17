@@ -2,9 +2,9 @@ name: 株式AI自動分析
 
 on:
   schedule:
-    - cron: "0 21 * * 0-4"   # JST 06:00
+    - cron: "2 21 * * 0-4"   # JST 06:02
     - cron: "10 0 * * 1-5"   # JST 09:10
-    - cron: "0 3 * * 1-5"    # JST 12:00
+    - cron: "2 3 * * 1-5"    # JST 12:02
     - cron: "35 6 * * 1-5"   # JST 15:35
   workflow_dispatch:
     inputs:
