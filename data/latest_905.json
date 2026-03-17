@@ -1,0 +1,88 @@
+{
+  "date": "2026-03-17",
+  "session": "905",
+  "generated_at": "07:06",
+  "opening": {
+    "nikkei_open": "38250",
+    "nikkei_change": "+0.8%",
+    "market_tone": "強い",
+    "dominant_theme": "半導体・AI関連"
+  },
+  "actual_flow": [
+    {
+      "theme": "半導体・AI関連",
+      "evidence": "米半導体指数の上昇を受けて東京エレクトロン、アドバンテストなど主力銘柄に買いが集中。AI投資期待が継続",
+      "strength": "high"
+    },
+    {
+      "theme": "円安メリット株",
+      "evidence": "ドル円が148円台後半で推移し、自動車・電機など輸出関連株に買い優勢",
+      "strength": "high"
+    },
+    {
+      "theme": "インバウンド消費関連",
+      "evidence": "訪日客数の回復トレンド継続で小売・ホテル関連に資金流入",
+      "strength": "medium"
+    },
+    {
+      "theme": "電力・エネルギー株",
+      "evidence": "データセンター向け電力需要増加観測で電力株が堅調推移",
+      "strength": "medium"
+    }
+  ],
+  "prediction_gap": [
+    {
+      "predicted_theme": "半導体・AI関連",
+      "predicted_score": 95,
+      "actual_result": "的中",
+      "gap_reason": "米国市場での半導体株高が東京市場にも波及",
+      "missed_factor": "なし"
+    },
+    {
+      "predicted_theme": "円安メリット株",
+      "predicted_score": 90,
+      "actual_result": "的中",
+      "gap_reason": "為替水準が輸出企業に追い風",
+      "missed_factor": "なし"
+    },
+    {
+      "predicted_theme": "防衛・安全保障関連",
+      "predicted_score": 75,
+      "actual_result": "部分的中",
+      "gap_reason": "材料出尽くし感から物色は限定的",
+      "missed_factor": "短期的な利益確定売り圧力"
+    },
+    {
+      "predicted_theme": "バイオ・医薬品株",
+      "predicted_score": 70,
+      "actual_result": "外れ",
+      "gap_reason": "個別材料不足で資金流入が見られず",
+      "missed_factor": "セクター全体の方向感欠如"
+    },
+    {
+      "predicted_theme": "金融・銀行株",
+      "predicted_score": 65,
+      "actual_result": "外れ",
+      "gap_reason": "長期金利の膠着で銀行株は様子見姿勢",
+      "missed_factor": "日銀政策への期待感後退"
+    }
+  ],
+  "intraday_correction": {
+    "themes_to_watch": [
+      "半導体関連の利益確定売り",
+      "電力株の需給バランス",
+      "米国時間での経済指標発表待ち"
+    ],
+    "themes_faded": [
+      "防衛関連",
+      "バイオ・医薬品"
+    ],
+    "correction_hints": [
+      "半導体株の上昇が一巡後は利益確定の動きに注意",
+      "後場は欧州市場の動向を見極める展開",
+      "円安が149円に接近する場合はさらなる輸出株買い観測"
+    ]
+  },
+  "morning_accuracy_score": 78,
+  "summary": "寄り付きは予測通り半導体・AI関連と円安メリット株が市場を牽引し、日経平均は堅調スタート。予測上位4テーマのうち3テーマが的中し精度は高め。一方で防衛関連は材料出尽くし、バイオ・金融は個別材料不足で期待外れ。テクノロジーセクター主導の上昇トレンドが鮮明で、市場のリスク選好姿勢が継続。後場は利益確定の動きと米経済指標待ちの様子見ムードに注意が必要"
+}
