@@ -45,8 +45,8 @@ def is_trading_day(d):
     return True
 
 
-def safe_get(url, timeout=20):
-    r = requests.get(url, headers=HEADERS, timeout=timeout)
+def safe_get(url, timeout=20, headers=None):
+    r = requests.get(url, headers=headers or HEADERS, timeout=timeout)
     r.raise_for_status()
     return r
 
@@ -171,137 +171,6 @@ def extract_table_rows(table, limit=40):
     return rows
 
 
-def score_market_item(item):
-    score = 0
-    if item.get("value"):
-        score += 4
-    if item.get("change"):
-        score += 3
-    if item.get("time"):
-        score += 2
-    if item.get("percent"):
-        score += 1
-    if item.get("_source"):
-        score += 1
-    return score
-
-
-def dedupe_best_market_items(items):
-    best = {}
-    for item in items:
-        name = item.get("name", "")
-        if not name:
-            continue
-        if name not in best or score_market_item(item) > score_market_item(best[name]):
-            best[name] = item
-    return list(best.values())
-
-
-def normalize_market_items(items):
-    out = []
-    for x in items:
-        y = dict(x)
-        y.pop("_source", None)
-        out.append(y)
-    return out
-
-
-def is_complete_quote(item):
-    return bool(item.get("name") and item.get("value") and item.get("change") and item.get("time"))
-
-
-def looks_like_quote_line(text):
-    return bool(
-        re.search(r"\([^)]+\)", text)
-        and re.search(r"[0-9,]+\.\d+", text)
-        and re.search(r"[+\-][0-9,]+\.\d+", text)
-    )
-
-
-def push_quote(candidates, bucket, label, time_text, value_text, change_text, source_name):
-    item = {
-        "name": label,
-        "time": clean_text(time_text),
-        "value": clean_text(value_text),
-        "change": clean_text(change_text),
-        "percent": "",
-        "_source": source_name,
-    }
-    if is_complete_quote(item):
-        candidates[bucket].append(item)
-
-
-def extract_market_from_mobile_top(lines, source_name):
-    candidates = {
-        "indices": [],
-        "world_indices": [],
-        "forex": [],
-        "futures": [],
-    }
-
-    patterns = [
-        ("indices", "日経平均", r"日経平均\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
-        ("forex", "米ドル円", r"ドル円\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
-        ("world_indices", "NYダウ", r"NYダウ\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
-        ("futures", "日経先物", r"日経先物\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
-    ]
-
-    for line in lines:
-        t = clean_text(line)
-        for bucket, label, pattern in patterns:
-            m = re.search(pattern, t)
-            if m:
-                push_quote(candidates, bucket, label, m.group(1), m.group(2), m.group(3), source_name)
-
-    return candidates
-
-
-def extract_market_from_desktop_text(lines, source_name):
-    candidates = {
-        "indices": [],
-        "world_indices": [],
-        "forex": [],
-        "futures": [],
-    }
-
-    domestic_patterns = [
-        ("indices", "日経平均", r"日経平均\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)"),
-        ("indices", "ＴＯＰＩＸ", r"ＴＯＰＩＸ\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)"),
-        ("indices", "TOPIX", r"TOPIX\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)"),
-        ("indices", "JPX日経400", r"JPX日経400\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)"),
-        ("indices", "グロース250", r"グロース250\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)"),
-    ]
-
-    for line in lines:
-        t = clean_text(line)
-        for bucket, label, pattern in domestic_patterns:
-            m = re.search(pattern, t)
-            if m:
-                candidates[bucket].append({
-                    "name": label,
-                    "time": "",
-                    "value": clean_text(m.group(1)),
-                    "change": clean_text(m.group(2)),
-                    "percent": "",
-                    "_source": source_name,
-                })
-
-    # もし desktop 側に 先物表記が乗る場合だけ拾う
-    future_patterns = [
-        ("futures", "日経先物", r"日経先物\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
-        ("futures", "日経225先物", r"日経225先物\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
-    ]
-
-    for line in lines:
-        t = clean_text(line)
-        for bucket, label, pattern in future_patterns:
-            m = re.search(pattern, t)
-            if m:
-                push_quote(candidates, bucket, label, m.group(1), m.group(2), m.group(3), source_name)
-
-    return candidates
-
-
 def is_valid_news_text(text):
     text = clean_text(text)
     if len(text) < 14:
@@ -321,108 +190,159 @@ def is_valid_news_text(text):
         r"会員限定",
         r"^\d+$",
         r"^(TOP|決算|開示|人気|コラム)$",
-        r"日経平均\s*\(",
-        r"ドル円\s*\(",
-        r"NYダウ\s*\(",
-        r"上海総合\s*\(",
-        r"日経先物\s*\(",
-        r"日経225先物\s*\(",
+        r"日経平均",
+        r"ドル円",
+        r"NYダウ",
+        r"上海総合",
+        r"日経先物",
+        r"日経225先物",
         r"^\s*PR\s*$",
     ]
 
     for p in ng_patterns:
         if re.search(p, text):
             return False
-
-    if looks_like_quote_line(text):
-        return False
-
     return True
 
 
-def fetch_kabutan_home():
-    result = {
+def yahoo_quote(symbol, label):
+    """
+    Yahoo Finance chart API から厳密取得
+    """
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+    params = {"interval": "1m", "range": "1d"}
+
+    headers = dict(HEADERS)
+    headers["Referer"] = f"https://finance.yahoo.com/quote/{symbol}"
+
+    try:
+        r = requests.get(url, params=params, headers=headers, timeout=20)
+        r.raise_for_status()
+        data = r.json()
+
+        result = data.get("chart", {}).get("result", [])
+        if not result:
+            return None
+
+        meta = result[0].get("meta", {})
+        price = meta.get("regularMarketPrice")
+        prev = meta.get("previousClose")
+        market_time = meta.get("regularMarketTime")
+
+        if price is None or prev is None or market_time is None:
+            return None
+
+        change = round(float(price) - float(prev), 2)
+        sign = "+" if change >= 0 else ""
+        jst_time = datetime.fromtimestamp(int(market_time), JST).strftime("%H:%M")
+
+        return {
+            "name": label,
+            "value": f"{float(price):,.2f}",
+            "change": f"{sign}{change:,.2f}",
+            "percent": "",
+            "time": jst_time,
+            "source": f"Yahoo Finance:{symbol}",
+        }
+    except Exception as e:
+        print(f"yahoo quote error {symbol}: {e}")
+        return None
+
+
+def fetch_strict_market_quotes():
+    quotes = {
         "indices": [],
         "world_indices": [],
         "forex": [],
         "futures": [],
-        "themes": [],
-        "sector": [],
-        "news": [],
         "search_results": [],
     }
 
-    urls = [
-        ("mobile", "https://s.kabutan.jp/"),
-        ("desktop", "https://kabutan.jp/"),
+    targets = [
+        ("indices", "^N225", "日経平均"),
+        ("futures", "NIY=F", "日経先物"),
+        ("forex", "JPY=X", "ドル円"),
+        ("world_indices", "^DJI", "NYダウ"),
     ]
 
-    all_indices = []
-    all_world = []
-    all_forex = []
-    all_futures = []
-    all_themes = []
-    all_news = []
-    search_results = []
+    ok = 0
+    for bucket, symbol, label in targets:
+        item = yahoo_quote(symbol, label)
+        if item:
+            quotes[bucket].append(item)
+            quotes["search_results"].append(f"Yahoo:{label} 取得成功")
+            ok += 1
+        else:
+            quotes["search_results"].append(f"Yahoo:{label} 未取得")
 
-    for source_name, url in urls:
+    print(f"strict quotes success: {ok}/{len(targets)}")
+    return quotes
+
+
+def fetch_kabutan_theme_news():
+    result = {
+        "themes": [],
+        "news": [],
+        "top_gainers": [],
+        "top_losers": [],
+        "volume_surge": [],
+    }
+
+    try:
+        r = safe_get("https://kabutan.jp/")
+        soup = BeautifulSoup(r.text, "html.parser")
+
+        theme_candidates = []
+        for a in soup.select("a[href*='theme'], a[href*='/themes/']"):
+            t = clean_text(a.get_text(" ", strip=True))
+            if 2 <= len(t) <= 30:
+                theme_candidates.append(t)
+        result["themes"] = list(dict.fromkeys(theme_candidates))[:15]
+
+        news_candidates = []
+        for a in soup.select("a[href]"):
+            t = clean_text(a.get_text(" ", strip=True))
+            if is_valid_news_text(t):
+                news_candidates.append(t)
+        result["news"] = list(dict.fromkeys(news_candidates))[:12]
+
+    except Exception as e:
+        print(f"kabutan home error: {e}")
+
+    pages = [
+        ("gainers", "https://kabutan.jp/warning/?mode=2_1"),
+        ("losers", "https://kabutan.jp/warning/?mode=2_2"),
+        ("volume", "https://kabutan.jp/warning/?mode=25_1"),
+    ]
+
+    for kind, url in pages:
         try:
             r = safe_get(url)
             soup = BeautifulSoup(r.text, "html.parser")
-            lines = [clean_text(x) for x in soup.get_text("\n", strip=True).splitlines()]
-            lines = [x for x in lines if x]
 
-            if source_name == "mobile":
-                mobile = extract_market_from_mobile_top(lines, source_name)
-                valid_i = [x for x in mobile["indices"] if is_complete_quote(x)]
-                valid_w = [x for x in mobile["world_indices"] if is_complete_quote(x)]
-                valid_f = [x for x in mobile["forex"] if is_complete_quote(x)]
-                valid_fu = [x for x in mobile["futures"] if is_complete_quote(x)]
+            for table in soup.find_all("table"):
+                rows = extract_table_rows(table, limit=40)
+                if len(rows) < 3:
+                    continue
 
-                all_indices.extend(valid_i)
-                all_world.extend(valid_w)
-                all_forex.extend(valid_f)
-                all_futures.extend(valid_fu)
+                header = " | ".join(rows[0])
 
-                search_results.append(
-                    f"{source_name}: 国内{len(valid_i)}件 / 海外{len(valid_w)}件 / 為替{len(valid_f)}件 / 先物{len(valid_fu)}件"
-                )
-            else:
-                desktop = extract_market_from_desktop_text(lines, source_name)
-                all_indices.extend(desktop["indices"])
-                all_world.extend(desktop["world_indices"])
-                all_forex.extend(desktop["forex"])
-                all_futures.extend(desktop["futures"])
+                if kind == "gainers" and "コード" in header and "銘柄名" in header:
+                    result["top_gainers"] = parse_warning_table(rows, "gainers")
+                    break
 
-                search_results.append(
-                    f"{source_name}: 国内{len(desktop['indices'])}件 / 海外{len(desktop['world_indices'])}件 / 為替{len(desktop['forex'])}件 / 先物{len(desktop['futures'])}件"
-                )
+                if kind == "losers" and "コード" in header and "銘柄名" in header:
+                    result["top_losers"] = parse_warning_table(rows, "losers")
+                    break
 
-            theme_candidates = []
-            for a in soup.select("a[href*='theme'], a[href*='/themes/']"):
-                t = clean_text(a.get_text(" ", strip=True))
-                if 2 <= len(t) <= 30:
-                    theme_candidates.append(t)
-            all_themes.extend(theme_candidates)
+                if kind == "volume" and "コード" in header and ("出来高" in header or "売買高" in header):
+                    result["volume_surge"] = parse_warning_table(rows, "volume")
+                    break
 
-            news_candidates = []
-            for a in soup.select("a[href]"):
-                t = clean_text(a.get_text(" ", strip=True))
-                if is_valid_news_text(t):
-                    news_candidates.append(t)
-            all_news.extend(news_candidates)
+            time.sleep(0.4)
 
         except Exception as e:
-            print(f"ホーム取得エラー {source_name}: {e}")
-            search_results.append(f"{source_name}: 取得失敗")
-
-    result["indices"] = normalize_market_items(dedupe_best_market_items(all_indices))[:6]
-    result["world_indices"] = normalize_market_items(dedupe_best_market_items(all_world))[:6]
-    result["forex"] = normalize_market_items(dedupe_best_market_items(all_forex))[:4]
-    result["futures"] = normalize_market_items(dedupe_best_market_items(all_futures))[:4]
-    result["themes"] = list(dict.fromkeys(all_themes))[:15]
-    result["news"] = list(dict.fromkeys(all_news))[:12]
-    result["search_results"] = search_results
+            print(f"ランキング取得エラー {url}: {e}")
 
     return result
 
@@ -467,57 +387,6 @@ def parse_warning_table(rows, mode="gainers"):
     return parsed[:15]
 
 
-def fetch_kabutan_ranking():
-    result = {
-        "top_gainers": [],
-        "top_losers": [],
-        "volume_surge": [],
-    }
-
-    pages = [
-        ("gainers", "https://kabutan.jp/warning/?mode=2_1"),
-        ("losers", "https://kabutan.jp/warning/?mode=2_2"),
-        ("volume", "https://kabutan.jp/warning/?mode=25_1"),
-    ]
-
-    for kind, url in pages:
-        try:
-            r = safe_get(url)
-            soup = BeautifulSoup(r.text, "html.parser")
-
-            for table in soup.find_all("table"):
-                rows = extract_table_rows(table, limit=40)
-                if len(rows) < 3:
-                    continue
-
-                header = " | ".join(rows[0])
-
-                if kind == "gainers" and "コード" in header and "銘柄名" in header:
-                    parsed = parse_warning_table(rows, "gainers")
-                    if parsed:
-                        result["top_gainers"] = parsed
-                        break
-
-                if kind == "losers" and "コード" in header and "銘柄名" in header:
-                    parsed = parse_warning_table(rows, "losers")
-                    if parsed:
-                        result["top_losers"] = parsed
-                        break
-
-                if kind == "volume" and "コード" in header and ("出来高" in header or "売買高" in header):
-                    parsed = parse_warning_table(rows, "volume")
-                    if parsed:
-                        result["volume_surge"] = parsed
-                        break
-
-            time.sleep(0.4)
-
-        except Exception as e:
-            print(f"ランキング取得エラー {url}: {e}")
-
-    return result
-
-
 def fetch_nhk_news():
     news = []
     try:
@@ -560,81 +429,59 @@ def fetch_reuters_news():
     return news[:10]
 
 
-def fetch_kabutan():
+def fetch_all_market_data():
+    strict = fetch_strict_market_quotes()
+    kabu = fetch_kabutan_theme_news()
+
     result = {
-        "indices": [],
-        "world_indices": [],
-        "forex": [],
-        "futures": [],
+        "indices": strict["indices"],
+        "world_indices": strict["world_indices"],
+        "forex": strict["forex"],
+        "futures": strict["futures"],
         "sector": [],
-        "top_gainers": [],
-        "top_losers": [],
-        "volume_surge": [],
-        "themes": [],
-        "news": [],
-        "search_results": [],
-        "source": "kabutan.jp",
+        "top_gainers": kabu["top_gainers"],
+        "top_losers": kabu["top_losers"],
+        "volume_surge": kabu["volume_surge"],
+        "themes": kabu["themes"],
+        "news": kabu["news"],
+        "search_results": strict["search_results"],
+        "source": "Yahoo Finance + kabutan.jp",
     }
 
-    home = fetch_kabutan_home()
-    ranking = fetch_kabutan_ranking()
-
-    result["indices"] = home.get("indices", [])
-    result["world_indices"] = home.get("world_indices", [])
-    result["forex"] = home.get("forex", [])
-    result["futures"] = home.get("futures", [])
-    result["sector"] = home.get("sector", [])
-    result["themes"] = home.get("themes", [])
-    result["news"] = home.get("news", [])
-    result["search_results"] = home.get("search_results", [])
-    result["top_gainers"] = ranking.get("top_gainers", [])
-    result["top_losers"] = ranking.get("top_losers", [])
-    result["volume_surge"] = ranking.get("volume_surge", [])
-
-    print("=== kabutan summary ===")
+    print("=== market summary ===")
     print(f"indices: {len(result['indices'])}")
     print(f"world_indices: {len(result['world_indices'])}")
     print(f"forex: {len(result['forex'])}")
     print(f"futures: {len(result['futures'])}")
-    print(f"sector: {len(result['sector'])}")
     print(f"top_gainers: {len(result['top_gainers'])}")
     print(f"top_losers: {len(result['top_losers'])}")
     print(f"volume_surge: {len(result['volume_surge'])}")
     print(f"themes: {len(result['themes'])}")
     print(f"news: {len(result['news'])}")
 
-    if result["indices"]:
-        print(f"indices data: {result['indices']}")
-    if result["world_indices"]:
-        print(f"world data: {result['world_indices']}")
-    if result["forex"]:
-        print(f"forex data: {result['forex']}")
-    if result["futures"]:
-        print(f"futures data: {result['futures']}")
-
     return result
 
 
-def build_data_sources_summary(kabutan, nhk, reuters):
+def build_data_sources_summary(market, nhk, reuters):
     sources = []
-    if kabutan.get("indices"):
-        sources.append(f"かぶたん国内指数{len(kabutan['indices'])}件")
-    if kabutan.get("world_indices"):
-        sources.append(f"かぶたん海外指数{len(kabutan['world_indices'])}件")
-    if kabutan.get("forex"):
-        sources.append(f"かぶたん為替{len(kabutan['forex'])}件")
-    if kabutan.get("futures"):
-        sources.append(f"かぶたん先物{len(kabutan['futures'])}件")
-    if kabutan.get("top_gainers"):
-        sources.append(f"値上がり{len(kabutan['top_gainers'])}件")
-    if kabutan.get("top_losers"):
-        sources.append(f"値下がり{len(kabutan['top_losers'])}件")
-    if kabutan.get("volume_surge"):
-        sources.append(f"出来高急増{len(kabutan['volume_surge'])}件")
-    if kabutan.get("themes"):
-        sources.append(f"テーマ{len(kabutan['themes'])}件")
-    if kabutan.get("news"):
-        sources.append(f"かぶたんニュース{len(kabutan['news'])}件")
+    if market.get("indices"):
+        sources.append(f"日経平均{len(market['indices'])}件")
+    if market.get("futures"):
+        sources.append(f"日経先物{len(market['futures'])}件")
+    if market.get("world_indices"):
+        sources.append(f"NYダウ{len(market['world_indices'])}件")
+    if market.get("forex"):
+        sources.append(f"ドル円{len(market['forex'])}件")
+    if market.get("top_gainers"):
+        sources.append(f"値上がり{len(market['top_gainers'])}件")
+    if market.get("top_losers"):
+        sources.append(f"値下がり{len(market['top_losers'])}件")
+    if market.get("volume_surge"):
+        sources.append(f"出来高急増{len(market['volume_surge'])}件")
+    if market.get("themes"):
+        sources.append(f"テーマ{len(market['themes'])}件")
+    if market.get("news"):
+        sources.append(f"かぶたんニュース{len(market['news'])}件")
     if nhk:
         sources.append(f"NHKニュース{len(nhk)}件")
     if reuters:
@@ -672,11 +519,11 @@ def run_600(today):
     ymd = today.strftime("%Y年%m月%d日")
 
     print("[6:00] データ収集中...")
-    kabutan = fetch_kabutan()
+    market = fetch_all_market_data()
     nhk = fetch_nhk_news()
     reuters = fetch_reuters_news()
-    data_sources = build_data_sources_summary(kabutan, nhk, reuters)
-    key_news = (kabutan["news"] + nhk + reuters)[:10]
+    data_sources = build_data_sources_summary(market, nhk, reuters)
+    key_news = (market["news"] + nhk + reuters)[:10]
 
     prompt = f"""IMPORTANT: Return ONLY valid JSON.
 No explanation. No markdown. Just JSON.
@@ -692,11 +539,11 @@ Return this JSON:
   "generated_at": "{now}",
   "data_sources": {json.dumps(data_sources, ensure_ascii=False)},
   "market_data": {{
-    "indices": {json.dumps(kabutan["indices"][:6], ensure_ascii=False)},
-    "world_indices": {json.dumps(kabutan["world_indices"][:6], ensure_ascii=False)},
-    "forex": {json.dumps(kabutan["forex"][:4], ensure_ascii=False)},
-    "futures": {json.dumps(kabutan["futures"][:4], ensure_ascii=False)},
-    "search_results": {json.dumps(kabutan["search_results"][:10], ensure_ascii=False)},
+    "indices": {json.dumps(market["indices"][:6], ensure_ascii=False)},
+    "world_indices": {json.dumps(market["world_indices"][:6], ensure_ascii=False)},
+    "forex": {json.dumps(market["forex"][:4], ensure_ascii=False)},
+    "futures": {json.dumps(market["futures"][:4], ensure_ascii=False)},
+    "search_results": {json.dumps(market["search_results"][:10], ensure_ascii=False)},
     "key_news": {json.dumps(key_news, ensure_ascii=False)}
   }},
   "themes": [
@@ -733,9 +580,9 @@ def run_905(today):
         raise FileNotFoundError("latest_600.json なし")
 
     print("[9:05] データ収集中...")
-    kabutan = fetch_kabutan()
+    market = fetch_all_market_data()
     nhk = fetch_nhk_news()
-    data_sources = build_data_sources_summary(kabutan, nhk, [])
+    data_sources = build_data_sources_summary(market, nhk, [])
 
     theme_names = [t.get("name", "") for t in pred.get("themes", [])]
     iso = today.isoformat()
@@ -747,10 +594,10 @@ No explanation. No markdown. Just JSON.
 Today is {ymd} 9:05. Analyze opening market vs 6:00 prediction.
 
 6:00 Predicted Themes: {json.dumps(theme_names, ensure_ascii=False)}
-Top Gainers: {json.dumps(kabutan['top_gainers'][:15], ensure_ascii=False)}
-Volume Surge: {json.dumps(kabutan['volume_surge'][:10], ensure_ascii=False)}
-Hot Themes: {json.dumps(kabutan['themes'][:10], ensure_ascii=False)}
-News: {json.dumps((kabutan['news'] + nhk)[:10], ensure_ascii=False)}
+Top Gainers: {json.dumps(market['top_gainers'][:15], ensure_ascii=False)}
+Volume Surge: {json.dumps(market['volume_surge'][:10], ensure_ascii=False)}
+Hot Themes: {json.dumps(market['themes'][:10], ensure_ascii=False)}
+News: {json.dumps((market['news'] + nhk)[:10], ensure_ascii=False)}
 
 Return this JSON:
 {{
@@ -802,10 +649,10 @@ def run_1535(today):
         raise FileNotFoundError("latest_600.json なし")
 
     print("[15:35] データ収集中...")
-    kabutan = fetch_kabutan()
+    market = fetch_all_market_data()
     nhk = fetch_nhk_news()
     reuters = fetch_reuters_news()
-    data_sources = build_data_sources_summary(kabutan, nhk, reuters)
+    data_sources = build_data_sources_summary(market, nhk, reuters)
 
     theme_names = [t.get("name", "") for t in pred_600.get("themes", [])]
     gap_905 = pred_905.get("prediction_gap", []) if pred_905 else []
@@ -822,11 +669,11 @@ Today is {ymd} 15:35. Summarize the full day's market.
 6:00 Predicted Themes: {json.dumps(theme_names, ensure_ascii=False)}
 9:05 Gap Analysis: {json.dumps(gap_905, ensure_ascii=False)}
 9:05 Correction Hints: {json.dumps(hints_905, ensure_ascii=False)}
-Top Gainers: {json.dumps(kabutan['top_gainers'][:15], ensure_ascii=False)}
-Top Losers: {json.dumps(kabutan['top_losers'][:10], ensure_ascii=False)}
-Volume Surge: {json.dumps(kabutan['volume_surge'][:10], ensure_ascii=False)}
-Hot Themes: {json.dumps(kabutan['themes'][:15], ensure_ascii=False)}
-News: {json.dumps((kabutan['news'] + nhk + reuters)[:12], ensure_ascii=False)}
+Top Gainers: {json.dumps(market['top_gainers'][:15], ensure_ascii=False)}
+Top Losers: {json.dumps(market['top_losers'][:10], ensure_ascii=False)}
+Volume Surge: {json.dumps(market['volume_surge'][:10], ensure_ascii=False)}
+Hot Themes: {json.dumps(market['themes'][:15], ensure_ascii=False)}
+News: {json.dumps((market['news'] + nhk + reuters)[:12], ensure_ascii=False)}
 
 Return this JSON:
 {{
