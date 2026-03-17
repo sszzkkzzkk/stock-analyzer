@@ -24,7 +24,6 @@
     }
 
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
@@ -32,11 +31,7 @@
       color: var(--text);
     }
 
-    .wrap {
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 12px;
-    }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 12px; }
 
     .header {
       display: flex;
@@ -65,18 +60,8 @@
       flex: 0 0 auto;
     }
 
-    .title {
-      font-size: 22px;
-      font-weight: 800;
-      line-height: 1.05;
-    }
-
-    .subtitle {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-      line-height: 1.22;
-    }
+    .title { font-size: 22px; font-weight: 800; line-height: 1.05; }
+    .subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.22; }
 
     .header-actions {
       display: flex;
@@ -104,7 +89,6 @@
       font: inherit;
       flex: 0 0 auto;
     }
-
     .btn:hover { background: var(--panel2); }
 
     .market-bar {
@@ -131,29 +115,35 @@
       gap: 6px;
     }
 
-    .market-chip-name,
-    .market-chip-time {
+    .market-chip-name, .market-chip-time {
       font-size: 10px;
       color: var(--muted);
       white-space: nowrap;
     }
 
     .market-chip-value {
-      font-size: 13px;
-      font-weight: 800;
+      font-size: 15px;
+      font-weight: 900;
       line-height: 1.1;
+      color: var(--text);
     }
+    .market-chip-value.good { color: var(--good); }
+    .market-chip-value.bad { color: var(--bad); }
+    .market-chip-value.warn { color: var(--warn); }
 
     .market-chip-change {
       font-size: 11px;
       font-weight: 700;
       line-height: 1.1;
     }
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+    .warn { color: var(--warn); }
 
     .tabs {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
-      flex-wrap: wrap;
       margin-bottom: 10px;
       position: sticky;
       top: 8px;
@@ -163,6 +153,7 @@
     }
 
     .tab {
+      width: 100%;
       border: 1px solid var(--line);
       background: var(--panel);
       color: var(--text);
@@ -171,8 +162,9 @@
       cursor: pointer;
       font: inherit;
       box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset;
+      text-align: center;
+      min-width: 0;
     }
-
     .tab.active {
       border-color: transparent;
       background: linear-gradient(135deg, #2457f5, #6f3ff5);
@@ -186,7 +178,6 @@
       padding: 12px;
       margin-bottom: 12px;
     }
-
     .panel.active { display: block; }
 
     .summary-card {
@@ -206,33 +197,11 @@
       margin-bottom: 8px;
     }
 
-    .summary-label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 4px;
-      line-height: 1.2;
-    }
+    .summary-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; line-height: 1.2; }
+    .summary-title { font-size: 24px; font-weight: 900; line-height: 1.08; word-break: break-word; }
+    .summary-text { font-size: 13px; color: var(--muted); line-height: 1.42; word-break: break-word; }
 
-    .summary-title {
-      font-size: 24px;
-      font-weight: 900;
-      line-height: 1.08;
-      word-break: break-word;
-    }
-
-    .summary-text {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.42;
-      word-break: break-word;
-    }
-
-    .pills, .chips {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
+    .pills, .chips { display: flex; gap: 6px; flex-wrap: wrap; }
     .pill, .chip {
       background: var(--chip);
       border: 1px solid var(--line);
@@ -247,7 +216,6 @@
     .grid { display: grid; gap: 10px; }
     .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
     .card {
       background: var(--panel3);
@@ -256,16 +224,9 @@
       padding: 12px;
       min-width: 0;
     }
+    .card h3 { margin: 0 0 8px; font-size: 15px; }
 
-    .card h3 {
-      margin: 0 0 8px;
-      font-size: 15px;
-    }
-
-    .list {
-      display: grid;
-      gap: 8px;
-    }
+    .list { display: grid; gap: 8px; }
 
     .item {
       background: rgba(255,255,255,0.03);
@@ -273,33 +234,21 @@
       border-radius: 12px;
       padding: 10px;
     }
-
-    .item.tight {
-      padding: 9px 10px;
-    }
-
+    .item.tight { padding: 9px 10px; }
     .item.danger {
       background: var(--danger-bg);
       border-color: var(--danger-line);
       color: var(--danger-text);
     }
 
-    .item-title {
-      font-weight: 700;
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
-
+    .item-title { font-weight: 700; margin-bottom: 4px; font-size: 14px; }
     .item-sub {
       color: var(--muted);
       line-height: 1.46;
       font-size: 13px;
       word-break: break-word;
     }
-
-    .item.danger .item-sub {
-      color: var(--danger-text);
-    }
+    .item.danger .item-sub { color: var(--danger-text); }
 
     .watch-card {
       background: rgba(255,255,255,0.03);
@@ -310,28 +259,24 @@
       display: grid;
       gap: 6px;
     }
-
     .watch-top {
       display: flex;
       gap: 8px;
       align-items: center;
       flex-wrap: wrap;
     }
-
     .watch-title {
       font-size: 14px;
       font-weight: 900;
       line-height: 1.2;
       word-break: break-word;
     }
-
     .watch-meta {
       font-size: 12px;
       color: var(--muted);
       line-height: 1.35;
       word-break: break-word;
     }
-
     .watch-row {
       display: grid;
       grid-template-columns: 66px 1fr;
@@ -339,24 +284,7 @@
       font-size: 12px;
       line-height: 1.35;
     }
-
     .watch-key { color: var(--muted); }
-
-    .mini-info {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 8px;
-    }
-
-    .mini-pill {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.03);
-      border-radius: 999px;
-      padding: 5px 9px;
-      font-size: 11px;
-      color: var(--muted);
-    }
 
     .empty {
       border: 1px dashed var(--line);
@@ -372,13 +300,11 @@
       border: 1px solid var(--line);
       border-radius: 12px;
     }
-
     table {
       width: 100%;
       min-width: 640px;
       border-collapse: collapse;
     }
-
     th, td {
       padding: 10px 9px;
       text-align: left;
@@ -386,11 +312,7 @@
       font-size: 13px;
       vertical-align: top;
     }
-
-    th {
-      color: var(--muted);
-      background: rgba(255,255,255,0.03);
-    }
+    th { color: var(--muted); background: rgba(255,255,255,0.03); }
 
     .notice {
       background: rgba(110,168,254,.10);
@@ -407,12 +329,7 @@
       gap: 6px;
       margin-bottom: 12px;
     }
-
-    .field label {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
+    .field label { font-size: 12px; color: var(--muted); }
     .field input {
       width: 100%;
       padding: 11px 12px;
@@ -424,8 +341,9 @@
     }
 
     @media (max-width: 900px) {
-      .grid.two, .grid.three, .grid.four { grid-template-columns: 1fr; }
+      .grid.two, .grid.three { grid-template-columns: 1fr; }
       .market-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .summary-title { font-size: 22px; }
     }
   </style>
@@ -605,15 +523,18 @@
         firstMatchItem(d600, ["NYダウ", "ＮＹダウ"], ["world_indices"]),
       ].filter(Boolean);
 
-      els.marketBar.innerHTML = picks.length ? picks.map(item => `
-        <div class="market-chip">
-          <div class="market-chip-top">
-            <div class="market-chip-name">${esc(item.name || "-")}</div>
-            <div class="market-chip-time">${esc(item.time || "")}</div>
-          </div>
-          <div class="market-chip-value">${esc(item.value || "—")}</div>
-          <div class="market-chip-change ${quoteClass(item.change)}">${esc(item.change || "—")} ${esc(item.percent || "")}</div>
-        </div>`).join("") : `<div class="empty" style="grid-column:1/-1;">市況データなし</div>`;
+      els.marketBar.innerHTML = picks.length ? picks.map(item => {
+        const klass = quoteClass(item.change);
+        return `
+          <div class="market-chip">
+            <div class="market-chip-top">
+              <div class="market-chip-name">${esc(item.name || "-")}</div>
+              <div class="market-chip-time">${esc(item.time || "")}</div>
+            </div>
+            <div class="market-chip-value ${klass}">${esc(item.value || "—")}</div>
+            <div class="market-chip-change ${klass}">${esc(item.change || "—")} ${esc(item.percent || "")}</div>
+          </div>`;
+      }).join("") : `<div class="empty" style="grid-column:1/-1;">市況データなし</div>`;
     }
 
     function render600(data) {
