@@ -1,74 +1,108 @@
-name: stock-analysis-scheduled
+name: 株式AI自動分析
 
 on:
-  workflow_dispatch:
   schedule:
-    # JST 06:00
-    - cron: '0 21 * * 0-4'
-    # JST 09:10
-    - cron: '10 0 * * 1-5'
-    # JST 12:00
-    - cron: '0 3 * * 1-5'
-    # JST 15:35
-    - cron: '35 6 * * 1-5'
+    - cron: "0 21 * * 0-4"   # JST 06:00
+    - cron: "10 0 * * 1-5"   # JST 09:10
+    - cron: "0 3 * * 1-5"    # JST 12:00
+    - cron: "35 6 * * 1-5"   # JST 15:35
+  workflow_dispatch:
+    inputs:
+      session:
+        description: "600 or 905 or 1200 or 1535"
+        required: true
+        default: "600"
+        type: choice
+        options:
+          - "600"
+          - "905"
+          - "1200"
+          - "1535"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  run-analysis:
+  run:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
 
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: setup python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
+          cache: pip
 
-      - name: Install dependencies
+      - name: install deps
+        run: pip install -r requirements.txt
+
+      - name: git config
         run: |
-          python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 jpholiday anthropic
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Resolve session from JST time
-        id: session
-        shell: bash
+      - name: restore data from gh-pages
         run: |
-          NOW_JST=$(TZ=Asia/Tokyo date '+%H:%M')
-          HOUR=$(TZ=Asia/Tokyo date '+%H')
-          MIN=$(TZ=Asia/Tokyo date '+%M')
-
-          if [ "$HOUR" = "06" ]; then
-            SESSION="600"
-          elif [ "$HOUR" = "09" ] && [ "$MIN" = "10" ]; then
-            SESSION="905"
-          elif [ "$HOUR" = "12" ] && [ "$MIN" = "00" ]; then
-            SESSION="1200"
-          elif [ "$HOUR" = "15" ] && [ "$MIN" = "35" ]; then
-            SESSION="1535"
-          else
-            echo "Unexpected JST time: $NOW_JST"
-            exit 1
+          git fetch origin gh-pages 2>/dev/null || true
+          mkdir -p data
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git checkout origin/gh-pages -- data/ 2>/dev/null || true
           fi
 
-          echo "now_jst=$NOW_JST" >> "$GITHUB_OUTPUT"
-          echo "session=$SESSION" >> "$GITHUB_OUTPUT"
+      - name: decide session
+        id: session
+        run: |
+          if [ -n "${{ github.event.inputs.session }}" ]; then
+            echo "session=${{ github.event.inputs.session }}" >> $GITHUB_OUTPUT
+          else
+            HM=$(TZ='Asia/Tokyo' date +%H%M)
 
-      - name: Run analysis
+            if [ "$HM" -lt 700 ]; then
+              echo "session=600" >> $GITHUB_OUTPUT
+            elif [ "$HM" -lt 1100 ]; then
+              echo "session=905" >> $GITHUB_OUTPUT
+            elif [ "$HM" -lt 1300 ]; then
+              echo "session=1200" >> $GITHUB_OUTPUT
+            else
+              echo "session=1535" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: run analyzer
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SESSION: ${{ steps.session.outputs.session }}
-        run: |
-          echo "JST: ${{ steps.session.outputs.now_jst }}"
-          echo "SESSION: ${{ steps.session.outputs.session }}"
-          python main.py
+        run: python main.py
 
-      - name: Commit data files
+      - name: inspect data
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/
-          git diff --cached --quiet && echo "No changes to commit" && exit 0
-          git commit -m "Update analysis data (${{ steps.session.outputs.session }})"
+          echo "=== data files ==="
+          ls -la data || true
+
+          echo "=== latest_600.json ==="
+          test -f data/latest_600.json && head -40 data/latest_600.json || true
+
+          echo "=== latest_905.json ==="
+          test -f data/latest_905.json && head -40 data/latest_905.json || true
+
+          echo "=== latest_1200.json ==="
+          test -f data/latest_1200.json && head -40 data/latest_1200.json || true
+
+          echo "=== latest_1535.json ==="
+          test -f data/latest_1535.json && head -40 data/latest_1535.json || true
+
+          echo "=== review_log.json ==="
+          test -f data/review_log.json && head -40 data/review_log.json || true
+
+      - name: commit generated data
+        run: |
+          git add data
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "update data: ${{ steps.session.outputs.session }}"
           git push
