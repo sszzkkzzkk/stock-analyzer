@@ -83,19 +83,34 @@ def fetch_kabutan():
         "volume_surge": [], "themes": [], "news": [],
         "source": "kabutan.jp"
     }
-    try:
-        r = requests.get("https://kabutan.jp/market/", headers=H, timeout=15)
-        soup = BeautifulSoup(r.text, "html.parser")
-        print("=== かぶたんHTML構造デバッグ ===")
-        for i, t in enumerate(soup.find_all("table")[:15]):
-            cls = t.get("class", [])
-            rows = t.find_all("tr")
-            print(f"table[{i}] class={cls} rows={len(rows)}")
-            if rows:
-                print(f"  sample: {rows[0].get_text(strip=True)[:60]}")
-        time.sleep(1)
-    except Exception as e:
-        print(f"かぶたんエラー: {e}")
+    
+    urls_to_check = [
+        "https://kabutan.jp/news/?b=n1",
+        "https://kabutan.jp/stock/ranking/?type=increase_rate&market=1",
+        "https://kabutan.jp/stock/ranking/?type=decrease_rate&market=1",
+        "https://kabutan.jp/stock/ranking/?type=volume&market=1",
+        "https://kabutan.jp/theme/",
+    ]
+    
+    for url in urls_to_check:
+        try:
+            r = requests.get(url, headers=H, timeout=15)
+            soup = BeautifulSoup(r.text, "html.parser")
+            print(f"\n=== {url} (status:{r.status_code}) ===")
+            for i, t in enumerate(soup.find_all("table")[:5]):
+                cls = t.get("class", [])
+                rows = t.find_all("tr")
+                print(f"  table[{i}] class={cls} rows={len(rows)}")
+                if rows and len(rows) > 1:
+                    print(f"  row1: {rows[1].get_text(strip=True)[:80]}")
+            for tag in ["div.news_list", "ul.news", "div.rankingTable"]:
+                items = soup.select(tag)
+                if items:
+                    print(f"  {tag}: {len(items)}件")
+            time.sleep(1)
+        except Exception as e:
+            print(f"エラー {url}: {e}")
+    
     return result
 
     try:
