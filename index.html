@@ -97,7 +97,7 @@
 
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      grid-template-columns: 1.4fr repeat(3, minmax(160px, 1fr));
       gap: 12px;
       align-items: stretch;
     }
@@ -781,52 +781,47 @@
       const nikkei = firstMatchItem(d600, ["日経平均"]);
       const usdjpy = firstMatchItem(d600, ["米ドル円", "ドル円"]);
       const nydow = firstMatchItem(d600, ["NYダウ", "ＮＹダウ"]);
-      const shanghai = firstMatchItem(d600, ["上海総合"]);
       const focus = current.trader_focus || {};
 
-      const quotes = [nikkei, usdjpy, nydow, shanghai].filter(
+      const quotes = [nikkei, usdjpy, nydow].filter(
         x => x && x.value && x.change && x.time
       );
+
+      const quoteHtml = quotes.length
+        ? quotes.map(item => `
+            <div class="quote">
+              <div class="quote-name">${esc(item.name || "-")}</div>
+              <div class="quote-value">${esc(item.value || "—")}</div>
+              <div class="quote-change ${quoteClass(item.change)}">
+                ${esc(item.change || "—")} ${esc(item.percent || "")}
+              </div>
+              <div class="quote-time">${esc(item.time || "")}</div>
+            </div>
+          `).join("")
+        : `
+          <div class="quote">
+            <div class="quote-name">主要指標</div>
+            <div class="quote-value">—</div>
+            <div class="quote-change warn">未取得</div>
+          </div>
+        `;
 
       els.heroPanel.innerHTML = `
         <div class="hero-grid">
           <div class="hero-main">
             <div class="hero-title">トレーダーズビュー</div>
-            <div class="hero-headline">${esc(focus.headline || current.summary || "本日の見立てデータなし")}</div>
+            <div class="hero-headline">
+              ${esc(focus.headline || current.summary || "本日の見立てデータなし")}
+            </div>
             <div class="hero-tags">
-              ${arr(focus.top_themes).length
-                ? arr(focus.top_themes).map(x => `<span class="hero-tag">${esc(x)}</span>`).join("")
-                : `<span class="hero-tag">テーマ未抽出</span>`}
+              ${
+                arr(focus.top_themes).length
+                  ? arr(focus.top_themes).map(x => `<span class="hero-tag">${esc(x)}</span>`).join("")
+                  : `<span class="hero-tag">テーマ未抽出</span>`
+              }
             </div>
           </div>
-
-          ${quotes.length
-            ? quotes.slice(0, 3).map(item => `
-                <div class="quote">
-                  <div class="quote-name">${esc(item.name || "-")}</div>
-                  <div class="quote-value">${esc(item.value || "—")}</div>
-                  <div class="quote-change ${quoteClass(item.change)}">${esc(item.change || "—")} ${esc(item.percent || "")}</div>
-                  <div class="quote-time">${esc(item.time || "")}</div>
-                </div>
-              `).join("")
-            : `
-                <div class="quote">
-                  <div class="quote-name">引用取得済み指標</div>
-                  <div class="quote-value">—</div>
-                  <div class="quote-change warn">未取得</div>
-                </div>
-                <div class="quote">
-                  <div class="quote-name">引用取得済み指標</div>
-                  <div class="quote-value">—</div>
-                  <div class="quote-change warn">未取得</div>
-                </div>
-                <div class="quote">
-                  <div class="quote-name">引用取得済み指標</div>
-                  <div class="quote-value">—</div>
-                  <div class="quote-change warn">未取得</div>
-                </div>
-              `
-          }
+          ${quoteHtml}
         </div>
       `;
     }
