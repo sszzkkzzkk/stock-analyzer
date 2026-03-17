@@ -45,8 +45,8 @@ def is_trading_day(d):
     return True
 
 
-def safe_get(url, timeout=20, headers=None):
-    r = requests.get(url, headers=headers or HEADERS, timeout=timeout)
+def safe_get(url, timeout=20, headers=None, params=None):
+    r = requests.get(url, headers=headers or HEADERS, timeout=timeout, params=params)
     r.raise_for_status()
     return r
 
@@ -72,63 +72,33 @@ def load(filename):
         return json.load(f)
 
 
+def save_text(filename, text):
+    path = DATA / filename
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
+    print(f"保存: {path}")
+
+
 def parse_json(raw):
     cleaned = re.sub(r"```json|```", "", raw).strip()
 
     start = cleaned.find("{")
     end = cleaned.rfind("}")
     if start == -1 or end == -1 or end <= start:
-        with open(DATA / "claude_raw.txt", "w", encoding="utf-8") as f:
-            f.write(raw)
-        return {
-            "date": datetime.now(JST).date().isoformat(),
-            "generated_at": datetime.now(JST).strftime("%H:%M"),
-            "summary": "Claudeの返答からJSONを抽出できませんでした",
-            "themes": [],
-            "market_data": {},
-            "data_sources": [],
-            "raw_saved": "data/claude_raw.txt",
-        }
+        raise ValueError("JSONオブジェクトの外形が見つかりません")
 
     body = cleaned[start:end + 1]
+    body = body.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
+    body = re.sub(r",\s*}", "}", body)
+    body = re.sub(r",\s*]", "]", body)
 
-    try:
-        return json.loads(body)
-    except json.JSONDecodeError as e1:
-        fixed = body
-        fixed = fixed.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
-        fixed = re.sub(r",\s*}", "}", fixed)
-        fixed = re.sub(r",\s*]", "]", fixed)
-
-        try:
-            return json.loads(fixed)
-        except json.JSONDecodeError as e2:
-            print(f"JSON parse error original: {e1}")
-            print(f"JSON parse error fixed: {e2}")
-            with open(DATA / "claude_raw.txt", "w", encoding="utf-8") as f:
-                f.write(raw)
-            with open(DATA / "claude_extracted.json.txt", "w", encoding="utf-8") as f:
-                f.write(body)
-            with open(DATA / "claude_fixed.json.txt", "w", encoding="utf-8") as f:
-                f.write(fixed)
-
-            return {
-                "date": datetime.now(JST).date().isoformat(),
-                "generated_at": datetime.now(JST).strftime("%H:%M"),
-                "summary": "ClaudeのJSON解析に失敗したため、フォールバック結果を返しました",
-                "themes": [],
-                "market_data": {},
-                "data_sources": [],
-                "raw_saved": "data/claude_raw.txt",
-                "extracted_saved": "data/claude_extracted.json.txt",
-                "fixed_saved": "data/claude_fixed.json.txt",
-            }
+    return json.loads(body)
 
 
 def call_claude(prompt):
     res = client.messages.create(
         model="claude-sonnet-4-5",
-        max_tokens=3500,
+        max_tokens=2200,
         messages=[{"role": "user", "content": prompt}],
     )
     return "".join(block.text for block in res.content if block.type == "text")
@@ -216,8 +186,7 @@ def yahoo_quote(symbol, label):
     headers["Referer"] = f"https://finance.yahoo.com/quote/{symbol}"
 
     try:
-        r = requests.get(url, params=params, headers=headers, timeout=20)
-        r.raise_for_status()
+        r = safe_get(url, timeout=20, headers=headers, params=params)
         data = r.json()
 
         result = data.get("chart", {}).get("result", [])
@@ -279,6 +248,46 @@ def fetch_strict_market_quotes():
     return quotes
 
 
+def parse_warning_table(rows, mode="gainers"):
+    parsed = []
+    for row in rows[1:]:
+        if len(row) < 4:
+            continue
+
+        code = ""
+        for cell in row:
+            if re.fullmatch(r"\d{4}[A-Z]?", cell):
+                code = cell
+                break
+        if not code:
+            continue
+
+        try:
+            idx = row.index(code)
+        except ValueError:
+            continue
+
+        name = row[idx + 1] if idx + 1 < len(row) else ""
+        if not name:
+            continue
+
+        item = {
+            "code": code,
+            "name": name,
+        }
+
+        if mode in ("gainers", "losers"):
+            item["price"] = row[idx + 2] if idx + 2 < len(row) else ""
+            item["change"] = row[-1] if row else ""
+        else:
+            item["volume"] = row[-2] if len(row) >= 2 else ""
+            item["change"] = row[-1] if row else ""
+
+        parsed.append(item)
+
+    return parsed[:15]
+
+
 def fetch_kabutan_theme_news():
     result = {
         "themes": [],
@@ -297,7 +306,7 @@ def fetch_kabutan_theme_news():
             t = clean_text(a.get_text(" ", strip=True))
             if 2 <= len(t) <= 30:
                 theme_candidates.append(t)
-        result["themes"] = list(dict.fromkeys(theme_candidates))[:15]
+        result["themes"] = list(dict.fromkeys(theme_candidates))[:10]
 
         news_candidates = []
         for a in soup.select("a[href]"):
@@ -345,46 +354,6 @@ def fetch_kabutan_theme_news():
             print(f"ランキング取得エラー {url}: {e}")
 
     return result
-
-
-def parse_warning_table(rows, mode="gainers"):
-    parsed = []
-    for row in rows[1:]:
-        if len(row) < 4:
-            continue
-
-        code = ""
-        for cell in row:
-            if re.fullmatch(r"\d{4}[A-Z]?", cell):
-                code = cell
-                break
-        if not code:
-            continue
-
-        try:
-            idx = row.index(code)
-        except ValueError:
-            continue
-
-        name = row[idx + 1] if idx + 1 < len(row) else ""
-        if not name:
-            continue
-
-        item = {
-            "code": code,
-            "name": name,
-        }
-
-        if mode in ("gainers", "losers"):
-            item["price"] = row[idx + 2] if idx + 2 < len(row) else ""
-            item["change"] = row[-1] if row else ""
-        else:
-            item["volume"] = row[-2] if len(row) >= 2 else ""
-            item["change"] = row[-1] if row else ""
-
-        parsed.append(item)
-
-    return parsed[:15]
 
 
 def fetch_nhk_news():
@@ -512,11 +481,143 @@ def build_trader_focus(result):
     return result
 
 
+def validate_600_analysis_json(obj):
+    if not isinstance(obj, dict):
+        raise ValueError("rootがdictではありません")
+
+    required = ["themes", "big_picture", "summary"]
+    for k in required:
+        if k not in obj:
+            raise ValueError(f"必須キー不足: {k}")
+
+    themes = obj.get("themes")
+    if not isinstance(themes, list) or len(themes) == 0:
+        raise ValueError("themesが空です")
+
+    for i, t in enumerate(themes[:3]):
+        if not isinstance(t, dict):
+            raise ValueError(f"theme[{i}]がdictではありません")
+        for k in ["rank", "name", "confidence_score", "rationale", "key_stocks", "risk_factors"]:
+            if k not in t:
+                raise ValueError(f"theme[{i}] 必須キー不足: {k}")
+
+    return True
+
+
+def build_analysis_prompt_600(today_str, learning_ctx, market, key_news):
+    compact_market = {
+        "indices": market["indices"][:2],
+        "futures": market["futures"][:1],
+        "forex": market["forex"][:1],
+        "world_indices": market["world_indices"][:1],
+        "top_gainers": market["top_gainers"][:8],
+        "top_losers": market["top_losers"][:8],
+        "volume_surge": market["volume_surge"][:6],
+        "themes": market["themes"][:8],
+        "key_news": key_news[:8],
+    }
+
+    schema = {
+        "themes": [
+            {
+                "rank": 1,
+                "name": "テーマ名",
+                "confidence_score": 80,
+                "rationale": "80字以内",
+                "key_stocks": [
+                    {"name": "銘柄名", "code": "1234", "reason": "40字以内"},
+                    {"name": "銘柄名", "code": "5678", "reason": "40字以内"}
+                ],
+                "risk_factors": "60字以内"
+            }
+        ],
+        "big_picture": "120字以内",
+        "summary": "160字以内"
+    }
+
+    return f"""
+You are a Japanese stock market analyst.
+Today is {today_str}.
+
+Learning context:
+{learning_ctx}
+
+Market data:
+{json.dumps(compact_market, ensure_ascii=False)}
+
+Task:
+- Predict today's strongest 3 themes in Japanese equities.
+- Use only the provided market data.
+- Return ONLY valid JSON.
+- Do not include markdown.
+- Do not include explanation outside JSON.
+- Keep strings short.
+- themes must contain exactly 3 items.
+- key_stocks must contain at most 2 items per theme.
+- If unsure, still output best-effort valid JSON.
+
+Required JSON schema:
+{json.dumps(schema, ensure_ascii=False)}
+
+Return ONLY JSON.
+""".strip()
+
+
+def run_claude_analysis_600(today, now, market, data_sources, key_news):
+    learning_ctx = load_learning_ctx()
+    today_str = today.strftime("%Y年%m月%d日")
+    prompt = build_analysis_prompt_600(today_str, learning_ctx, market, key_news)
+
+    raw = call_claude(prompt)
+    save_text("claude_raw_600.txt", raw)
+
+    parsed = parse_json(raw)
+    validate_600_analysis_json(parsed)
+
+    result = {
+        "date": today.isoformat(),
+        "session": "600",
+        "generated_at": now,
+        "data_sources": data_sources,
+        "market_data": {
+            "indices": market["indices"][:6],
+            "world_indices": market["world_indices"][:6],
+            "forex": market["forex"][:4],
+            "futures": market["futures"][:4],
+            "search_results": market["search_results"][:10],
+            "key_news": key_news[:10],
+        },
+        "themes": parsed["themes"][:3],
+        "big_picture": parsed["big_picture"],
+        "summary": parsed["summary"],
+    }
+
+    return build_trader_focus(result)
+
+
+def build_analysis_failure_600(today, now, market, data_sources, key_news, reason):
+    return {
+        "date": today.isoformat(),
+        "session": "600",
+        "generated_at": now,
+        "data_sources": data_sources,
+        "market_data": {
+            "indices": market["indices"][:6],
+            "world_indices": market["world_indices"][:6],
+            "forex": market["forex"][:4],
+            "futures": market["futures"][:4],
+            "search_results": market["search_results"][:10],
+            "key_news": key_news[:10],
+        },
+        "themes": [],
+        "big_picture": "分析失敗",
+        "summary": f"AI分析に失敗しました: {reason}",
+        "analysis_status": "failed",
+    }
+
+
 def run_600(today):
-    ctx = load_learning_ctx()
-    iso = today.isoformat()
     now = datetime.now(JST).strftime("%H:%M")
-    ymd = today.strftime("%Y年%m月%d日")
 
     print("[6:00] データ収集中...")
     market = fetch_all_market_data()
@@ -525,51 +626,14 @@ def run_600(today):
     data_sources = build_data_sources_summary(market, nhk, reuters)
     key_news = (market["news"] + nhk + reuters)[:10]
 
-    prompt = f"""IMPORTANT: Return ONLY valid JSON.
-No explanation. No markdown. Just JSON.
-Today is {ymd}. You are a Japanese stock market analyst.
-Based on the collected market data, predict today's TSE themes.
+    try:
+        print("[6:00] Claude分析中...")
+        result = run_claude_analysis_600(today, now, market, data_sources, key_news)
+    except Exception as e:
+        print(f"[6:00] Claude分析失敗: {e}")
+        result = build_analysis_failure_600(today, now, market, data_sources, key_news, str(e))
+        save_text("analysis_error_600.txt", str(e))
 
-Learning data: {ctx}
-
-Return this JSON:
-{{
-  "date": "{iso}",
-  "session": "600",
-  "generated_at": "{now}",
-  "data_sources": {json.dumps(data_sources, ensure_ascii=False)},
-  "market_data": {{
-    "indices": {json.dumps(market["indices"][:6], ensure_ascii=False)},
-    "world_indices": {json.dumps(market["world_indices"][:6], ensure_ascii=False)},
-    "forex": {json.dumps(market["forex"][:4], ensure_ascii=False)},
-    "futures": {json.dumps(market["futures"][:4], ensure_ascii=False)},
-    "search_results": {json.dumps(market["search_results"][:10], ensure_ascii=False)},
-    "key_news": {json.dumps(key_news, ensure_ascii=False)}
-  }},
-  "themes": [
-    {{
-      "rank": 1,
-      "name": "テーマ名",
-      "confidence_score": 85,
-      "rationale": "根拠",
-      "data_basis": ["参照したデータ1", "参照したデータ2"],
-      "key_stocks": [
-        {{"name": "銘柄名", "code": "コード", "reason": "理由"}}
-      ],
-      "risk_factors": "リスク",
-      "us_connection": "米国との連動"
-    }}
-  ],
-  "big_picture": "本日の最重要ファクター",
-  "summary": "相場展望"
-}}
-ONLY JSON, nothing else.
-"""
-
-    print("[6:00] Claude呼び出し中...")
-    result = parse_json(call_claude(prompt))
-    result["data_sources"] = data_sources
-    result = build_trader_focus(result)
     save("latest_600.json", result)
     return result
 
@@ -594,17 +658,13 @@ No explanation. No markdown. Just JSON.
 Today is {ymd} 9:05. Analyze opening market vs 6:00 prediction.
 
 6:00 Predicted Themes: {json.dumps(theme_names, ensure_ascii=False)}
-Top Gainers: {json.dumps(market['top_gainers'][:15], ensure_ascii=False)}
-Volume Surge: {json.dumps(market['volume_surge'][:10], ensure_ascii=False)}
-Hot Themes: {json.dumps(market['themes'][:10], ensure_ascii=False)}
-News: {json.dumps((market['news'] + nhk)[:10], ensure_ascii=False)}
+Top Gainers: {json.dumps(market['top_gainers'][:12], ensure_ascii=False)}
+Volume Surge: {json.dumps(market['volume_surge'][:8], ensure_ascii=False)}
+Hot Themes: {json.dumps(market['themes'][:8], ensure_ascii=False)}
+News: {json.dumps((market['news'] + nhk)[:8], ensure_ascii=False)}
 
 Return this JSON:
 {{
-  "date": "{iso}",
-  "session": "905",
-  "generated_at": "{now}",
-  "data_sources": {json.dumps(data_sources, ensure_ascii=False)},
   "opening": {{
     "nikkei_open": "値",
     "nikkei_change": "変化率",
@@ -612,15 +672,15 @@ Return this JSON:
     "dominant_theme": "主役テーマ"
   }},
   "actual_flow": [
-    {{"theme": "テーマ名", "evidence": "根拠", "strength": "high/medium/low"}}
+    {{"theme": "テーマ名", "evidence": "80字以内", "strength": "high"}}
   ],
   "prediction_gap": [
     {{
       "predicted_theme": "予測テーマ",
-      "predicted_score": 85,
+      "predicted_score": 80,
       "actual_result": "的中/外れ/部分的中",
-      "gap_reason": "理由",
-      "missed_factor": "見落とし"
+      "gap_reason": "60字以内",
+      "missed_factor": "40字以内"
     }}
   ],
   "intraday_correction": {{
@@ -629,14 +689,49 @@ Return this JSON:
     "correction_hints": ["ヒント1", "ヒント2"]
   }},
   "morning_accuracy_score": 70,
-  "summary": "寄り付き総評"
+  "summary": "120字以内"
 }}
 ONLY JSON.
 """
 
-    print("[9:05] Claude呼び出し中...")
-    result = parse_json(call_claude(prompt))
-    result["data_sources"] = data_sources
+    try:
+        raw = call_claude(prompt)
+        save_text("claude_raw_905.txt", raw)
+        parsed = parse_json(raw)
+
+        result = {
+            "date": iso,
+            "session": "905",
+            "generated_at": now,
+            "data_sources": data_sources,
+            **parsed,
+        }
+    except Exception as e:
+        print(f"[9:05] Claude分析失敗: {e}")
+        result = {
+            "date": iso,
+            "session": "905",
+            "generated_at": now,
+            "data_sources": data_sources,
+            "opening": {
+                "nikkei_open": "",
+                "nikkei_change": "",
+                "market_tone": "未分析",
+                "dominant_theme": "",
+            },
+            "actual_flow": [],
+            "prediction_gap": [],
+            "intraday_correction": {
+                "themes_to_watch": [],
+                "themes_faded": [],
+                "correction_hints": [],
+            },
+            "morning_accuracy_score": 0,
+            "summary": f"AI分析に失敗しました: {e}",
+            "analysis_status": "failed",
+        }
+        save_text("analysis_error_905.txt", str(e))
+
     save("latest_905.json", result)
     return result
 
@@ -669,50 +764,85 @@ Today is {ymd} 15:35. Summarize the full day's market.
 6:00 Predicted Themes: {json.dumps(theme_names, ensure_ascii=False)}
 9:05 Gap Analysis: {json.dumps(gap_905, ensure_ascii=False)}
 9:05 Correction Hints: {json.dumps(hints_905, ensure_ascii=False)}
-Top Gainers: {json.dumps(market['top_gainers'][:15], ensure_ascii=False)}
-Top Losers: {json.dumps(market['top_losers'][:10], ensure_ascii=False)}
-Volume Surge: {json.dumps(market['volume_surge'][:10], ensure_ascii=False)}
-Hot Themes: {json.dumps(market['themes'][:15], ensure_ascii=False)}
-News: {json.dumps((market['news'] + nhk + reuters)[:12], ensure_ascii=False)}
+Top Gainers: {json.dumps(market['top_gainers'][:12], ensure_ascii=False)}
+Top Losers: {json.dumps(market['top_losers'][:8], ensure_ascii=False)}
+Volume Surge: {json.dumps(market['volume_surge'][:8], ensure_ascii=False)}
+Hot Themes: {json.dumps(market['themes'][:10], ensure_ascii=False)}
+News: {json.dumps((market['news'] + nhk + reuters)[:10], ensure_ascii=False)}
 
 Return this JSON:
 {{
-  "date": "{iso}",
-  "session": "1535",
-  "generated_at": "{now}",
-  "data_sources": {json.dumps(data_sources, ensure_ascii=False)},
   "closing": {{
     "nikkei": "終値と変化率",
     "topix": "終値と変化率",
-    "total_assessment": "総評"
+    "total_assessment": "100字以内"
   }},
   "theme_results": [
-    {{"name": "テーマ名", "morning_score": 85, "final_result": "的中/外れ/部分的中", "detail": "詳細"}}
+    {{"name": "テーマ名", "morning_score": 80, "final_result": "的中/外れ/部分的中", "detail": "60字以内"}}
   ],
   "stock_results": [
-    {{"name": "銘柄名", "code": "コード", "close": "終値", "change": "変化率", "comment": "コメント"}}
+    {{"name": "銘柄名", "code": "1234", "close": "終値", "change": "変化率", "comment": "50字以内"}}
   ],
   "news_impact": [
-    {{"news": "ニュース", "impact": "影響"}}
+    {{"news": "ニュース", "impact": "60字以内"}}
   ],
-  "correction_evaluation": "9:05修正の評価",
+  "correction_evaluation": "80字以内",
   "tomorrow_outlook": {{
     "key_events": ["イベント1", "イベント2"],
     "watch_themes": ["テーマ1", "テーマ2"],
-    "hint": "明日のヒント"
+    "hint": "80字以内"
   }},
   "final_accuracy_score": 75,
   "strongest_theme": "最も的中したテーマ",
   "weakest_theme": "最も外れたテーマ",
   "learning_points": ["学習1", "学習2", "学習3"],
-  "summary": "本日の総括"
+  "summary": "120字以内"
 }}
 ONLY JSON.
 """
 
-    print("[15:35] Claude呼び出し中...")
-    result = parse_json(call_claude(prompt))
-    result["data_sources"] = data_sources
+    try:
+        raw = call_claude(prompt)
+        save_text("claude_raw_1535.txt", raw)
+        parsed = parse_json(raw)
+
+        result = {
+            "date": iso,
+            "session": "1535",
+            "generated_at": now,
+            "data_sources": data_sources,
+            **parsed,
+        }
+    except Exception as e:
+        print(f"[15:35] Claude分析失敗: {e}")
+        result = {
+            "date": iso,
+            "session": "1535",
+            "generated_at": now,
+            "data_sources": data_sources,
+            "closing": {
+                "nikkei": "",
+                "topix": "",
+                "total_assessment": "未分析",
+            },
+            "theme_results": [],
+            "stock_results": [],
+            "news_impact": [],
+            "correction_evaluation": "",
+            "tomorrow_outlook": {
+                "key_events": [],
+                "watch_themes": [],
+                "hint": "",
+            },
+            "final_accuracy_score": 0,
+            "strongest_theme": "",
+            "weakest_theme": "",
+            "learning_points": [],
+            "summary": f"AI分析に失敗しました: {e}",
+            "analysis_status": "failed",
+        }
+        save_text("analysis_error_1535.txt", str(e))
+
     save("latest_1535.json", result)
 
     logs = load("accuracy_log.json") or []
