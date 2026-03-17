@@ -42,7 +42,7 @@
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .brand {
@@ -64,12 +64,13 @@
     .title {
       font-size: 24px;
       font-weight: 800;
+      line-height: 1.1;
     }
 
     .subtitle {
       font-size: 13px;
       color: var(--muted);
-      margin-top: 2px;
+      margin-top: 4px;
     }
 
     .btn {
@@ -91,28 +92,29 @@
       background: linear-gradient(135deg, var(--accent), var(--accent2));
     }
 
-    .statusbar {
+    .top-mini {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
     }
 
-    .stat {
+    .mini-card {
       background: rgba(17,26,52,.96);
       border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 14px;
+      border-radius: 16px;
+      padding: 12px 14px;
+      min-width: 0;
     }
 
-    .stat .label {
+    .mini-label {
       color: var(--muted);
       font-size: 12px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .stat .value {
-      font-size: 18px;
+    .mini-value {
+      font-size: 15px;
       font-weight: 700;
       word-break: break-word;
     }
@@ -122,7 +124,7 @@
       border: 1px solid var(--line);
       border-radius: 22px;
       padding: 18px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .hero h2 {
@@ -177,7 +179,7 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .tab {
@@ -389,7 +391,7 @@
     }
 
     @media (max-width: 900px) {
-      .statusbar,
+      .top-mini,
       .hero-grid,
       .grid.two,
       .grid.three {
@@ -419,24 +421,24 @@
       <button class="btn" id="refreshBtn">↻ 再読込</button>
     </div>
 
-    <div class="statusbar">
-      <div class="stat">
-        <div class="label">接続先</div>
-        <div class="value" id="repoStatus">未設定</div>
+    <section class="top-mini">
+      <div class="mini-card">
+        <div class="mini-label">接続先</div>
+        <div class="mini-value" id="repoStatus">未設定</div>
       </div>
-      <div class="stat">
-        <div class="label">最新6:00</div>
-        <div class="value" id="status600">-</div>
+      <div class="mini-card">
+        <div class="mini-label">6:00</div>
+        <div class="mini-value" id="status600">-</div>
       </div>
-      <div class="stat">
-        <div class="label">最新9:05</div>
-        <div class="value" id="status905">-</div>
+      <div class="mini-card">
+        <div class="mini-label">9:05</div>
+        <div class="mini-value" id="status905">-</div>
       </div>
-      <div class="stat">
-        <div class="label">最新15:35</div>
-        <div class="value" id="status1535">-</div>
+      <div class="mini-card">
+        <div class="mini-label">15:35</div>
+        <div class="mini-value" id="status1535">-</div>
       </div>
-    </div>
+    </section>
 
     <section class="hero" id="heroPanel"></section>
 
@@ -541,6 +543,16 @@
               <div class="item-sub">${formatValue(x)}</div>
             </div>
           `).join("")}
+        </div>
+      `;
+    }
+
+    function renderNewsLines(items) {
+      const list = arr(items).filter(Boolean);
+      if (!list.length) return `<div class="empty">ニュースなし</div>`;
+      return `
+        <div class="list">
+          ${list.map(x => `<div class="item"><div class="item-sub">${esc(x)}</div></div>`).join("")}
         </div>
       `;
     }
@@ -784,9 +796,9 @@
     }
 
     function renderHero(d600, d905, d1535) {
-      const base = d600 || d905 || d1535;
-      if (!base) {
-        els.heroPanel.innerHTML = `<div class="empty">速報データがまだありません</div>`;
+      const source = d600 || d905 || d1535;
+      if (!source) {
+        els.heroPanel.style.display = "none";
         return;
       }
 
@@ -794,33 +806,39 @@
       const usdjpy = firstMatchItem(d600, ["米ドル円", "ドル円"]);
       const nydow = firstMatchItem(d600, ["NYダウ", "ＮＹダウ"]);
       const shanghai = firstMatchItem(d600, ["上海総合"]);
+      const cards = [nikkei, usdjpy, nydow, shanghai];
 
-      const cards = [nikkei, usdjpy, nydow, shanghai].map((item, idx) => {
-        const names = ["日経平均", "ドル円", "NYダウ", "上海総合"];
-        const fallback = names[idx];
-        if (!item) {
-          return `
-            <div class="quote">
-              <div class="quote-name">${esc(fallback)}</div>
-              <div class="quote-value">—</div>
-              <div class="quote-change warn">データなし</div>
-            </div>
-          `;
-        }
-        return `
-          <div class="quote">
-            <div class="quote-name">${esc(item.name || fallback)}</div>
-            <div class="quote-value">${esc(item.value || "—")}</div>
-            <div class="quote-change ${quoteClass(item.change)}">${esc(item.change || "—")} ${esc(item.percent || "")}</div>
-            <div class="quote-time">${esc(item.time || "")}</div>
-          </div>
-        `;
-      }).join("");
+      const hasAny = cards.some(x => x && (x.value || x.change || x.time));
+      if (!hasAny) {
+        els.heroPanel.style.display = "none";
+        return;
+      }
 
+      els.heroPanel.style.display = "block";
       els.heroPanel.innerHTML = `
         <h2>マーケット速報</h2>
         <div class="hero-grid">
-          ${cards}
+          ${cards.map((item, idx) => {
+            const names = ["日経平均", "ドル円", "NYダウ", "上海総合"];
+            const fallback = names[idx];
+            if (!item) {
+              return `
+                <div class="quote">
+                  <div class="quote-name">${esc(fallback)}</div>
+                  <div class="quote-value">—</div>
+                  <div class="quote-change warn">データなし</div>
+                </div>
+              `;
+            }
+            return `
+              <div class="quote">
+                <div class="quote-name">${esc(item.name || fallback)}</div>
+                <div class="quote-value">${esc(item.value || "—")}</div>
+                <div class="quote-change ${quoteClass(item.change)}">${esc(item.change || "—")} ${esc(item.percent || "")}</div>
+                <div class="quote-time">${esc(item.time || "")}</div>
+              </div>
+            `;
+          }).join("")}
         </div>
       `;
     }
@@ -851,8 +869,8 @@
         </div>
 
         <div class="card" style="margin-top:14px;">
-          <h3>検索結果</h3>
-          ${renderSimpleList(market.search_results, "検索結果なし")}
+          <h3>取得状況</h3>
+          ${renderSimpleList(market.search_results, "取得状況なし")}
         </div>
 
         <div class="grid three" style="margin-top:14px;">
@@ -873,7 +891,7 @@
               </div>
               <div class="item">
                 <div class="item-title">主要ニュース</div>
-                <div class="item-sub">${arr(market.key_news).map(esc).join("<br>") || "データなし"}</div>
+                ${renderNewsLines(market.key_news)}
               </div>
             </div>
           </div>
