@@ -1,5 +1,5 @@
 """
-株式AI自動分析 v6
+株式AI自動分析
 SESSION=600 / 905 / 1535
 """
 
@@ -21,18 +21,18 @@ JST = timezone(timedelta(hours=9))
 DATA = Path("data")
 DATA.mkdir(exist_ok=True)
 
-client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-
 YEAR_END = {(12, 31), (1, 1), (1, 2), (1, 3)}
 
-H = {
+HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/120.0.0.0 Safari/537.36"
+        "Chrome/122.0.0.0 Safari/537.36"
     ),
-    "Accept-Language": "ja,en;q=0.9",
+    "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
 }
+
+client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
 
 def is_trading_day(d):
@@ -45,77 +45,8 @@ def is_trading_day(d):
     return True
 
 
-def call_claude(prompt):
-    res = client.messages.create(
-        model="claude-sonnet-4-5",
-        max_tokens=4000,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return "".join(b.text for b in res.content if b.type == "text")
-
-
-def parse_json(raw):
-    clean = re.sub(r"```json|```", "", raw).strip()
-    m = re.search(r"\{[\s\S]*\}", clean)
-    if not m:
-        raise ValueError(f"JSON not found: {raw[:200]}")
-    text = m.group()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        text = re.sub(r",\s*}", "}", text)
-        text = re.sub(r",\s*]", "]", text)
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError:
-            return {
-                "date": datetime.now(JST).date().isoformat(),
-                "generated_at": datetime.now(JST).strftime("%H:%M"),
-                "summary": "JSON解析エラー",
-                "themes": [],
-                "market_data": {},
-                "data_sources": [],
-            }
-
-
-def save(filename, data):
-    p = DATA / filename
-    with open(p, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    print(f"保存: {p}")
-
-
-def load(filename):
-    p = DATA / filename
-    if not p.exists():
-        return None
-    with open(p, encoding="utf-8") as f:
-        return json.load(f)
-
-
-def load_learning_ctx():
-    logs = load("accuracy_log.json")
-    if not logs:
-        return "初回実行"
-
-    recent = logs[-10:]
-    avg = sum(r.get("accuracy_score", 0) for r in recent) / len(recent)
-    weak = list({r.get("weakest_theme", "") for r in recent if r.get("weakest_theme")})
-    strong = list({r.get("strongest_theme", "") for r in recent if r.get("strongest_theme")})
-    hints = []
-    for r in recent[-3:]:
-        hints.extend(r.get("improvement_hints", []))
-
-    return (
-        f"過去{len(recent)}日平均精度:{avg:.0f}点 "
-        f"的中:{','.join(strong[:2])} "
-        f"外れ:{','.join(weak[:2])} "
-        f"ヒント:{' / '.join(hints[-2:])}"
-    )
-
-
-def safe_get(url, timeout=15):
-    r = requests.get(url, headers=H, timeout=timeout)
+def safe_get(url, timeout=20):
+    r = requests.get(url, headers=HEADERS, timeout=timeout)
     r.raise_for_status()
     return r
 
@@ -124,6 +55,70 @@ def clean_text(text):
     if not text:
         return ""
     return re.sub(r"\s+", " ", text).strip()
+
+
+def save(filename, data):
+    path = DATA / filename
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    print(f"保存: {path}")
+
+
+def load(filename):
+    path = DATA / filename
+    if not path.exists():
+        return None
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def parse_json(raw):
+    cleaned = re.sub(r"```json|```", "", raw).strip()
+    m = re.search(r"\{[\s\S]*\}", cleaned)
+    if not m:
+        raise ValueError(f"JSON not found: {raw[:300]}")
+
+    body = m.group(0)
+    try:
+        return json.loads(body)
+    except json.JSONDecodeError:
+        body = re.sub(r",\s*}", "}", body)
+        body = re.sub(r",\s*]", "]", body)
+        return json.loads(body)
+
+
+def call_claude(prompt):
+    res = client.messages.create(
+        model="claude-sonnet-4-5",
+        max_tokens=3500,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return "".join(block.text for block in res.content if block.type == "text")
+
+
+def load_learning_ctx():
+    logs = load("accuracy_log.json")
+    if not logs:
+        return "初回実行"
+
+    recent = logs[-10:]
+    avg = sum(x.get("accuracy_score", 0) for x in recent) / max(len(recent), 1)
+    strong = [x.get("strongest_theme", "") for x in recent if x.get("strongest_theme")]
+    weak = [x.get("weakest_theme", "") for x in recent if x.get("weakest_theme")]
+    hints = []
+    for x in recent[-3:]:
+        hints.extend(x.get("improvement_hints", []))
+
+    strong = list(dict.fromkeys(strong))[:3]
+    weak = list(dict.fromkeys(weak))[:3]
+    hints = hints[-3:]
+
+    return (
+        f"過去{len(recent)}日平均精度:{avg:.0f}点 "
+        f"強かったテーマ:{' / '.join(strong) if strong else 'なし'} "
+        f"弱かったテーマ:{' / '.join(weak) if weak else 'なし'} "
+        f"改善ヒント:{' / '.join(hints) if hints else 'なし'}"
+    )
 
 
 def extract_table_rows(table, limit=30):
@@ -138,30 +133,138 @@ def extract_table_rows(table, limit=30):
     return rows
 
 
-def find_first_code(row):
-    for cell in row:
-        m = re.fullmatch(r"\d{4}", cell)
-        if m:
-            return cell
-    return ""
+def split_top_metric_block(text):
+    """
+    例:
+    '54,110.50 -230.73 158.51 +0.05 49,149.63 -42.36 4,112.60 -13.49'
+    '-0.42% 0.04% -0.09% -0.33%'
+    """
+    nums = text.split()
+    pairs = []
+    for i in range(0, len(nums), 2):
+        if i + 1 < len(nums):
+            pairs.append((nums[i], nums[i + 1]))
+    return pairs
 
 
-def parse_rank_rows(rows, mode="gainers"):
+def fetch_kabutan_home():
+    result = {
+        "indices": [],
+        "world_indices": [],
+        "forex": [],
+        "themes": [],
+        "sector": [],
+        "news": [],
+    }
+
+    try:
+        r = safe_get("https://kabutan.jp/")
+        soup = BeautifulSoup(r.text, "html.parser")
+        lines = [clean_text(x) for x in soup.get_text("\n", strip=True).splitlines()]
+        lines = [x for x in lines if x]
+
+        # トップの市況ブロック
+        # 参照: 日経平均, 米ドル円, ＮＹダウ, 上海総合 の並び
+        try:
+            nikkei_idx = lines.index("日経平均")
+            usdjpy_idx = lines.index("米ドル円")
+            nydow_idx = lines.index("ＮＹダウ") if "ＮＹダウ" in lines else lines.index("NYダウ")
+            shanghai_idx = lines.index("上海総合")
+
+            times = [
+                lines[nikkei_idx + 1] if nikkei_idx + 1 < len(lines) else "",
+                lines[usdjpy_idx + 1] if usdjpy_idx + 1 < len(lines) else "",
+                lines[nydow_idx + 1] if nydow_idx + 1 < len(lines) else "",
+                lines[shanghai_idx + 1] if shanghai_idx + 1 < len(lines) else "",
+            ]
+
+            block1 = ""
+            block2 = ""
+            for i, line in enumerate(lines):
+                if re.search(r"\d[\d,]*\.\d+\s+[+\-]\d[\d,]*\.\d+", line):
+                    if i + 1 < len(lines) and "%" in lines[i + 1]:
+                        block1 = line
+                        block2 = lines[i + 1]
+                        break
+
+            pairs = split_top_metric_block(block1)
+            percs = block2.split()
+
+            names = ["日経平均", "米ドル円", "ＮＹダウ", "上海総合"]
+            for i, name in enumerate(names):
+                value = pairs[i][0] if i < len(pairs) else ""
+                change = pairs[i][1] if i < len(pairs) else ""
+                pct = percs[i] if i < len(percs) else ""
+                item = {
+                    "name": name,
+                    "value": value,
+                    "change": change,
+                    "percent": pct,
+                    "time": times[i] if i < len(times) else "",
+                }
+                if name in ["日経平均"]:
+                    result["indices"].append(item)
+                elif name in ["米ドル円"]:
+                    result["forex"].append(item)
+                else:
+                    result["world_indices"].append(item)
+        except Exception as e:
+            print(f"トップ市況解析エラー: {e}")
+
+        # 人気テーマ
+        try:
+            theme_start = lines.index("人気テーマ")
+            # 3日間ランキングの後に数字とテーマ名が並ぶ
+            theme_candidates = []
+            for line in lines[theme_start: theme_start + 80]:
+                if line.isdigit():
+                    continue
+                if line in ["人気テーマ", "(3日間のﾗﾝｷﾝｸﾞ)", "ベスト30を見る"]:
+                    continue
+                if 2 <= len(line) <= 30 and re.search(r"[ぁ-んァ-ン一-龥A-Za-z0-9]", line):
+                    if not re.search(r"%|日経平均|米ドル円|ＮＹダウ|上海総合", line):
+                        theme_candidates.append(line)
+            result["themes"] = list(dict.fromkeys(theme_candidates))[:15]
+        except Exception as e:
+            print(f"テーマ解析エラー: {e}")
+
+        # トップニュース
+        try:
+            news_candidates = []
+            for a in soup.select("a[href*='/news/']"):
+                text = clean_text(a.get_text(" ", strip=True))
+                if len(text) >= 12:
+                    news_candidates.append(text)
+            result["news"] = list(dict.fromkeys(news_candidates))[:12]
+        except Exception as e:
+            print(f"ニュース解析エラー: {e}")
+
+    except Exception as e:
+        print(f"ホーム取得エラー: {e}")
+
+    return result
+
+
+def parse_warning_table(rows, mode="gainers"):
     parsed = []
     for row in rows[1:]:
         if len(row) < 4:
             continue
 
-        code = find_first_code(row)
+        code = ""
+        for cell in row:
+            if re.fullmatch(r"\d{4}[A-Z]?", cell):
+                code = cell
+                break
         if not code:
             continue
 
         try:
-            code_idx = row.index(code)
+            idx = row.index(code)
         except ValueError:
             continue
 
-        name = row[code_idx + 1] if code_idx + 1 < len(row) else ""
+        name = row[idx + 1] if idx + 1 < len(row) else ""
         if not name:
             continue
 
@@ -171,42 +274,15 @@ def parse_rank_rows(rows, mode="gainers"):
         }
 
         if mode in ("gainers", "losers"):
-            item["price"] = row[-2] if len(row) >= 2 else ""
-            item["change"] = row[-1] if len(row) >= 1 else ""
-        elif mode == "volume":
+            item["price"] = row[idx + 2] if idx + 2 < len(row) else ""
+            item["change"] = row[-1] if row else ""
+        else:
             item["volume"] = row[-2] if len(row) >= 2 else ""
-            item["change"] = row[-1] if len(row) >= 1 else ""
+            item["change"] = row[-1] if row else ""
 
         parsed.append(item)
 
     return parsed[:15]
-
-
-def fetch_kabutan_news():
-    news = []
-    urls = [
-        "https://kabutan.jp/news/marketnews/",
-        "https://kabutan.jp/news/?b=n1",
-    ]
-
-    for url in urls:
-        try:
-            r = safe_get(url)
-            soup = BeautifulSoup(r.text, "html.parser")
-
-            for a in soup.select("a[href*='/news/']"):
-                text = clean_text(a.get_text(" ", strip=True))
-                href = a.get("href", "")
-                if "/news/" in href and len(text) >= 12 and text not in news:
-                    news.append(text)
-                if len(news) >= 12:
-                    return news[:12]
-
-            time.sleep(0.5)
-        except Exception as e:
-            print(f"かぶたんニュース取得エラー {url}: {e}")
-
-    return news[:12]
 
 
 def fetch_kabutan_ranking():
@@ -217,113 +293,96 @@ def fetch_kabutan_ranking():
     }
 
     pages = [
-        ("gainers", "https://kabutan.jp/stock/ranking/?market=0&updown=1"),
-        ("losers", "https://kabutan.jp/stock/ranking/?market=0&updown=2"),
-        ("volume", "https://kabutan.jp/stock/ranking/?market=0&info=volume"),
-        ("fallback", "https://kabutan.jp/stock/ranking/"),
+        ("gainers", "https://kabutan.jp/warning/?mode=2_1"),
+        ("losers", "https://kabutan.jp/warning/?mode=2_2"),
+        ("volume", "https://kabutan.jp/warning/?mode=25_1"),
     ]
 
     for kind, url in pages:
         try:
             r = safe_get(url)
             soup = BeautifulSoup(r.text, "html.parser")
-            tables = soup.find_all("table")
 
-            for table in tables:
-                rows = extract_table_rows(table, limit=25)
+            found = False
+            for table in soup.find_all("table"):
+                rows = extract_table_rows(table, limit=40)
                 if len(rows) < 3:
                     continue
 
                 header = " | ".join(rows[0])
 
-                if kind == "gainers" and not result["top_gainers"]:
-                    if "コード" in header and "銘柄名" in header:
-                        parsed = parse_rank_rows(rows, "gainers")
-                        if parsed:
-                            result["top_gainers"] = parsed
+                if kind == "gainers" and "コード" in header and "銘柄名" in header:
+                    parsed = parse_warning_table(rows, "gainers")
+                    if parsed:
+                        result["top_gainers"] = parsed
+                        found = True
+                        break
 
-                elif kind == "losers" and not result["top_losers"]:
-                    if "コード" in header and "銘柄名" in header:
-                        parsed = parse_rank_rows(rows, "losers")
-                        if parsed:
-                            result["top_losers"] = parsed
+                if kind == "losers" and "コード" in header and "銘柄名" in header:
+                    parsed = parse_warning_table(rows, "losers")
+                    if parsed:
+                        result["top_losers"] = parsed
+                        found = True
+                        break
 
-                elif kind == "volume" and not result["volume_surge"]:
-                    if "コード" in header and ("出来高" in header or "売買高" in header):
-                        parsed = parse_rank_rows(rows, "volume")
-                        if parsed:
-                            result["volume_surge"] = parsed
+                if kind == "volume" and "コード" in header and ("出来高" in header or "売買高" in header):
+                    parsed = parse_warning_table(rows, "volume")
+                    if parsed:
+                        result["volume_surge"] = parsed
+                        found = True
+                        break
 
-                elif kind == "fallback":
-                    if not result["top_gainers"] and "コード" in header and "銘柄名" in header:
-                        result["top_gainers"] = parse_rank_rows(rows, "gainers")
-                    if not result["volume_surge"] and "コード" in header and ("出来高" in header or "売買高" in header):
-                        result["volume_surge"] = parse_rank_rows(rows, "volume")
+            if not found and kind == "volume":
+                print(f"出来高ページ解析失敗: {url}")
 
-            time.sleep(0.5)
+            time.sleep(0.4)
+
         except Exception as e:
             print(f"ランキング取得エラー {url}: {e}")
 
     return result
 
 
-def fetch_kabutan_market():
-    result = {
-        "indices": [],
-        "world_indices": [],
-        "forex": [],
-        "sector": [],
-        "themes": [],
-    }
-
+def fetch_nhk_news():
+    news = []
     try:
-        r = safe_get("https://kabutan.jp/market/")
+        r = safe_get("https://www3.nhk.or.jp/news/")
         soup = BeautifulSoup(r.text, "html.parser")
-
-        for tr in soup.select("tr"):
-            row = [clean_text(x.get_text(" ", strip=True)) for x in tr.select("th, td")]
-            row = [x for x in row if x]
-            if not row:
-                continue
-
-            joined = " | ".join(row)
-
-            if any(k in joined for k in ["日経平均", "TOPIX", "東証グロース", "JPX日経"]):
-                result["indices"].append(joined)
-
-            if any(k in joined for k in ["NYダウ", "NASDAQ", "S&P500", "SOX", "DAX", "上海総合"]):
-                result["world_indices"].append(joined)
-
-            if any(k in joined for k in ["ドル円", "ユーロ円", "ユーロドル"]):
-                result["forex"].append(joined)
-
-            if any(k in joined for k in ["水産・農林", "鉱業", "建設", "電気機器", "銀行業", "輸送用機器", "情報・通信", "不動産業"]):
-                result["sector"].append(joined)
-
-        result["indices"] = list(dict.fromkeys(result["indices"]))[:10]
-        result["world_indices"] = list(dict.fromkeys(result["world_indices"]))[:10]
-        result["forex"] = list(dict.fromkeys(result["forex"]))[:10]
-        result["sector"] = list(dict.fromkeys(result["sector"]))[:20]
-
-    except Exception as e:
-        print(f"market取得エラー: {e}")
-
-    try:
-        r = safe_get("https://kabutan.jp/themes/")
-        soup = BeautifulSoup(r.text, "html.parser")
-
-        theme_candidates = []
-        for a in soup.select("a[href*='/themes/']"):
+        for a in soup.select("a"):
             text = clean_text(a.get_text(" ", strip=True))
-            if 2 <= len(text) <= 30:
-                theme_candidates.append(text)
-
-        result["themes"] = list(dict.fromkeys(theme_candidates))[:20]
-
+            if len(text) >= 15 and text not in news:
+                news.append(text[:120])
+            if len(news) >= 10:
+                break
+        print(f"NHKニュース: {len(news)}件")
     except Exception as e:
-        print(f"themes取得エラー: {e}")
+        print(f"NHKエラー: {e}")
+    return news[:10]
 
-    return result
+
+def fetch_reuters_news():
+    news = []
+    urls = [
+        "https://jp.reuters.com/markets/",
+        "https://jp.reuters.com/business/",
+        "https://jp.reuters.com/world/",
+    ]
+    for url in urls:
+        try:
+            r = safe_get(url)
+            soup = BeautifulSoup(r.text, "html.parser")
+            for el in soup.select("a, h2, h3"):
+                text = clean_text(el.get_text(" ", strip=True))
+                if len(text) >= 15 and text not in news:
+                    news.append(text[:120])
+                if len(news) >= 10:
+                    print(f"ロイターニュース: {len(news)}件")
+                    return news[:10]
+            time.sleep(0.4)
+        except Exception as e:
+            print(f"ロイターエラー {url}: {e}")
+    print(f"ロイターニュース: {len(news)}件")
+    return news[:10]
 
 
 def fetch_kabutan():
@@ -340,13 +399,18 @@ def fetch_kabutan():
         "source": "kabutan.jp",
     }
 
-    market_data = fetch_kabutan_market()
-    ranking_data = fetch_kabutan_ranking()
-    news_data = fetch_kabutan_news()
+    home = fetch_kabutan_home()
+    ranking = fetch_kabutan_ranking()
 
-    result.update(market_data)
-    result.update(ranking_data)
-    result["news"] = news_data
+    result["indices"] = home.get("indices", [])
+    result["world_indices"] = home.get("world_indices", [])
+    result["forex"] = home.get("forex", [])
+    result["sector"] = home.get("sector", [])
+    result["themes"] = home.get("themes", [])
+    result["news"] = home.get("news", [])
+    result["top_gainers"] = ranking.get("top_gainers", [])
+    result["top_losers"] = ranking.get("top_losers", [])
+    result["volume_surge"] = ranking.get("volume_surge", [])
 
     print("=== kabutan summary ===")
     print(f"indices: {len(result['indices'])}")
@@ -362,56 +426,14 @@ def fetch_kabutan():
     return result
 
 
-def fetch_nhk_news():
-    news = []
-    try:
-        r = safe_get("https://www3.nhk.or.jp/news/catnew.html")
-        soup = BeautifulSoup(r.text, "html.parser")
-        for item in soup.select("ul.content--list li, div.content--header, a"):
-            text = clean_text(item.get_text(" ", strip=True))
-            if len(text) > 15 and text not in news:
-                news.append(text[:120])
-            if len(news) >= 10:
-                break
-        print(f"NHKニュース: {len(news)}件")
-    except Exception as e:
-        print(f"NHKエラー: {e}")
-    return news
-
-
-def fetch_reuters_news():
-    news = []
-    urls = [
-        "https://jp.reuters.com/world/",
-        "https://jp.reuters.com/business/",
-        "https://jp.reuters.com/markets/",
-    ]
-    for url in urls:
-        try:
-            r = safe_get(url)
-            soup = BeautifulSoup(r.text, "html.parser")
-            for item in soup.select("a, h2, h3"):
-                text = clean_text(item.get_text(" ", strip=True))
-                if len(text) > 15 and text not in news:
-                    news.append(text[:120])
-                if len(news) >= 10:
-                    print(f"ロイターニュース: {len(news)}件")
-                    return news
-            time.sleep(0.5)
-        except Exception as e:
-            print(f"ロイターエラー {url}: {e}")
-    print(f"ロイターニュース: {len(news)}件")
-    return news
-
-
 def build_data_sources_summary(kabutan, nhk, reuters):
     sources = []
     if kabutan.get("indices"):
         sources.append(f"かぶたん国内指数{len(kabutan['indices'])}件")
     if kabutan.get("world_indices"):
         sources.append(f"かぶたん海外指数{len(kabutan['world_indices'])}件")
-    if kabutan.get("sector"):
-        sources.append(f"業種別騰落{len(kabutan['sector'])}件")
+    if kabutan.get("forex"):
+        sources.append(f"かぶたん為替{len(kabutan['forex'])}件")
     if kabutan.get("top_gainers"):
         sources.append(f"値上がり{len(kabutan['top_gainers'])}件")
     if kabutan.get("top_losers"):
@@ -440,8 +462,7 @@ def run_600(today):
     nhk = fetch_nhk_news()
     reuters = fetch_reuters_news()
     data_sources = build_data_sources_summary(kabutan, nhk, reuters)
-
-    key_news = (kabutan["news"] + nhk + reuters)[:8]
+    key_news = (kabutan["news"] + nhk + reuters)[:10]
 
     prompt = f"""IMPORTANT: Return ONLY valid JSON.
 No explanation. No markdown. Just JSON.
@@ -457,9 +478,9 @@ Return this JSON:
   "generated_at": "{now}",
   "data_sources": {json.dumps(data_sources, ensure_ascii=False)},
   "market_data": {{
-    "indices": {json.dumps(kabutan['indices'][:6], ensure_ascii=False)},
-    "world_indices": {json.dumps(kabutan['world_indices'][:6], ensure_ascii=False)},
-    "forex": {json.dumps(kabutan['forex'][:4], ensure_ascii=False)},
+    "indices": {json.dumps(kabutan["indices"][:6], ensure_ascii=False)},
+    "world_indices": {json.dumps(kabutan["world_indices"][:6], ensure_ascii=False)},
+    "forex": {json.dumps(kabutan["forex"][:4], ensure_ascii=False)},
     "key_news": {json.dumps(key_news, ensure_ascii=False)}
   }},
   "themes": [
@@ -511,7 +532,6 @@ Today is {ymd} 9:05. Analyze opening market vs 6:00 prediction.
 6:00 Predicted Themes: {json.dumps(theme_names, ensure_ascii=False)}
 Top Gainers: {json.dumps(kabutan['top_gainers'][:15], ensure_ascii=False)}
 Volume Surge: {json.dumps(kabutan['volume_surge'][:10], ensure_ascii=False)}
-Sector: {json.dumps(kabutan['sector'][:15], ensure_ascii=False)}
 Hot Themes: {json.dumps(kabutan['themes'][:10], ensure_ascii=False)}
 News: {json.dumps((kabutan['news'] + nhk)[:10], ensure_ascii=False)}
 
@@ -588,7 +608,6 @@ Today is {ymd} 15:35. Summarize the full day's market.
 Top Gainers: {json.dumps(kabutan['top_gainers'][:15], ensure_ascii=False)}
 Top Losers: {json.dumps(kabutan['top_losers'][:10], ensure_ascii=False)}
 Volume Surge: {json.dumps(kabutan['volume_surge'][:10], ensure_ascii=False)}
-Sector: {json.dumps(kabutan['sector'][:20], ensure_ascii=False)}
 Hot Themes: {json.dumps(kabutan['themes'][:15], ensure_ascii=False)}
 News: {json.dumps((kabutan['news'] + nhk + reuters)[:12], ensure_ascii=False)}
 
@@ -635,7 +654,6 @@ ONLY JSON.
     logs = load("accuracy_log.json") or []
     today_str = today.isoformat()
 
-    existing = next((i for i, r in enumerate(logs) if r["date"] == today_str), None)
     entry = {
         "date": today_str,
         "accuracy_score": result.get("final_accuracy_score", 0),
@@ -644,9 +662,13 @@ ONLY JSON.
         "improvement_hints": result.get("learning_points", []),
     }
 
-    if existing is not None:
-        logs[existing] = entry
-    else:
+    updated = False
+    for i, row in enumerate(logs):
+        if row.get("date") == today_str:
+            logs[i] = entry
+            updated = True
+            break
+    if not updated:
         logs.append(entry)
 
     save("accuracy_log.json", logs[-90:])
@@ -660,7 +682,12 @@ if __name__ == "__main__":
     session = os.environ.get("SESSION", "").strip()
     if not session:
         hour = now_jst.hour
-        session = "600" if hour < 7 else "905" if hour < 10 else "1535"
+        if hour < 7:
+            session = "600"
+        elif hour < 10:
+            session = "905"
+        else:
+            session = "1535"
 
     print(f"SESSION={session} date={today}")
 
@@ -675,7 +702,7 @@ if __name__ == "__main__":
     elif session == "1535":
         run_1535(today)
     else:
-        print(f"不明: {session}")
+        print(f"不明なSESSION: {session}")
         sys.exit(1)
 
     print(f"[{session}] 完了")
