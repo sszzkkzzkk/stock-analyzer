@@ -48,6 +48,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: prepare gh-pages worktree
+        shell: bash
         run: |
           git fetch origin gh-pages || true
 
@@ -67,6 +68,7 @@ jobs:
           fi
 
       - name: restore data from gh-pages
+        shell: bash
         run: |
           mkdir -p data
           if [ -d gh-pages-worktree/data ]; then
@@ -75,6 +77,7 @@ jobs:
 
       - name: decide session
         id: session
+        shell: bash
         run: |
           if [ -n "${{ github.event.inputs.session }}" ]; then
             echo "session=${{ github.event.inputs.session }}" >> "$GITHUB_OUTPUT"
@@ -99,6 +102,7 @@ jobs:
         run: python main.py
 
       - name: inspect generated files
+        shell: bash
         run: |
           echo "=== data files ==="
           ls -la data || true
@@ -119,6 +123,7 @@ jobs:
           test -f data/review_log.json && head -40 data/review_log.json || true
 
       - name: copy publish files to gh-pages
+        shell: bash
         run: |
           rm -rf gh-pages-worktree/*
           cp index.html gh-pages-worktree/index.html
@@ -127,6 +132,7 @@ jobs:
           touch gh-pages-worktree/.nojekyll
 
       - name: commit and push gh-pages
+        shell: bash
         run: |
           cd gh-pages-worktree
           git add index.html data .nojekyll
