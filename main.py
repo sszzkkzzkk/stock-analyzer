@@ -121,7 +121,7 @@ def load_learning_ctx():
     )
 
 
-def extract_table_rows(table, limit=30):
+def extract_table_rows(table, limit=40):
     rows = []
     for tr in table.select("tr"):
         cells = [clean_text(td.get_text(" ", strip=True)) for td in tr.select("th, td")]
@@ -133,18 +133,37 @@ def extract_table_rows(table, limit=30):
     return rows
 
 
-def split_top_metric_block(text):
-    """
-    例:
-    '54,110.50 -230.73 158.51 +0.05 49,149.63 -42.36 4,112.60 -13.49'
-    '-0.42% 0.04% -0.09% -0.33%'
-    """
-    nums = text.split()
+def extract_named_time(lines, names):
+    result = {}
+    for i, line in enumerate(lines):
+        if line in names and i + 1 < len(lines):
+            nxt = lines[i + 1]
+            if re.fullmatch(r"(終値|\d{1,2}:\d{2})", nxt):
+                result[line] = nxt
+    return result
+
+
+def parse_metric_pairs(metric_line):
+    nums = metric_line.split()
     pairs = []
     for i in range(0, len(nums), 2):
         if i + 1 < len(nums):
-            pairs.append((nums[i], nums[i + 1]))
+            left = nums[i]
+            right = nums[i + 1]
+            if re.fullmatch(r"[0-9,]+\.\d+", left) and re.fullmatch(r"[+\-][0-9,]+\.\d+", right):
+                pairs.append((left, right))
     return pairs
+
+
+def unique_by_name(items):
+    out = []
+    seen = set()
+    for x in items:
+        name = x.get("name", "")
+        if name and name not in seen:
+            out.append(x)
+            seen.add(name)
+    return out
 
 
 def fetch_kabutan_home():
@@ -163,66 +182,78 @@ def fetch_kabutan_home():
         lines = [clean_text(x) for x in soup.get_text("\n", strip=True).splitlines()]
         lines = [x for x in lines if x]
 
-        # トップの市況ブロック
-        # 参照: 日経平均, 米ドル円, ＮＹダウ, 上海総合 の並び
-        try:
-            nikkei_idx = lines.index("日経平均")
-            usdjpy_idx = lines.index("米ドル円")
-            nydow_idx = lines.index("ＮＹダウ") if "ＮＹダウ" in lines else lines.index("NYダウ")
-            shanghai_idx = lines.index("上海総合")
+        top_times = extract_named_time(lines, ["日経平均", "米ドル円", "ＮＹダウ", "NYダウ", "上海総合"])
 
-            times = [
-                lines[nikkei_idx + 1] if nikkei_idx + 1 < len(lines) else "",
-                lines[usdjpy_idx + 1] if usdjpy_idx + 1 < len(lines) else "",
-                lines[nydow_idx + 1] if nydow_idx + 1 < len(lines) else "",
-                lines[shanghai_idx + 1] if shanghai_idx + 1 < len(lines) else "",
-            ]
+        metric_line = ""
+        percent_line = ""
+        for i, line in enumerate(lines):
+            if re.search(r"\d[\d,]*\.\d+\s+[+\-]\d[\d,]*\.\d+", line):
+                if i + 1 < len(lines) and "%" in lines[i + 1]:
+                    metric_line = line
+                    percent_line = lines[i + 1]
+                    break
 
-            block1 = ""
-            block2 = ""
-            for i, line in enumerate(lines):
-                if re.search(r"\d[\d,]*\.\d+\s+[+\-]\d[\d,]*\.\d+", line):
-                    if i + 1 < len(lines) and "%" in lines[i + 1]:
-                        block1 = line
-                        block2 = lines[i + 1]
-                        break
-
-            pairs = split_top_metric_block(block1)
-            percs = block2.split()
+        if metric_line:
+            pairs = parse_metric_pairs(metric_line)
+            percs = percent_line.split() if percent_line else []
 
             names = ["日経平均", "米ドル円", "ＮＹダウ", "上海総合"]
             for i, name in enumerate(names):
-                value = pairs[i][0] if i < len(pairs) else ""
-                change = pairs[i][1] if i < len(pairs) else ""
-                pct = percs[i] if i < len(percs) else ""
+                if i >= len(pairs):
+                    continue
+
                 item = {
                     "name": name,
-                    "value": value,
-                    "change": change,
-                    "percent": pct,
-                    "time": times[i] if i < len(times) else "",
+                    "value": pairs[i][0],
+                    "change": pairs[i][1],
+                    "percent": percs[i] if i < len(percs) else "",
+                    "time": top_times.get(name, top_times.get("NYダウ", "")),
                 }
-                if name in ["日経平均"]:
+
+                if name == "日経平均":
                     result["indices"].append(item)
-                elif name in ["米ドル円"]:
+                elif name == "米ドル円":
                     result["forex"].append(item)
                 else:
                     result["world_indices"].append(item)
-        except Exception as e:
-            print(f"トップ市況解析エラー: {e}")
+
+        # 国内指標ブロックから補完
+        domestic_patterns = [
+            ("日経平均", "indices"),
+            ("ＴＯＰＩＸ", "indices"),
+            ("TOPIX", "indices"),
+            ("JPX日経400", "indices"),
+            ("グロース250", "indices"),
+        ]
+
+        for line in lines:
+            for name, bucket in domestic_patterns:
+                if name in line:
+                    m = re.search(rf"{re.escape(name)}\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)", line)
+                    if m:
+                        result[bucket].append({
+                            "name": name,
+                            "value": m.group(1),
+                            "change": m.group(2),
+                            "percent": "",
+                            "time": top_times.get("日経平均", ""),
+                        })
+
+        result["indices"] = unique_by_name(result["indices"])[:6]
+        result["world_indices"] = unique_by_name(result["world_indices"])[:6]
+        result["forex"] = unique_by_name(result["forex"])[:4]
 
         # 人気テーマ
         try:
             theme_start = lines.index("人気テーマ")
-            # 3日間ランキングの後に数字とテーマ名が並ぶ
             theme_candidates = []
-            for line in lines[theme_start: theme_start + 80]:
+            for line in lines[theme_start: theme_start + 100]:
                 if line.isdigit():
                     continue
                 if line in ["人気テーマ", "(3日間のﾗﾝｷﾝｸﾞ)", "ベスト30を見る"]:
                     continue
                 if 2 <= len(line) <= 30 and re.search(r"[ぁ-んァ-ン一-龥A-Za-z0-9]", line):
-                    if not re.search(r"%|日経平均|米ドル円|ＮＹダウ|上海総合", line):
+                    if not re.search(r"%|日経平均|米ドル円|ＮＹダウ|NYダウ|上海総合", line):
                         theme_candidates.append(line)
             result["themes"] = list(dict.fromkeys(theme_candidates))[:15]
         except Exception as e:
@@ -303,7 +334,6 @@ def fetch_kabutan_ranking():
             r = safe_get(url)
             soup = BeautifulSoup(r.text, "html.parser")
 
-            found = False
             for table in soup.find_all("table"):
                 rows = extract_table_rows(table, limit=40)
                 if len(rows) < 3:
@@ -315,25 +345,19 @@ def fetch_kabutan_ranking():
                     parsed = parse_warning_table(rows, "gainers")
                     if parsed:
                         result["top_gainers"] = parsed
-                        found = True
                         break
 
                 if kind == "losers" and "コード" in header and "銘柄名" in header:
                     parsed = parse_warning_table(rows, "losers")
                     if parsed:
                         result["top_losers"] = parsed
-                        found = True
                         break
 
                 if kind == "volume" and "コード" in header and ("出来高" in header or "売買高" in header):
                     parsed = parse_warning_table(rows, "volume")
                     if parsed:
                         result["volume_surge"] = parsed
-                        found = True
                         break
-
-            if not found and kind == "volume":
-                print(f"出来高ページ解析失敗: {url}")
 
             time.sleep(0.4)
 
