@@ -174,7 +174,7 @@ def extract_table_rows(table, limit=40):
 def score_market_item(item):
     score = 0
     if item.get("value"):
-        score += 3
+        score += 4
     if item.get("change"):
         score += 3
     if item.get("time"):
@@ -197,22 +197,31 @@ def dedupe_best_market_items(items):
     return list(best.values())
 
 
-def parse_market_candidates_from_lines(lines, source_name):
+def normalize_market_items(items):
+    out = []
+    for x in items:
+        y = dict(x)
+        y.pop("_source", None)
+        out.append(y)
+    return out
+
+
+def extract_market_from_mobile_top(lines, source_name):
     candidates = {
         "indices": [],
         "world_indices": [],
         "forex": [],
     }
 
-    strict_patterns = [
-        ("indices", r"日経平均\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)", "日経平均"),
-        ("forex", r"(?:米)?ドル円\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)", "米ドル円"),
-        ("world_indices", r"(?:ＮＹダウ|NYダウ)\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)", "NYダウ"),
-        ("world_indices", r"上海総合\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)", "上海総合"),
+    patterns = [
+        ("indices", "日経平均", r"日経平均\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
+        ("forex", "米ドル円", r"ドル円\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
+        ("world_indices", "NYダウ", r"NYダウ\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
+        ("world_indices", "上海総合", r"上海総合\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
     ]
 
     for line in lines:
-        for bucket, pattern, label in strict_patterns:
+        for bucket, label, pattern in patterns:
             m = re.search(pattern, line)
             if m:
                 candidates[bucket].append({
@@ -223,21 +232,30 @@ def parse_market_candidates_from_lines(lines, source_name):
                     "percent": "",
                     "_source": source_name,
                 })
+    return candidates
+
+
+def extract_market_from_desktop_text(lines, source_name):
+    candidates = {
+        "indices": [],
+        "world_indices": [],
+        "forex": [],
+    }
 
     domestic_patterns = [
-        ("日経平均", "indices"),
-        ("ＴＯＰＩＸ", "indices"),
-        ("TOPIX", "indices"),
-        ("JPX日経400", "indices"),
-        ("グロース250", "indices"),
+        ("indices", "日経平均", r"日経平均\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)"),
+        ("indices", "ＴＯＰＩＸ", r"ＴＯＰＩＸ\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)"),
+        ("indices", "TOPIX", r"TOPIX\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)"),
+        ("indices", "JPX日経400", r"JPX日経400\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)"),
+        ("indices", "グロース250", r"グロース250\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)"),
     ]
 
     for line in lines:
-        for name, bucket in domestic_patterns:
-            m = re.search(rf"{re.escape(name)}\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)", line)
+        for bucket, label, pattern in domestic_patterns:
+            m = re.search(pattern, line)
             if m:
                 candidates[bucket].append({
-                    "name": name,
+                    "name": label,
                     "time": "",
                     "value": m.group(1),
                     "change": m.group(2),
@@ -248,13 +266,35 @@ def parse_market_candidates_from_lines(lines, source_name):
     return candidates
 
 
-def normalize_market_items(items):
-    normalized = []
-    for x in items:
-        y = dict(x)
-        y.pop("_source", None)
-        normalized.append(y)
-    return normalized
+def is_valid_news_text(text):
+    if len(text) < 14:
+        return False
+
+    ng_patterns = [
+        r"すでに会員の方はログイン",
+        r"プレミアム会員限定",
+        r"ログイン",
+        r"銘柄検索",
+        r"メニュー",
+        r"PC版を表示",
+        r"人気テーマ",
+        r"人気株",
+        r"ベスト30を見る",
+        r"お知らせ",
+        r"会員限定",
+        r"^\d+$",
+        r"^(TOP|決算|開示|人気|コラム)$",
+        r"日経平均\s*\(",
+        r"ドル円\s*\(",
+        r"NYダウ\s*\(",
+        r"上海総合\s*\(",
+    ]
+
+    for p in ng_patterns:
+        if re.search(p, text):
+            return False
+
+    return True
 
 
 def fetch_kabutan_home():
@@ -287,38 +327,36 @@ def fetch_kabutan_home():
             lines = [clean_text(x) for x in soup.get_text("\n", strip=True).splitlines()]
             lines = [x for x in lines if x]
 
-            market_candidates = parse_market_candidates_from_lines(lines, source_name)
-            all_indices.extend(market_candidates["indices"])
-            all_world.extend(market_candidates["world_indices"])
-            all_forex.extend(market_candidates["forex"])
+            if source_name == "mobile":
+                mobile = extract_market_from_mobile_top(lines, source_name)
+                all_indices.extend(mobile["indices"])
+                all_world.extend(mobile["world_indices"])
+                all_forex.extend(mobile["forex"])
 
-            search_results.append(
-                f"{source_name}: 国内{len(market_candidates['indices'])}件 / 海外{len(market_candidates['world_indices'])}件 / 為替{len(market_candidates['forex'])}件"
-            )
+                search_results.append(
+                    f"{source_name}: 国内{len(mobile['indices'])}件 / 海外{len(mobile['world_indices'])}件 / 為替{len(mobile['forex'])}件"
+                )
+            else:
+                desktop = extract_market_from_desktop_text(lines, source_name)
+                all_indices.extend(desktop["indices"])
+                all_world.extend(desktop["world_indices"])
+                all_forex.extend(desktop["forex"])
+
+                search_results.append(
+                    f"{source_name}: 国内{len(desktop['indices'])}件 / 海外{len(desktop['world_indices'])}件 / 為替{len(desktop['forex'])}件"
+                )
 
             theme_candidates = []
-            for a in soup.select("a[href*='theme'], a[href*='/themes/'], a[href*='人気']"):
+            for a in soup.select("a[href*='theme'], a[href*='/themes/']"):
                 t = clean_text(a.get_text(" ", strip=True))
                 if 2 <= len(t) <= 30:
                     theme_candidates.append(t)
-
-            if not theme_candidates:
-                for a in soup.select("a"):
-                    t = clean_text(a.get_text(" ", strip=True))
-                    if 2 <= len(t) <= 30 and re.search(r"[ぁ-んァ-ン一-龥A-Za-z0-9]", t):
-                        if t not in [
-                            "TOP", "決算", "開示", "人気", "コラム",
-                            "ログイン", "お知らせ", "銘柄検索", "メニュー",
-                            "PC版を表示"
-                        ] and not re.fullmatch(r"\d+", t):
-                            theme_candidates.append(t)
-
             all_themes.extend(theme_candidates)
 
             news_candidates = []
             for a in soup.select("a[href]"):
                 t = clean_text(a.get_text(" ", strip=True))
-                if len(t) >= 12:
+                if is_valid_news_text(t):
                     news_candidates.append(t)
             all_news.extend(news_candidates)
 
@@ -544,6 +582,29 @@ def build_data_sources_summary(kabutan, nhk, reuters):
     return sources
 
 
+def build_trader_focus(result):
+    themes = result.get("themes", []) or []
+    summary = result.get("summary", "")
+    top_theme_names = [t.get("name", "") for t in themes[:3] if t.get("name")]
+    top_stocks = []
+    for t in themes[:3]:
+        for s in t.get("key_stocks", [])[:2]:
+            if s.get("name"):
+                top_stocks.append({
+                    "name": s.get("name", ""),
+                    "code": s.get("code", ""),
+                    "reason": s.get("reason", ""),
+                })
+    top_stocks = top_stocks[:6]
+
+    result["trader_focus"] = {
+        "top_themes": top_theme_names,
+        "top_stocks": top_stocks,
+        "headline": summary[:140] if isinstance(summary, str) else "",
+    }
+    return result
+
+
 def run_600(today):
     ctx = load_learning_ctx()
     iso = today.isoformat()
@@ -600,6 +661,7 @@ ONLY JSON, nothing else.
     print("[6:00] Claude呼び出し中...")
     result = parse_json(call_claude(prompt))
     result["data_sources"] = data_sources
+    result = build_trader_focus(result)
     save("latest_600.json", result)
     return result
 
