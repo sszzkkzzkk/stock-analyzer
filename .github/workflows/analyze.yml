@@ -12,7 +12,10 @@ on:
         required: true
         default: "600"
         type: choice
-        options: ["600", "905", "1535"]
+        options:
+          - "600"
+          - "905"
+          - "1535"
 
 permissions:
   contents: write
@@ -23,6 +26,7 @@ jobs:
   run:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
     steps:
       - uses: actions/checkout@v4
 
@@ -31,7 +35,8 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - run: pip install -r requirements.txt
+      - name: 依存関係インストール
+        run: pip install -r requirements.txt
 
       - name: Git設定
         run: |
@@ -68,11 +73,22 @@ jobs:
           SESSION: ${{ steps.session.outputs.session }}
         run: python main.py
 
-
       - name: データ確認
         run: |
+          echo "=== data files ==="
+          ls -la data || true
+
           echo "=== latest_600.json ==="
-          cat data/latest_600.json | head -3
+          test -f data/latest_600.json && head -40 data/latest_600.json || true
+
+          echo "=== latest_905.json ==="
+          test -f data/latest_905.json && head -40 data/latest_905.json || true
+
+          echo "=== latest_1535.json ==="
+          test -f data/latest_1535.json && head -40 data/latest_1535.json || true
+
+          echo "=== accuracy_log.json ==="
+          test -f data/accuracy_log.json && head -40 data/accuracy_log.json || true
 
       - name: GitHub Pagesに公開
         run: |
@@ -80,6 +96,7 @@ jobs:
           cp index.html "$TEMP/"
           cp -r data "$TEMP/data"
           ls -la "$TEMP/data/"
+
           cd "$TEMP"
           git init
           git config user.name "github-actions[bot]"
