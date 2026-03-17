@@ -87,38 +87,6 @@
       background: var(--panel2);
     }
 
-    .btn.primary {
-      border: none;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-    }
-
-    .top-mini {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .mini-card {
-      background: rgba(17,26,52,.96);
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 12px 14px;
-      min-width: 0;
-    }
-
-    .mini-label {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 6px;
-    }
-
-    .mini-value {
-      font-size: 15px;
-      font-weight: 700;
-      word-break: break-word;
-    }
-
     .hero {
       background: rgba(17,26,52,.96);
       border: 1px solid var(--line);
@@ -127,15 +95,45 @@
       margin-bottom: 14px;
     }
 
-    .hero h2 {
-      margin: 0 0 14px;
-      font-size: 18px;
-    }
-
     .hero-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: 1.2fr 1fr 1fr 1fr;
       gap: 12px;
+      align-items: stretch;
+    }
+
+    .hero-main {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .hero-title {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .hero-headline {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .hero-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .hero-tag {
+      background: var(--chip);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
     }
 
     .quote {
@@ -153,7 +151,7 @@
     }
 
     .quote-value {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
       line-height: 1.1;
       word-break: break-word;
@@ -253,6 +251,18 @@
       word-break: break-word;
     }
 
+    .kv {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 8px 12px;
+      font-size: 14px;
+      align-items: start;
+    }
+
+    .kv div:nth-child(odd) {
+      color: var(--muted);
+    }
+
     .chips {
       display: flex;
       flex-wrap: wrap;
@@ -267,26 +277,6 @@
       font-size: 12px;
     }
 
-    .kv {
-      display: grid;
-      grid-template-columns: 120px 1fr;
-      gap: 8px 12px;
-      font-size: 14px;
-      align-items: start;
-    }
-
-    .kv div:nth-child(odd) {
-      color: var(--muted);
-    }
-
-    .theme-head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-
     .rank {
       width: 32px;
       height: 32px;
@@ -295,6 +285,14 @@
       place-items: center;
       font-weight: 800;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+
+    .theme-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
     }
 
     .badge {
@@ -319,6 +317,22 @@
       background: var(--panel2);
       color: var(--text);
       font: inherit;
+    }
+
+    .mini-info {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .mini-pill {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: var(--muted);
     }
 
     .empty {
@@ -391,7 +405,6 @@
     }
 
     @media (max-width: 900px) {
-      .top-mini,
       .hero-grid,
       .grid.two,
       .grid.three {
@@ -415,30 +428,11 @@
         <div class="logo">株</div>
         <div>
           <div class="title">株式AI分析</div>
-          <div class="subtitle">6:00予測 / 9:05確認 / 15:35総括</div>
+          <div class="subtitle">寄り前予測 / 寄り確認 / 引け総括</div>
         </div>
       </div>
       <button class="btn" id="refreshBtn">↻ 再読込</button>
     </div>
-
-    <section class="top-mini">
-      <div class="mini-card">
-        <div class="mini-label">接続先</div>
-        <div class="mini-value" id="repoStatus">未設定</div>
-      </div>
-      <div class="mini-card">
-        <div class="mini-label">6:00</div>
-        <div class="mini-value" id="status600">-</div>
-      </div>
-      <div class="mini-card">
-        <div class="mini-label">9:05</div>
-        <div class="mini-value" id="status905">-</div>
-      </div>
-      <div class="mini-card">
-        <div class="mini-label">15:35</div>
-        <div class="mini-value" id="status1535">-</div>
-      </div>
-    </section>
 
     <section class="hero" id="heroPanel"></section>
 
@@ -462,10 +456,6 @@
     const STORAGE_REPO = "stock-ai-repo";
 
     const els = {
-      repoStatus: document.getElementById("repoStatus"),
-      status600: document.getElementById("status600"),
-      status905: document.getElementById("status905"),
-      status1535: document.getElementById("status1535"),
       heroPanel: document.getElementById("heroPanel"),
       tab600: document.getElementById("tab600"),
       tab905: document.getElementById("tab905"),
@@ -527,12 +517,6 @@
       return esc(String(x));
     }
 
-    function chipList(items) {
-      const list = arr(items).filter(Boolean);
-      if (!list.length) return `<div class="empty">データなし</div>`;
-      return `<div class="chips">${list.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>`;
-    }
-
     function renderSimpleList(items, emptyText = "データなし") {
       const list = arr(items).filter(Boolean);
       if (!list.length) return `<div class="empty">${esc(emptyText)}</div>`;
@@ -555,6 +539,12 @@
           ${list.map(x => `<div class="item"><div class="item-sub">${esc(x)}</div></div>`).join("")}
         </div>
       `;
+    }
+
+    function chipList(items) {
+      const list = arr(items).filter(Boolean);
+      if (!list.length) return `<div class="empty">データなし</div>`;
+      return `<div class="chips">${list.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>`;
     }
 
     function renderThemeCards(themes, keyword = "") {
@@ -764,20 +754,6 @@
       return await res.json();
     }
 
-    function updateRepoStatus() {
-      const user = localStorage.getItem(STORAGE_USER) || "";
-      const repo = localStorage.getItem(STORAGE_REPO) || "";
-      els.repoStatus.textContent = user && repo ? `${user}/${repo}` : "未設定";
-    }
-
-    function setStatus(el, data) {
-      if (!data) {
-        el.textContent = "未取得";
-        return;
-      }
-      el.textContent = `${data.date || "-"} ${data.generated_at || "-"}`;
-    }
-
     function quoteClass(change) {
       const s = String(change || "");
       if (s.startsWith("+")) return "good";
@@ -796,9 +772,9 @@
     }
 
     function renderHero(d600, d905, d1535) {
-      const source = d600 || d905 || d1535;
-      if (!source) {
-        els.heroPanel.style.display = "none";
+      const current = d600 || d905 || d1535;
+      if (!current) {
+        els.heroPanel.innerHTML = `<div class="empty">データがありません</div>`;
         return;
       }
 
@@ -806,39 +782,48 @@
       const usdjpy = firstMatchItem(d600, ["米ドル円", "ドル円"]);
       const nydow = firstMatchItem(d600, ["NYダウ", "ＮＹダウ"]);
       const shanghai = firstMatchItem(d600, ["上海総合"]);
-      const cards = [nikkei, usdjpy, nydow, shanghai];
+      const focus = current.trader_focus || {};
+      const hasQuotes = [nikkei, usdjpy, nydow, shanghai].some(x => x && (x.value || x.change || x.time));
 
-      const hasAny = cards.some(x => x && (x.value || x.change || x.time));
-      if (!hasAny) {
-        els.heroPanel.style.display = "none";
-        return;
-      }
-
-      els.heroPanel.style.display = "block";
       els.heroPanel.innerHTML = `
-        <h2>マーケット速報</h2>
         <div class="hero-grid">
-          ${cards.map((item, idx) => {
-            const names = ["日経平均", "ドル円", "NYダウ", "上海総合"];
-            const fallback = names[idx];
-            if (!item) {
+          <div class="hero-main">
+            <div class="hero-title">トレーダーズビュー</div>
+            <div class="hero-headline">${esc(focus.headline || current.summary || "本日の見立てデータなし")}</div>
+            <div class="hero-tags">
+              ${arr(focus.top_themes).length
+                ? arr(focus.top_themes).map(x => `<span class="hero-tag">${esc(x)}</span>`).join("")
+                : `<span class="hero-tag">テーマ未抽出</span>`}
+            </div>
+          </div>
+
+          ${hasQuotes ? `
+            ${[nikkei, usdjpy, nydow, shanghai].map((item, idx) => {
+              const names = ["日経平均", "ドル円", "NYダウ", "上海総合"];
+              const fallback = names[idx];
+              if (!item) {
+                return `
+                  <div class="quote">
+                    <div class="quote-name">${esc(fallback)}</div>
+                    <div class="quote-value">—</div>
+                    <div class="quote-change warn">データなし</div>
+                  </div>
+                `;
+              }
               return `
                 <div class="quote">
-                  <div class="quote-name">${esc(fallback)}</div>
-                  <div class="quote-value">—</div>
-                  <div class="quote-change warn">データなし</div>
+                  <div class="quote-name">${esc(item.name || fallback)}</div>
+                  <div class="quote-value">${esc(item.value || "—")}</div>
+                  <div class="quote-change ${quoteClass(item.change)}">${esc(item.change || "—")} ${esc(item.percent || "")}</div>
+                  <div class="quote-time">${esc(item.time || "")}</div>
                 </div>
               `;
-            }
-            return `
-              <div class="quote">
-                <div class="quote-name">${esc(item.name || fallback)}</div>
-                <div class="quote-value">${esc(item.value || "—")}</div>
-                <div class="quote-change ${quoteClass(item.change)}">${esc(item.change || "—")} ${esc(item.percent || "")}</div>
-                <div class="quote-time">${esc(item.time || "")}</div>
-              </div>
-            `;
-          }).join("")}
+            }).join("")}
+          ` : `
+            <div class="quote"><div class="quote-name">日経平均</div><div class="quote-value">—</div><div class="quote-change warn">データなし</div></div>
+            <div class="quote"><div class="quote-name">ドル円</div><div class="quote-value">—</div><div class="quote-change warn">データなし</div></div>
+            <div class="quote"><div class="quote-name">NYダウ</div><div class="quote-value">—</div><div class="quote-change warn">データなし</div></div>
+          `}
         </div>
       `;
     }
@@ -850,27 +835,43 @@
       }
 
       const market = data.market_data || {};
+      const focus = data.trader_focus || {};
 
       els.tab600.innerHTML = `
+        <div class="mini-info">
+          <span class="mini-pill">更新 ${esc(data.date || "-")} ${esc(data.generated_at || "-")}</span>
+          <span class="mini-pill">接続先 ${esc((localStorage.getItem(STORAGE_USER) || "") + "/" + (localStorage.getItem(STORAGE_REPO) || ""))}</span>
+        </div>
+
         <div class="grid two">
           <div class="card">
-            <h3>6:00予測サマリー</h3>
+            <h3>結論</h3>
             <div class="kv">
-              <div>日付</div><div>${esc(data.date || "-")}</div>
-              <div>生成時刻</div><div>${esc(data.generated_at || "-")}</div>
-              <div>最重要ファクター</div><div>${nl2br(data.big_picture || "-")}</div>
+              <div>最重要</div><div>${nl2br(data.big_picture || "-")}</div>
               <div>相場展望</div><div>${nl2br(data.summary || "-")}</div>
+              <div>注目テーマ</div><div>${arr(focus.top_themes).map(esc).join(" / ") || "-"}</div>
             </div>
           </div>
           <div class="card">
-            <h3>データソース</h3>
-            ${chipList(data.data_sources)}
+            <h3>主役候補銘柄</h3>
+            ${
+              arr(focus.top_stocks).length
+              ? `<div class="list">
+                  ${arr(focus.top_stocks).map(s => `
+                    <div class="item">
+                      <div class="item-title">${esc(s.name || "-")} ${s.code ? `(${esc(s.code)})` : ""}</div>
+                      <div class="item-sub">${esc(s.reason || "-")}</div>
+                    </div>
+                  `).join("")}
+                </div>`
+              : `<div class="empty">主役候補銘柄なし</div>`
+            }
           </div>
         </div>
 
         <div class="card" style="margin-top:14px;">
-          <h3>取得状況</h3>
-          ${renderSimpleList(market.search_results, "取得状況なし")}
+          <h3>データソース</h3>
+          ${chipList(data.data_sources)}
         </div>
 
         <div class="grid three" style="margin-top:14px;">
@@ -927,12 +928,14 @@
       const corr = data.intraday_correction || {};
 
       els.tab905.innerHTML = `
+        <div class="mini-info">
+          <span class="mini-pill">更新 ${esc(data.date || "-")} ${esc(data.generated_at || "-")}</span>
+        </div>
+
         <div class="grid two">
           <div class="card">
             <h3>寄り付き総評</h3>
             <div class="kv">
-              <div>日付</div><div>${esc(data.date || "-")}</div>
-              <div>生成時刻</div><div>${esc(data.generated_at || "-")}</div>
               <div>日経始値</div><div>${esc(opening.nikkei_open || "-")}</div>
               <div>日経変化率</div><div>${esc(opening.nikkei_change || "-")}</div>
               <div>市場トーン</div><div>${esc(opening.market_tone || "-")}</div>
@@ -947,7 +950,6 @@
               <div>継続監視</div><div>${arr(corr.themes_to_watch).map(esc).join(" / ") || "-"}</div>
               <div>失速テーマ</div><div>${arr(corr.themes_faded).map(esc).join(" / ") || "-"}</div>
               <div>修正ヒント</div><div>${arr(corr.correction_hints).map(esc).join("<br>") || "-"}</div>
-              <div>データソース</div><div>${arr(data.data_sources).map(esc).join(" / ") || "-"}</div>
             </div>
           </div>
         </div>
@@ -974,19 +976,20 @@
       const tomorrow = data.tomorrow_outlook || {};
 
       els.tab1535.innerHTML = `
+        <div class="mini-info">
+          <span class="mini-pill">更新 ${esc(data.date || "-")} ${esc(data.generated_at || "-")}</span>
+        </div>
+
         <div class="grid two">
           <div class="card">
             <h3>大引け総括</h3>
             <div class="kv">
-              <div>日付</div><div>${esc(data.date || "-")}</div>
-              <div>生成時刻</div><div>${esc(data.generated_at || "-")}</div>
               <div>日経平均</div><div>${esc(closing.nikkei || "-")}</div>
               <div>TOPIX</div><div>${esc(closing.topix || "-")}</div>
               <div>総評</div><div>${nl2br(closing.total_assessment || "-")}</div>
               <div>最終精度</div><div class="big">${esc(data.final_accuracy_score ?? "-")}</div>
               <div>最も当たったテーマ</div><div>${esc(data.strongest_theme || "-")}</div>
               <div>最も外れたテーマ</div><div>${esc(data.weakest_theme || "-")}</div>
-              <div>総括</div><div>${nl2br(data.summary || "-")}</div>
             </div>
           </div>
           <div class="card">
@@ -996,8 +999,6 @@
               <div>注目テーマ</div><div>${arr(tomorrow.watch_themes).map(esc).join(" / ") || "-"}</div>
               <div>ヒント</div><div>${nl2br(tomorrow.hint || "-")}</div>
               <div>9:05修正評価</div><div>${nl2br(data.correction_evaluation || "-")}</div>
-              <div>学習ポイント</div><div>${arr(data.learning_points).map(esc).join("<br>") || "-"}</div>
-              <div>データソース</div><div>${arr(data.data_sources).map(esc).join(" / ") || "-"}</div>
             </div>
           </div>
         </div>
@@ -1034,19 +1035,27 @@
 
       els.tabSettings.innerHTML = `
         <div class="notice">
-          GitHub Pages 上の <code>data/latest_600.json</code> などを読み込みます。
+          設定や接続情報はここで確認します。上部には表示しません。
         </div>
         <div style="height:12px;"></div>
+
         <div class="field">
           <label for="ghUser">GitHub ユーザー名</label>
           <input id="ghUser" value="${esc(user)}" placeholder="例: sszzkkzzkk">
         </div>
+
         <div class="field">
           <label for="ghRepo">リポジトリ名</label>
           <input id="ghRepo" value="${esc(repo)}" placeholder="例: stock-analyzer">
         </div>
+
+        <div class="field">
+          <label>現在の接続先</label>
+          <div class="item-sub">${esc(user && repo ? `${user}/${repo}` : "未設定")}</div>
+        </div>
+
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn primary" id="saveSettingsBtn">保存して接続</button>
+          <button class="btn" id="saveSettingsBtn">保存して接続</button>
           <button class="btn" id="clearSettingsBtn">設定クリア</button>
         </div>
       `;
@@ -1056,14 +1065,12 @@
         const repoVal = document.getElementById("ghRepo").value.trim();
         localStorage.setItem(STORAGE_USER, userVal);
         localStorage.setItem(STORAGE_REPO, repoVal);
-        updateRepoStatus();
         await loadAll();
       });
 
       document.getElementById("clearSettingsBtn").addEventListener("click", () => {
         localStorage.removeItem(STORAGE_USER);
         localStorage.removeItem(STORAGE_REPO);
-        updateRepoStatus();
         renderHero(null, null, null);
         render600(null);
         render905(null);
@@ -1082,8 +1089,6 @@
     }
 
     async function loadAll() {
-      updateRepoStatus();
-
       if (!baseUrl()) {
         renderHero(null, null, null);
         render600(null);
@@ -1107,10 +1112,6 @@
         safeLoad("accuracy_log.json"),
       ]);
 
-      setStatus(els.status600, d600);
-      setStatus(els.status905, d905);
-      setStatus(els.status1535, d1535);
-
       renderHero(d600, d905, d1535);
       render600(d600);
       render905(d905);
@@ -1130,7 +1131,6 @@
 
     els.refreshBtn.addEventListener("click", loadAll);
 
-    updateRepoStatus();
     loadAll();
   </script>
 </body>
