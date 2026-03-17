@@ -85,11 +85,8 @@ def fetch_kabutan():
 
     urls_to_check = [
         ("news", "https://kabutan.jp/news/?b=n1"),
-        ("gainers", "https://kabutan.jp/stock/ranking/?type=increase_rate"),
-        ("losers", "https://kabutan.jp/stock/ranking/?type=decrease_rate"),
-        ("volume", "https://kabutan.jp/stock/ranking/?type=volume_increase_rate"),
-        ("theme", "https://kabutan.jp/themes/"),
-        ("sector", "https://kabutan.jp/market/?b=sector"),
+        ("gainers", "https://kabutan.jp/stock/ranking/"),
+        ("sector", "https://kabutan.jp/market/"),
     ]
 
     for key, url in urls_to_check:
