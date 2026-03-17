@@ -1,106 +1,74 @@
-name: 株式AI自動分析
+name: stock-analysis-scheduled
 
 on:
-  schedule:
-    - cron: "0 21 * * 0-4"
-    - cron: "5 0 * * 1-5"
-    - cron: "35 6 * * 1-5"
   workflow_dispatch:
-    inputs:
-      session:
-        description: "600 or 905 or 1535"
-        required: true
-        default: "600"
-        type: choice
-        options:
-          - "600"
-          - "905"
-          - "1535"
-
-permissions:
-  contents: write
-  pages: write
-  id-token: write
+  schedule:
+    # JST 06:00
+    - cron: '0 21 * * 0-4'
+    # JST 09:10
+    - cron: '10 0 * * 1-5'
+    # JST 12:00
+    - cron: '0 3 * * 1-5'
+    # JST 15:35
+    - cron: '35 6 * * 1-5'
 
 jobs:
-  run:
+  run-analysis:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: setup python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: pip
+          python-version: '3.11'
 
-      - name: install deps
-        run: pip install -r requirements.txt
-
-      - name: git config
+      - name: Install dependencies
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 jpholiday anthropic
 
-      - name: restore data from gh-pages
-        run: |
-          git fetch origin gh-pages 2>/dev/null || true
-          mkdir -p data
-          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
-            git checkout origin/gh-pages -- data/ 2>/dev/null || true
-          fi
-
-      - name: decide session
+      - name: Resolve session from JST time
         id: session
+        shell: bash
         run: |
-          if [ -n "${{ github.event.inputs.session }}" ]; then
-            echo "session=${{ github.event.inputs.session }}" >> $GITHUB_OUTPUT
+          NOW_JST=$(TZ=Asia/Tokyo date '+%H:%M')
+          HOUR=$(TZ=Asia/Tokyo date '+%H')
+          MIN=$(TZ=Asia/Tokyo date '+%M')
+
+          if [ "$HOUR" = "06" ]; then
+            SESSION="600"
+          elif [ "$HOUR" = "09" ] && [ "$MIN" = "10" ]; then
+            SESSION="905"
+          elif [ "$HOUR" = "12" ] && [ "$MIN" = "00" ]; then
+            SESSION="1200"
+          elif [ "$HOUR" = "15" ] && [ "$MIN" = "35" ]; then
+            SESSION="1535"
           else
-            HOUR=$(TZ='Asia/Tokyo' date +%H)
-            if [ "$HOUR" -lt 7 ]; then
-              echo "session=600" >> $GITHUB_OUTPUT
-            elif [ "$HOUR" -lt 10 ]; then
-              echo "session=905" >> $GITHUB_OUTPUT
-            else
-              echo "session=1535" >> $GITHUB_OUTPUT
-            fi
+            echo "Unexpected JST time: $NOW_JST"
+            exit 1
           fi
 
-      - name: run analyzer
+          echo "now_jst=$NOW_JST" >> "$GITHUB_OUTPUT"
+          echo "session=$SESSION" >> "$GITHUB_OUTPUT"
+
+      - name: Run analysis
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SESSION: ${{ steps.session.outputs.session }}
-        run: python main.py
-
-      - name: inspect data
         run: |
-          echo "=== data files ==="
-          ls -la data || true
-          echo "=== latest_600.json ==="
-          test -f data/latest_600.json && head -40 data/latest_600.json || true
-          echo "=== latest_905.json ==="
-          test -f data/latest_905.json && head -40 data/latest_905.json || true
-          echo "=== latest_1535.json ==="
-          test -f data/latest_1535.json && head -40 data/latest_1535.json || true
-          echo "=== accuracy_log.json ==="
-          test -f data/accuracy_log.json && head -40 data/accuracy_log.json || true
+          echo "JST: ${{ steps.session.outputs.now_jst }}"
+          echo "SESSION: ${{ steps.session.outputs.session }}"
+          python main.py
 
-      - name: deploy gh-pages
+      - name: Commit data files
         run: |
-          TEMP=$(mktemp -d)
-          cp index.html "$TEMP/"
-          mkdir -p "$TEMP/data"
-          cp -r data/. "$TEMP/data/" 2>/dev/null || true
-
-          cd "$TEMP"
-          git init
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan gh-pages
-          git add .
-          git commit -m "deploy: $(TZ='Asia/Tokyo' date +'%Y-%m-%d %H:%M JST')"
-          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
-          git push origin gh-pages --force
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "Update analysis data (${{ steps.session.outputs.session }})"
+          git push
