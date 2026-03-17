@@ -112,133 +112,11 @@
       margin-bottom: 12px;
     }
 
-    .hero-head {
-      display: grid;
-      grid-template-columns: 1.35fr auto;
-      gap: 8px;
-      align-items: start;
-      margin-bottom: 8px;
-    }
-
-    .hero-main {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 14px;
-      padding: 10px 12px;
-      min-width: 0;
-    }
-
-    .hero-kicker {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .hero-title-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 5px;
-    }
-
-    .hero-title {
-      font-size: 28px;
-      font-weight: 900;
-      line-height: 1.05;
-      word-break: break-word;
-    }
-
-    .hero-summary {
-      font-size: 12px;
-      line-height: 1.4;
-      color: var(--muted);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .hero-side {
-      display: grid;
-      gap: 8px;
-      min-width: 180px;
-    }
-
-    .mini-stack {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 14px;
-      padding: 10px 12px;
-    }
-
-    .mini-label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .mini-main {
-      font-size: 14px;
-      line-height: 1.3;
-      font-weight: 800;
-      word-break: break-word;
-    }
-
-    .pill-row, .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .pill, .chip {
-      background: var(--chip);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 5px 9px;
-      font-size: 11px;
-      line-height: 1.2;
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .hero-box {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 14px;
-      padding: 9px 10px;
-      min-width: 0;
-    }
-
-    .hero-box-label {
-      font-size: 10px;
-      color: var(--muted);
-      margin-bottom: 4px;
-      line-height: 1.2;
-    }
-
-    .hero-box-main {
-      font-size: 13px;
-      font-weight: 800;
-      line-height: 1.3;
-      word-break: break-word;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
     .quote-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
+      margin-bottom: 8px;
     }
 
     .quote {
@@ -284,6 +162,114 @@
     .good { color: var(--good); }
     .bad { color: var(--bad); }
     .warn { color: var(--warn); }
+
+    .hero-primary {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    .hero-kicker {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .hero-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 5px;
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1.05;
+      word-break: break-word;
+    }
+
+    .pill-row, .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill, .chip {
+      background: var(--chip);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 11px;
+      line-height: 1.2;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .hero-summary {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .hero-twin {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .hero-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 9px 10px;
+      min-width: 0;
+    }
+
+    .hero-box-label {
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+
+    .hero-box-main {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .hero-stack {
+      display: grid;
+      gap: 8px;
+    }
+
+    .hero-box-wide {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 10px 12px;
+      min-width: 0;
+    }
+
+    .hero-box-wide .hero-box-main {
+      font-size: 13px;
+      line-height: 1.38;
+      font-weight: 800;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
 
     .tabs {
       display: flex;
@@ -442,8 +428,7 @@
     }
 
     @media (max-width: 900px) {
-      .hero-head,
-      .hero-grid,
+      .hero-twin,
       .grid.two,
       .grid.three {
         grid-template-columns: 1fr;
@@ -454,10 +439,8 @@
       }
 
       .hero-title { font-size: 24px; }
-      .mini-main { font-size: 14px; }
-      .quote-value { font-size: 15px; }
+      .quote-value { font-size: 16px; }
       .quote { padding: 8px 9px; }
-      .hero-side { min-width: 0; }
     }
   </style>
 </head>
@@ -621,8 +604,8 @@
     }
 
     function baseUrl() {
-      const user = localStorage.getItem(STORAGE_USER) || "";
-      const repo = localStorage.getItem(STORAGE_REPO) || "";
+      const user = localStorage.getItem("stock-ai-user") || "";
+      const repo = localStorage.getItem("stock-ai-repo") || "";
       if (!user || !repo) return "";
       return `https://${user}.github.io/${repo}`;
     }
@@ -632,9 +615,7 @@
       if (!base) throw new Error("GitHub設定が未入力");
       const url = `${base}/data/${path}?t=${Date.now()}`;
       const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) {
-        throw new Error(`${path} の取得失敗: ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`${path} の取得失敗: ${res.status}`);
       return await res.json();
     }
 
@@ -664,7 +645,7 @@
       const futures = firstMatchItem(d600, ["日経先物", "日経225先物"], ["futures"]);
       const usdjpy = firstMatchItem(d600, ["ドル円", "米ドル円"], ["forex"]);
       const nydow = firstMatchItem(d600, ["NYダウ", "ＮＹダウ"], ["world_indices"]);
-      const quotes = [nikkei, futures, usdjpy, nydow].filter(x => x && x.value);
+      const quotesOrdered = [nikkei, futures, usdjpy, nydow].filter(x => x && x.value);
 
       const topThemes = arr(d600.priority_themes).slice(0, 3).map(x => x.name).filter(Boolean);
       const topStocks = arr(d600.watchlist)
@@ -689,7 +670,7 @@
         ${failedBanner}
 
         <div class="quote-grid">
-          ${quotes.length ? quotes.map(item => `
+          ${quotesOrdered.length ? quotesOrdered.map(item => `
             <div class="quote">
               <div class="quote-head">
                 <div class="quote-name">${esc(item.name || "-")}</div>
@@ -705,42 +686,41 @@
               <div class="quote-change warn">未取得</div>
             </div>
           `}
+        </div>
 
-        <div class="hero-head">
-          <div class="hero-main">
-            <div class="hero-kicker">今日の相場判定</div>
-            <div class="hero-title-row">
-              <div class="hero-title">${esc(strategy.market_regime_label || "未判定")}</div>
-              <div class="pill-row">
-                ${strategy.entry_style_label ? `<span class="pill">${esc(strategy.entry_style_label)}</span>` : ""}
-                ${strategy.danger_level ? `<span class="pill">危険度 ${esc(strategy.danger_level)}</span>` : ""}
-              </div>
+        <div class="hero-primary">
+          <div class="hero-kicker">今日の相場判定</div>
+          <div class="hero-title-row">
+            <div class="hero-title">${esc(strategy.market_regime_label || "未判定")}</div>
+            <div class="pill-row">
+              ${strategy.entry_style_label ? `<span class="pill">${esc(strategy.entry_style_label)}</span>` : ""}
+              ${strategy.danger_level ? `<span class="pill">危険度 ${esc(strategy.danger_level)}</span>` : ""}
             </div>
-            <div class="hero-summary">${esc(strategy.conclusion || d600.summary || "結論なし")}</div>
           </div>
+          <div class="hero-summary">${esc(strategy.conclusion || d600.summary || "結論なし")}</div>
+        </div>
 
-          <div class="hero-side">
-            <div class="mini-stack">
-              <div class="mini-label">本命テーマ</div>
-              <div class="mini-main">${esc(compactJoin(topThemes))}</div>
-            </div>
-            <div class="mini-stack">
-              <div class="mini-label">本命監視銘柄</div>
-              <div class="mini-main">${esc(compactJoin(topStocks))}</div>
-            </div>
+        <div class="hero-twin">
+          <div class="hero-box">
+            <div class="hero-box-label">本命テーマ</div>
+            <div class="hero-box-main">${esc(compactJoin(topThemes))}</div>
+          </div>
+          <div class="hero-box">
+            <div class="hero-box-label">本命監視銘柄</div>
+            <div class="hero-box-main">${esc(compactJoin(topStocks))}</div>
           </div>
         </div>
 
-        <div class="hero-grid">
-          <div class="hero-box">
+        <div class="hero-stack">
+          <div class="hero-box-wide">
             <div class="hero-box-label">やらないこと</div>
             <div class="hero-box-main">${esc(compactJoin(skip1, "なし"))}</div>
           </div>
-          <div class="hero-box">
+          <div class="hero-box-wide">
             <div class="hero-box-label">危険パターン</div>
             <div class="hero-box-main">${esc(compactJoin(danger1, "なし"))}</div>
           </div>
-          <div class="hero-box">
+          <div class="hero-box-wide">
             <div class="hero-box-label">仕掛け条件</div>
             <div class="hero-box-main">${esc(compactJoin(entry1, "なし"))}</div>
           </div>
@@ -748,8 +728,6 @@
             <div class="hero-box-label">更新</div>
             <div class="hero-box-main">${esc((d600.date || "-") + " " + (d600.generated_at || "-"))}</div>
           </div>
-        </div>
-
         </div>
       `;
     }
@@ -773,57 +751,27 @@
           <div class="card">
             <h3>今日の戦略</h3>
             <div class="list">
-              <div class="item">
-                <div class="item-title">相場判定</div>
-                <div class="item-sub">${esc(strategy.market_regime_label || "-")} / ${esc(strategy.market_regime || "-")}</div>
-              </div>
-              <div class="item">
-                <div class="item-title">参加戦略</div>
-                <div class="item-sub">${esc(strategy.entry_style_label || "-")} / ${esc(strategy.entry_style || "-")}</div>
-              </div>
-              <div class="item">
-                <div class="item-title">危険度</div>
-                <div class="item-sub">${esc(strategy.danger_level || "-")}</div>
-              </div>
-              <div class="item">
-                <div class="item-title">結論</div>
-                <div class="item-sub">${esc(strategy.conclusion || "-")}</div>
-              </div>
+              <div class="item"><div class="item-title">相場判定</div><div class="item-sub">${esc(strategy.market_regime_label || "-")} / ${esc(strategy.market_regime || "-")}</div></div>
+              <div class="item"><div class="item-title">参加戦略</div><div class="item-sub">${esc(strategy.entry_style_label || "-")} / ${esc(strategy.entry_style || "-")}</div></div>
+              <div class="item"><div class="item-title">危険度</div><div class="item-sub">${esc(strategy.danger_level || "-")}</div></div>
+              <div class="item"><div class="item-title">結論</div><div class="item-sub">${esc(strategy.conclusion || "-")}</div></div>
             </div>
           </div>
 
           <div class="card">
             <h3>売買条件</h3>
             <div class="list">
-              <div class="item">
-                <div class="item-title">エントリー条件</div>
-                <div class="item-sub">${arr(data.entry_conditions).map(esc).join("<br>") || "-"}</div>
-              </div>
-              <div class="item">
-                <div class="item-title">見送り条件</div>
-                <div class="item-sub">${arr(data.skip_conditions).map(esc).join("<br>") || "-"}</div>
-              </div>
-              <div class="item">
-                <div class="item-title">危険パターン</div>
-                <div class="item-sub">${arr(data.danger_patterns).map(esc).join("<br>") || "-"}</div>
-              </div>
+              <div class="item"><div class="item-title">エントリー条件</div><div class="item-sub">${arr(data.entry_conditions).map(esc).join("<br>") || "-"}</div></div>
+              <div class="item"><div class="item-title">見送り条件</div><div class="item-sub">${arr(data.skip_conditions).map(esc).join("<br>") || "-"}</div></div>
+              <div class="item"><div class="item-title">危険パターン</div><div class="item-sub">${arr(data.danger_patterns).map(esc).join("<br>") || "-"}</div></div>
             </div>
           </div>
         </div>
 
         <div class="grid three" style="margin-top:12px;">
-          <div class="card">
-            <h3>強いテーマ</h3>
-            ${renderThemeList(data.priority_themes, "強いテーマなし")}
-          </div>
-          <div class="card">
-            <h3>見ないテーマ</h3>
-            ${renderThemeList(data.avoid_themes, "見ないテーマなし")}
-          </div>
-          <div class="card">
-            <h3>監視銘柄</h3>
-            ${renderWatchlist(data.watchlist, "監視銘柄なし")}
-          </div>
+          <div class="card"><h3>強いテーマ</h3>${renderThemeList(data.priority_themes, "強いテーマなし")}</div>
+          <div class="card"><h3>見ないテーマ</h3>${renderThemeList(data.avoid_themes, "見ないテーマなし")}</div>
+          <div class="card"><h3>監視銘柄</h3>${renderWatchlist(data.watchlist, "監視銘柄なし")}</div>
         </div>
 
         <div class="grid two" style="margin-top:12px;">
@@ -837,10 +785,7 @@
             </div>
           </div>
 
-          <div class="card">
-            <h3>参考データ</h3>
-            ${chipList(data.data_sources)}
-          </div>
+          <div class="card"><h3>参考データ</h3>${chipList(data.data_sources)}</div>
         </div>
       `;
     }
@@ -871,17 +816,12 @@
             </div>
           </div>
 
-          <div class="card">
-            <h3>テーマ状態</h3>
-            ${renderThemeStatus(data.theme_status, "テーマ状態なし")}
-          </div>
+          <div class="card"><h3>テーマ状態</h3>${renderThemeStatus(data.theme_status, "テーマ状態なし")}</div>
         </div>
 
         <div class="card" style="margin-top:12px;">
           <h3>寄り後メモ</h3>
-          <div class="item">
-            <div class="item-sub">${nl2br(data.summary || "-")}</div>
-          </div>
+          <div class="item"><div class="item-sub">${nl2br(data.summary || "-")}</div></div>
         </div>
       `;
     }
@@ -928,22 +868,15 @@
     }
 
     function renderLog(logs) {
-      els.tabLog.innerHTML = `
-        <div class="card">
-          <h3>振り返りログ</h3>
-          ${renderReviewLogs(logs)}
-        </div>
-      `;
+      els.tabLog.innerHTML = `<div class="card"><h3>振り返りログ</h3>${renderReviewLogs(logs)}</div>`;
     }
 
     function renderSettings() {
-      const user = localStorage.getItem(STORAGE_USER) || "";
-      const repo = localStorage.getItem(STORAGE_REPO) || "";
+      const user = localStorage.getItem("stock-ai-user") || "";
+      const repo = localStorage.getItem("stock-ai-repo") || "";
 
       els.tabSettings.innerHTML = `
-        <div class="notice">
-          接続先や設定はここで管理します。
-        </div>
+        <div class="notice">接続先や設定はここで管理します。</div>
         <div style="height:12px;"></div>
 
         <div class="field">
@@ -970,39 +903,25 @@
       document.getElementById("saveSettingsBtn").addEventListener("click", async () => {
         const userVal = document.getElementById("ghUser").value.trim();
         const repoVal = document.getElementById("ghRepo").value.trim();
-        localStorage.setItem(STORAGE_USER, userVal);
-        localStorage.setItem(STORAGE_REPO, repoVal);
+        localStorage.setItem("stock-ai-user", userVal);
+        localStorage.setItem("stock-ai-repo", repoVal);
         await loadAll();
       });
 
       document.getElementById("clearSettingsBtn").addEventListener("click", () => {
-        localStorage.removeItem(STORAGE_USER);
-        localStorage.removeItem(STORAGE_REPO);
-        renderHero(null);
-        render600(null);
-        render905(null);
-        render1535(null);
-        renderLog(null);
-        renderSettings();
+        localStorage.removeItem("stock-ai-user");
+        localStorage.removeItem("stock-ai-repo");
+        renderHero(null); render600(null); render905(null); render1535(null); renderLog(null); renderSettings();
       });
     }
 
     async function safeLoad(path) {
-      try {
-        return await fetchJson(path);
-      } catch (e) {
-        return null;
-      }
+      try { return await fetchJson(path); } catch (e) { return null; }
     }
 
     async function loadAll() {
       if (!baseUrl()) {
-        renderHero(null);
-        render600(null);
-        render905(null);
-        render1535(null);
-        renderLog(null);
-        renderSettings();
+        renderHero(null); render600(null); render905(null); render1535(null); renderLog(null); renderSettings();
         return;
       }
 
@@ -1036,8 +955,7 @@
       });
     });
 
-    els.refreshBtn.addEventListener("click", loadAll);
-
+    document.getElementById("refreshBtn").addEventListener("click", loadAll);
     loadAll();
   </script>
 </body>
