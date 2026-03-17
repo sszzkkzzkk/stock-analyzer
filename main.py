@@ -77,22 +77,27 @@ def load_learning_ctx():
 H = {"User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15", "Accept-Language": "ja"}
 
 def fetch_kabutan():
-    """かぶたんから市場データを全取得"""
     result = {
-        "indices": [],
-        "world_indices": [],
-        "forex": [],
-        "commodities": [],
-        "sector": [],
-        "top_gainers": [],
-        "top_losers": [],
-        "volume_surge": [],
-        "themes": [],
-        "news": [],
+        "indices": [], "world_indices": [], "forex": [],
+        "sector": [], "top_gainers": [], "top_losers": [],
+        "volume_surge": [], "themes": [], "news": [],
         "source": "kabutan.jp"
     }
-    
-    # 指数・為替・商品
+    try:
+        r = requests.get("https://kabutan.jp/market/", headers=H, timeout=15)
+        soup = BeautifulSoup(r.text, "html.parser")
+        print("=== かぶたんHTML構造デバッグ ===")
+        for i, t in enumerate(soup.find_all("table")[:15]):
+            cls = t.get("class", [])
+            rows = t.find_all("tr")
+            print(f"table[{i}] class={cls} rows={len(rows)}")
+            if rows:
+                print(f"  sample: {rows[0].get_text(strip=True)[:60]}")
+        time.sleep(1)
+    except Exception as e:
+        print(f"かぶたんエラー: {e}")
+    return result
+
     try:
         r = requests.get("https://kabutan.jp/market/", headers=H, timeout=15)
         soup = BeautifulSoup(r.text, "html.parser")
