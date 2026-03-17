@@ -97,12 +97,13 @@
 
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.4fr repeat(3, minmax(160px, 1fr));
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
       gap: 12px;
       align-items: stretch;
     }
 
     .hero-main {
+      grid-column: 1 / -1;
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 16px;
@@ -411,6 +412,10 @@
         grid-template-columns: 1fr;
       }
 
+      .hero-main {
+        grid-column: auto;
+      }
+
       .kv {
         grid-template-columns: 1fr;
       }
@@ -503,9 +508,10 @@
           code: "コード",
           price: "価格",
           volume: "出来高",
+          source: "取得元",
         };
 
-        const order = ["name", "value", "change", "percent", "time", "code", "price", "volume"];
+        const order = ["name", "value", "change", "percent", "time", "source", "code", "price", "volume"];
         const keys = [...order.filter(k => k in x), ...Object.keys(x).filter(k => !order.includes(k))];
 
         return keys
@@ -761,13 +767,17 @@
       return "warn";
     }
 
-    function firstMatchItem(data, names) {
+    function firstMatchItem(data, names, extraBucket = null) {
       const market = data?.market_data || {};
       const merged = [
         ...arr(market.indices),
         ...arr(market.world_indices),
         ...arr(market.forex),
+        ...arr(market.futures),
       ];
+      if (extraBucket && Array.isArray(market[extraBucket])) {
+        return market[extraBucket].find(x => names.includes(x.name)) || null;
+      }
       return merged.find(x => names.includes(x.name)) || null;
     }
 
@@ -779,16 +789,18 @@
       }
 
       const nikkei = firstMatchItem(d600, ["日経平均"]);
-      const usdjpy = firstMatchItem(d600, ["米ドル円", "ドル円"]);
+      const futures = firstMatchItem(d600, ["日経先物", "日経225先物"], "futures");
+      const usdjpy = firstMatchItem(d600, ["ドル円", "米ドル円"]);
       const nydow = firstMatchItem(d600, ["NYダウ", "ＮＹダウ"]);
       const focus = current.trader_focus || {};
 
-      const quotes = [nikkei, usdjpy, nydow].filter(
+      const quotes = [nikkei, futures, usdjpy, nydow].filter(
         x => x && x.value && x.change && x.time
       );
 
-      const quoteHtml = quotes.length
-        ? quotes.map(item => `
+      els.heroPanel.innerHTML = `
+        <div class="hero-grid">
+          ${quotes.length ? quotes.map(item => `
             <div class="quote">
               <div class="quote-name">${esc(item.name || "-")}</div>
               <div class="quote-value">${esc(item.value || "—")}</div>
@@ -797,17 +809,14 @@
               </div>
               <div class="quote-time">${esc(item.time || "")}</div>
             </div>
-          `).join("")
-        : `
-          <div class="quote">
-            <div class="quote-name">主要指標</div>
-            <div class="quote-value">—</div>
-            <div class="quote-change warn">未取得</div>
-          </div>
-        `;
+          `).join("") : `
+            <div class="quote">
+              <div class="quote-name">主要指標</div>
+              <div class="quote-value">—</div>
+              <div class="quote-change warn">未取得</div>
+            </div>
+          `}
 
-      els.heroPanel.innerHTML = `
-        <div class="hero-grid">
           <div class="hero-main">
             <div class="hero-title">トレーダーズビュー</div>
             <div class="hero-headline">
@@ -821,7 +830,6 @@
               }
             </div>
           </div>
-          ${quoteHtml}
         </div>
       `;
     }
@@ -878,10 +886,10 @@
               ${renderSimpleList(market.indices, "国内指数データなし")}
             </div>
           ` : ""}
-          ${arr(market.world_indices).length ? `
+          ${arr(market.world_indices).length || arr(market.futures).length ? `
             <div class="card">
-              <h3>海外指数</h3>
-              ${renderSimpleList(market.world_indices, "海外指数データなし")}
+              <h3>海外 / 先物</h3>
+              ${renderSimpleList([...arr(market.world_indices), ...arr(market.futures)], "海外・先物データなし")}
             </div>
           ` : ""}
           <div class="card">
