@@ -155,10 +155,11 @@
     .bad { color: var(--bad); }
     .warn { color: var(--warn); }
 
-    .top-decision-grid {
+    .hero-main-grid {
       display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr;
+      grid-template-columns: 1.2fr 1fr 1fr;
       gap: 12px;
+      margin-bottom: 12px;
     }
 
     .decision-card {
@@ -196,6 +197,12 @@
       font-size: 12px;
       margin-right: 8px;
       margin-top: 8px;
+    }
+
+    .hero-bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
 
     .tabs {
@@ -290,20 +297,6 @@
       font-size: 12px;
     }
 
-    .search-box {
-      margin-bottom: 14px;
-    }
-
-    .search-box input {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: var(--panel2);
-      color: var(--text);
-      font: inherit;
-    }
-
     .mini-info {
       display: flex;
       gap: 8px;
@@ -386,7 +379,8 @@
 
     @media (max-width: 900px) {
       .quote-grid,
-      .top-decision-grid,
+      .hero-main-grid,
+      .hero-bottom-grid,
       .grid.two,
       .grid.three {
         grid-template-columns: 1fr;
@@ -409,7 +403,7 @@
         <div class="logo">株</div>
         <div>
           <div class="title">株式AI分析</div>
-          <div class="subtitle">毎朝の日本株トレード判断補助</div>
+          <div class="subtitle">日本株短期トレード用・個人向け売買判断補助</div>
         </div>
       </div>
       <button class="btn" id="refreshBtn">↻ 再読込</button>
@@ -418,9 +412,9 @@
     <section class="hero" id="heroPanel"></section>
 
     <div class="tabs">
-      <button class="tab active" data-tab="tab600">6:00 朝の予測</button>
-      <button class="tab" data-tab="tab905">9:05 寄り後確認</button>
-      <button class="tab" data-tab="tab1535">15:35 引け後総括</button>
+      <button class="tab active" data-tab="tab600">6:00 戦略会議</button>
+      <button class="tab" data-tab="tab905">9:05 行動修正</button>
+      <button class="tab" data-tab="tab1535">15:35 実戦学習</button>
       <button class="tab" data-tab="tabLog">振り返りログ</button>
       <button class="tab" data-tab="tabSettings">設定</button>
     </div>
@@ -469,25 +463,6 @@
       return `<div class="chips">${list.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>`;
     }
 
-    function renderSimpleList(items, emptyText = "データなし") {
-      const list = arr(items).filter(Boolean);
-      if (!list.length) return `<div class="empty">${esc(emptyText)}</div>`;
-      return `
-        <div class="list">
-          ${list.map(x => `
-            <div class="item">
-              <div class="item-title">${esc(x.name || x.role || "")}</div>
-              <div class="item-sub">${Object.entries(x)
-                .filter(([k, v]) => !["name"].includes(k) && v !== "" && v != null)
-                .map(([k, v]) => `${esc(k)}: ${esc(String(v))}`)
-                .join("<br>")}
-              </div>
-            </div>
-          `).join("")}
-        </div>
-      `;
-    }
-
     function renderTextList(items, emptyText = "データなし") {
       const list = arr(items).filter(Boolean);
       if (!list.length) return `<div class="empty">${esc(emptyText)}</div>`;
@@ -495,7 +470,7 @@
         <div class="list">
           ${list.map(x => `
             <div class="item">
-              <div class="item-sub">${typeof x === "string" ? esc(x) : esc(JSON.stringify(x))}</div>
+              <div class="item-sub">${esc(typeof x === "string" ? x : JSON.stringify(x))}</div>
             </div>
           `).join("")}
         </div>
@@ -509,7 +484,7 @@
         <div class="list">
           ${list.map(x => `
             <div class="item">
-              <div class="item-title">${esc(x.name || "-")}</div>
+              <div class="item-title">${esc(x.name || "-")} ${x.priority ? `<span class="chip">${esc(x.priority)}</span>` : ""}</div>
               <div class="item-sub">${esc(x.reason || "-")}</div>
             </div>
           `).join("")}
@@ -524,8 +499,28 @@
         <div class="list">
           ${list.map(x => `
             <div class="item">
-              <div class="item-title">${esc(x.role || "-")} / ${esc(x.name || "-")} ${x.code ? `(${esc(x.code)})` : ""}</div>
-              <div class="item-sub">${esc(x.reason || "-")}</div>
+              <div class="item-title">${esc(x.bucket || "-")} / ${esc(x.name || "-")} ${x.code ? `(${esc(x.code)})` : ""}</div>
+              <div class="item-sub">
+                監視理由: ${esc(x.reason || "-")}<br>
+                仕掛け条件: ${esc(x.trigger || "-")}<br>
+                失効条件: ${esc(x.invalidation || "-")}<br>
+                注目時間帯: ${esc(x.time_window || "-")}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderThemeStatus(items, emptyText = "データなし") {
+      const list = arr(items).filter(Boolean);
+      if (!list.length) return `<div class="empty">${esc(emptyText)}</div>`;
+      return `
+        <div class="list">
+          ${list.map(x => `
+            <div class="item">
+              <div class="item-title">${esc(x.name || "-")} / ${esc(x.type || "-")}</div>
+              <div class="item-sub">${esc(x.comment || "-")}</div>
             </div>
           `).join("")}
         </div>
@@ -542,9 +537,12 @@
               <tr>
                 <th>日付</th>
                 <th>使えた判断</th>
-                <th>取りやすかった型</th>
-                <th>危険だった型</th>
-                <th>次の注意点</th>
+                <th>良かった点</th>
+                <th>禁止事項</th>
+                <th>次の注目</th>
+                <th>テーマ精度</th>
+                <th>執行精度</th>
+                <th>見送り精度</th>
               </tr>
             </thead>
             <tbody>
@@ -555,6 +553,9 @@
                   <td>${esc(x.easy_pattern || "-")}</td>
                   <td>${esc(x.danger_pattern || "-")}</td>
                   <td>${esc(x.next_note || "-")}</td>
+                  <td>${esc(x.theme_score ?? "-")}</td>
+                  <td>${esc(x.execution_score ?? "-")}</td>
+                  <td>${esc(x.skip_score ?? "-")}</td>
                 </tr>
               `).join("")}
             </tbody>
@@ -591,7 +592,7 @@
     function firstMatchItem(data, names, buckets = []) {
       const market = data?.market_data || {};
       const merged = [];
-      const useBuckets = buckets.length ? buckets : ["indices", "futures", "forex", "world_indices"];
+      const useBuckets = buckets.length ? buckets : ["indices", "futures", "forex", "world_indices", "sox", "oil"];
       useBuckets.forEach(b => merged.push(...arr(market[b])));
       return merged.find(x => names.includes(x.name)) || null;
     }
@@ -602,12 +603,19 @@
         return;
       }
 
-      const decision = d600.decision || {};
+      const strategy = d600.strategy || {};
       const nikkei = firstMatchItem(d600, ["日経平均"], ["indices"]);
       const futures = firstMatchItem(d600, ["日経先物", "日経225先物"], ["futures"]);
       const usdjpy = firstMatchItem(d600, ["ドル円", "米ドル円"], ["forex"]);
       const nydow = firstMatchItem(d600, ["NYダウ", "ＮＹダウ"], ["world_indices"]);
       const quotes = [nikkei, futures, usdjpy, nydow].filter(x => x && x.value && x.change && x.time);
+
+      const topThemes = arr(d600.priority_themes).slice(0, 3).map(x => x.name).filter(Boolean);
+      const topStocks = arr(d600.watchlist)
+        .filter(x => ["先導株", "連想1軍"].includes(x.bucket))
+        .slice(0, 3)
+        .map(x => x.name)
+        .filter(Boolean);
 
       const failedBanner = d600.analysis_status === "failed"
         ? `
@@ -625,7 +633,7 @@
             <div class="quote">
               <div class="quote-name">${esc(item.name || "-")}</div>
               <div class="quote-value">${esc(item.value || "—")}</div>
-              <div class="quote-change ${quoteClass(item.change)}">${esc(item.change || "—")}</div>
+              <div class="quote-change ${quoteClass(item.change)}">${esc(item.change || "—")} ${esc(item.percent || "")}</div>
               <div class="quote-time">${esc(item.time || "")}</div>
             </div>
           `).join("") : `
@@ -637,27 +645,39 @@
           `}
         </div>
 
-        <div class="top-decision-grid">
+        <div class="hero-main-grid">
           <div class="decision-card">
-            <div class="decision-label">今日の結論</div>
-            <div class="decision-main">${esc(decision.conclusion || d600.summary || "結論なし")}</div>
+            <div class="decision-label">今日の相場判定</div>
+            <div class="decision-main">${esc(strategy.market_regime_label || "未判定")}</div>
             <div class="decision-sub">
-              ${decision.stance ? `<span class="stance-chip">${esc(decision.stance)}</span>` : ""}
-              ${decision.market_tone ? `<span class="stance-chip">${esc(decision.market_tone)}</span>` : ""}
-              ${decision.trading_style ? `<span class="stance-chip">${esc(decision.trading_style)}</span>` : ""}
+              ${strategy.market_regime_label ? `<span class="stance-chip">${esc(strategy.market_regime_label)}</span>` : ""}
+              ${strategy.entry_style_label ? `<span class="stance-chip">${esc(strategy.entry_style_label)}</span>` : ""}
+              ${strategy.danger_level ? `<span class="stance-chip">危険度 ${esc(strategy.danger_level)}</span>` : ""}
             </div>
           </div>
 
           <div class="decision-card">
-            <div class="decision-label">地合い</div>
-            <div class="decision-main">${esc(decision.market_tone || "未判定")}</div>
-            <div class="decision-sub">${esc(decision.trading_style || "")}</div>
+            <div class="decision-label">一番見たいテーマ</div>
+            <div class="decision-main">${esc(topThemes.join(" / ") || "なし")}</div>
+            <div class="decision-sub">${esc(strategy.conclusion || d600.summary || "")}</div>
           </div>
 
           <div class="decision-card">
-            <div class="decision-label">今日の行動案</div>
-            <div class="decision-main">${arr(d600.action_plan).length ? esc(d600.action_plan[0]) : "未設定"}</div>
-            <div class="decision-sub">${arr(d600.action_plan).slice(1).map(esc).join(" / ")}</div>
+            <div class="decision-label">本命監視銘柄3つ</div>
+            <div class="decision-main">${esc(topStocks.join(" / ") || "なし")}</div>
+            <div class="decision-sub">本命と連想1軍を優先表示</div>
+          </div>
+        </div>
+
+        <div class="hero-bottom-grid">
+          <div class="decision-card">
+            <div class="decision-label">今日はやらないこと</div>
+            <div class="decision-sub">${arr(d600.skip_conditions).map(esc).join("<br>") || "なし"}</div>
+          </div>
+
+          <div class="decision-card">
+            <div class="decision-label">危険パターン</div>
+            <div class="decision-sub">${arr(d600.danger_patterns).map(esc).join("<br>") || "なし"}</div>
           </div>
         </div>
       `;
@@ -669,20 +689,65 @@
         return;
       }
 
+      const strategy = data.strategy || {};
+      const classifiedNews = data.market_data?.classified_news || {};
+
       els.tab600.innerHTML = `
         <div class="mini-info">
           <span class="mini-pill">更新 ${esc(data.date || "-")} ${esc(data.generated_at || "-")}</span>
           ${data.analysis_status === "failed" ? `<span class="mini-pill">分析失敗</span>` : ""}
         </div>
 
-        <div class="grid three">
+        <div class="grid two">
+          <div class="card">
+            <h3>今日の戦略</h3>
+            <div class="list">
+              <div class="item">
+                <div class="item-title">相場判定</div>
+                <div class="item-sub">${esc(strategy.market_regime_label || "-")} / ${esc(strategy.market_regime || "-")}</div>
+              </div>
+              <div class="item">
+                <div class="item-title">参加戦略</div>
+                <div class="item-sub">${esc(strategy.entry_style_label || "-")} / ${esc(strategy.entry_style || "-")}</div>
+              </div>
+              <div class="item">
+                <div class="item-title">危険度</div>
+                <div class="item-sub">${esc(strategy.danger_level || "-")}</div>
+              </div>
+              <div class="item">
+                <div class="item-title">結論</div>
+                <div class="item-sub">${esc(strategy.conclusion || "-")}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>売買条件</h3>
+            <div class="list">
+              <div class="item">
+                <div class="item-title">エントリー条件</div>
+                <div class="item-sub">${arr(data.entry_conditions).map(esc).join("<br>") || "-"}</div>
+              </div>
+              <div class="item">
+                <div class="item-title">見送り条件</div>
+                <div class="item-sub">${arr(data.skip_conditions).map(esc).join("<br>") || "-"}</div>
+              </div>
+              <div class="item">
+                <div class="item-title">危険パターン</div>
+                <div class="item-sub">${arr(data.danger_patterns).map(esc).join("<br>") || "-"}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid three" style="margin-top:14px;">
           <div class="card">
             <h3>強いテーマ</h3>
-            ${renderThemeList(data.strong_themes, "強いテーマなし")}
+            ${renderThemeList(data.priority_themes, "強いテーマなし")}
           </div>
           <div class="card">
-            <h3>弱いテーマ</h3>
-            ${renderThemeList(data.weak_themes, "弱いテーマなし")}
+            <h3>見ないテーマ</h3>
+            ${renderThemeList(data.avoid_themes, "見ないテーマなし")}
           </div>
           <div class="card">
             <h3>監視銘柄</h3>
@@ -692,18 +757,19 @@
 
         <div class="grid two" style="margin-top:14px;">
           <div class="card">
-            <h3>今日の行動案</h3>
-            ${renderTextList(data.action_plan, "行動案なし")}
+            <h3>売買材料ニュース</h3>
+            <div class="list">
+              <div class="item"><div class="item-title">マクロ</div><div class="item-sub">${arr(classifiedNews.macro).map(esc).join("<br>") || "-"}</div></div>
+              <div class="item"><div class="item-title">業界</div><div class="item-sub">${arr(classifiedNews.industry).map(esc).join("<br>") || "-"}</div></div>
+              <div class="item"><div class="item-title">個別材料</div><div class="item-sub">${arr(classifiedNews.stock_specific).map(esc).join("<br>") || "-"}</div></div>
+              <div class="item"><div class="item-title">需給イベント</div><div class="item-sub">${arr(classifiedNews.supply_demand).map(esc).join("<br>") || "-"}</div></div>
+            </div>
           </div>
-          <div class="card">
-            <h3>注意点</h3>
-            ${renderTextList(data.risk_notes, "注意点なし")}
-          </div>
-        </div>
 
-        <div class="card" style="margin-top:14px;">
-          <h3>参考データ</h3>
-          ${chipList(data.data_sources)}
+          <div class="card">
+            <h3>参考データ</h3>
+            ${chipList(data.data_sources)}
+          </div>
         </div>
       `;
     }
@@ -714,7 +780,7 @@
         return;
       }
 
-      const memo = data.correction_memo || {};
+      const j = data.action_judgement || {};
 
       els.tab905.innerHTML = `
         <div class="mini-info">
@@ -724,20 +790,26 @@
 
         <div class="grid two">
           <div class="card">
-            <h3>寄り後確認</h3>
+            <h3>今から何をするか</h3>
             <div class="list">
-              <div class="item"><div class="item-title">実際に何が強いか</div><div class="item-sub">${esc(memo.actual_leader || "-")}</div></div>
-              <div class="item"><div class="item-title">朝予測とのズレ</div><div class="item-sub">${esc(memo.gap_from_morning || "-")}</div></div>
-              <div class="item"><div class="item-title">今から触れるか</div><div class="item-sub">${esc(memo.tradable_now || "-")}</div></div>
-              <div class="item"><div class="item-title">見送りか</div><div class="item-sub">${esc(memo.skip_or_not || "-")}</div></div>
+              <div class="item"><div class="item-title">寄りの状態</div><div class="item-sub">${esc(j.opening_state || "-")}</div></div>
+              <div class="item"><div class="item-title">主役テーマ</div><div class="item-sub">${esc(j.best_current_theme || "-")}</div></div>
+              <div class="item"><div class="item-title">主役銘柄</div><div class="item-sub">${esc(j.best_current_stock || "-")}</div></div>
+              <div class="item"><div class="item-title">行動判断</div><div class="item-sub">${esc(j.action_now || "-")}</div></div>
+              <div class="item"><div class="item-title">追わないもの</div><div class="item-sub">${esc(j.do_not_chase || "-")}</div></div>
             </div>
           </div>
 
           <div class="card">
-            <h3>行動修正メモ</h3>
-            <div class="item">
-              <div class="item-sub">${nl2br(data.summary || "-")}</div>
-            </div>
+            <h3>テーマ状態</h3>
+            ${renderThemeStatus(data.theme_status, "テーマ状態なし")}
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <h3>寄り後メモ</h3>
+          <div class="item">
+            <div class="item-sub">${nl2br(data.summary || "-")}</div>
           </div>
         </div>
       `;
@@ -749,7 +821,7 @@
         return;
       }
 
-      const review = data.review || {};
+      const r = data.review || {};
 
       els.tab1535.innerHTML = `
         <div class="mini-info">
@@ -759,20 +831,25 @@
 
         <div class="grid two">
           <div class="card">
-            <h3>翌日に活かす反省メモ</h3>
+            <h3>実戦学習メモ</h3>
             <div class="list">
-              <div class="item"><div class="item-title">実際に強かったテーマ</div><div class="item-sub">${arr(review.actually_strong).map(esc).join(" / ") || "-"}</div></div>
-              <div class="item"><div class="item-title">朝予測とのズレ</div><div class="item-sub">${esc(review.morning_gap || "-")}</div></div>
-              <div class="item"><div class="item-title">取りやすかった型</div><div class="item-sub">${esc(review.easy_pattern || "-")}</div></div>
-              <div class="item"><div class="item-title">危なかった型</div><div class="item-sub">${esc(review.danger_pattern || "-")}</div></div>
-              <div class="item"><div class="item-title">明日以降の注意点</div><div class="item-sub">${esc(review.next_note || "-")}</div></div>
+              <div class="item"><div class="item-title">本当に取るべきだったテーマ</div><div class="item-sub">${esc(r.actually_best_theme || "-")}</div></div>
+              <div class="item"><div class="item-title">朝の時点で危険だったテーマ</div><div class="item-sub">${esc(r.danger_theme_in_morning || "-")}</div></div>
+              <div class="item"><div class="item-title">実際に伸びた先導株</div><div class="item-sub">${esc(r.best_leader_stock || "-")}</div></div>
+              <div class="item"><div class="item-title">伸びなかった連想株</div><div class="item-sub">${esc(r.weak_secondary_stock || "-")}</div></div>
+              <div class="item"><div class="item-title">外れた仮説</div><div class="item-sub">${esc(r.wrong_hypothesis || "-")}</div></div>
+              <div class="item"><div class="item-title">次回の禁止事項</div><div class="item-sub">${esc(r.next_ban_rule || "-")}</div></div>
+              <div class="item"><div class="item-title">次の注目</div><div class="item-sub">${esc(r.next_focus || "-")}</div></div>
             </div>
           </div>
 
           <div class="card">
-            <h3>引け後総括</h3>
-            <div class="item">
-              <div class="item-sub">${nl2br(data.summary || "-")}</div>
+            <h3>精度の分解</h3>
+            <div class="list">
+              <div class="item"><div class="item-title">テーマ精度</div><div class="item-sub">${esc(r.theme_score ?? "-")}</div></div>
+              <div class="item"><div class="item-title">執行精度</div><div class="item-sub">${esc(r.execution_score ?? "-")}</div></div>
+              <div class="item"><div class="item-title">見送り精度</div><div class="item-sub">${esc(r.skip_score ?? "-")}</div></div>
+              <div class="item"><div class="item-title">引け後総括</div><div class="item-sub">${nl2br(data.summary || "-")}</div></div>
             </div>
           </div>
         </div>
