@@ -1,7 +1,6 @@
-
 """
 株式AI自動分析
-SESSION=600 / 905 / 1535
+SESSION=600 / 905 / 1200 / 1535
 個人用・日本株短期売買補助ツール版
 """
 
@@ -83,17 +82,14 @@ def save_text(filename, text):
 
 def parse_json(raw):
     cleaned = re.sub(r"```json|```", "", raw).strip()
-
     start = cleaned.find("{")
     end = cleaned.rfind("}")
     if start == -1 or end == -1 or end <= start:
         raise ValueError("JSONオブジェクトの外形が見つかりません")
-
     body = cleaned[start:end + 1]
     body = body.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
     body = re.sub(r",\s*}", "}", body)
     body = re.sub(r",\s*]", "]", body)
-
     return json.loads(body)
 
 
@@ -175,14 +171,12 @@ def is_valid_news_text(text):
 def yahoo_quote(symbol, label):
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
     params = {"interval": "1m", "range": "1d"}
-
     headers = dict(HEADERS)
     headers["Referer"] = f"https://finance.yahoo.com/quote/{symbol}"
 
     try:
         r = safe_get(url, timeout=20, headers=headers, params=params)
         data = r.json()
-
         result = data.get("chart", {}).get("result", [])
         if not result:
             return None
@@ -271,10 +265,7 @@ def parse_warning_table(rows, mode="gainers"):
         if not name:
             continue
 
-        item = {
-            "code": code,
-            "name": name,
-        }
+        item = {"code": code, "name": name}
 
         if mode in ("gainers", "losers"):
             item["price"] = row[idx + 2] if idx + 2 < len(row) else ""
@@ -452,17 +443,8 @@ def fetch_all_market_data():
     }
 
     print("=== market summary ===")
-    print(f"indices: {len(result['indices'])}")
-    print(f"world_indices: {len(result['world_indices'])}")
-    print(f"forex: {len(result['forex'])}")
-    print(f"futures: {len(result['futures'])}")
-    print(f"sox: {len(result['sox'])}")
-    print(f"oil: {len(result['oil'])}")
-    print(f"top_gainers: {len(result['top_gainers'])}")
-    print(f"top_losers: {len(result['top_losers'])}")
-    print(f"volume_surge: {len(result['volume_surge'])}")
-    print(f"themes: {len(result['themes'])}")
-    print(f"news: {len(result['news'])}")
+    for key in ["indices", "world_indices", "forex", "futures", "sox", "oil", "top_gainers", "top_losers", "volume_surge", "themes", "news"]:
+        print(f"{key}: {len(result[key])}")
 
     return result
 
@@ -498,30 +480,7 @@ def build_data_sources_summary(market, nhk, reuters):
     return sources
 
 
-def build_trader_focus_from_strategy(result):
-    strategy = result.get("strategy", {}) or {}
-    watch = result.get("watchlist", []) or []
-
-    result["trader_focus"] = {
-        "headline": strategy.get("conclusion", "") or result.get("summary", ""),
-        "top_themes": [x.get("name", "") for x in result.get("priority_themes", [])[:3] if x.get("name")],
-        "top_stocks": [
-            {
-                "name": x.get("name", ""),
-                "code": x.get("code", ""),
-                "reason": x.get("reason", ""),
-            }
-            for x in watch[:5]
-            if x.get("name")
-        ],
-    }
-    return result
-
-
 def validate_600_analysis_json(obj):
-    if not isinstance(obj, dict):
-        raise ValueError("rootがdictではありません")
-
     required = [
         "strategy",
         "priority_themes",
@@ -553,11 +512,6 @@ def validate_600_analysis_json(obj):
         raise ValueError("entry_style_labelが規定値外です")
     if strategy["danger_level"] not in ["低", "中", "高"]:
         raise ValueError("danger_levelが規定値外です")
-
-    for key in ["priority_themes", "avoid_themes", "watchlist", "entry_conditions", "skip_conditions", "danger_patterns"]:
-        if not isinstance(obj.get(key), list):
-            raise ValueError(f"{key}がlistではありません")
-
     return True
 
 
@@ -585,23 +539,17 @@ def build_analysis_prompt_600(today_str, learning_ctx, market, key_news):
             "danger_level": "中",
             "conclusion": "120字以内"
         },
-        "priority_themes": [
-            {"name": "半導体", "reason": "60字以内", "priority": "A"}
-        ],
-        "avoid_themes": [
-            {"name": "材料小型", "reason": "60字以内"}
-        ],
-        "watchlist": [
-            {
-                "bucket": "先導株",
-                "name": "銘柄名",
-                "code": "1234",
-                "reason": "50字以内",
-                "trigger": "50字以内",
-                "invalidation": "50字以内",
-                "time_window": "9:00-9:20"
-            }
-        ],
+        "priority_themes": [{"name": "半導体", "reason": "60字以内", "priority": "A"}],
+        "avoid_themes": [{"name": "材料小型", "reason": "60字以内"}],
+        "watchlist": [{
+            "bucket": "先導株",
+            "name": "銘柄名",
+            "code": "1234",
+            "reason": "50字以内",
+            "trigger": "50字以内",
+            "invalidation": "50字以内",
+            "time_window": "9:00-9:20"
+        }],
         "entry_conditions": ["60字以内"],
         "skip_conditions": ["60字以内"],
         "danger_patterns": ["60字以内"],
@@ -633,12 +581,12 @@ Rules:
 - No markdown
 - No explanation outside JSON
 - Keep strings short
-- priority_themes: max 3
-- avoid_themes: max 3
-- watchlist: max 5
-- entry_conditions: max 3
-- skip_conditions: max 3
-- danger_patterns: max 3
+- priority_themes max 3
+- avoid_themes max 3
+- watchlist max 5
+- entry_conditions max 3
+- skip_conditions max 3
+- danger_patterns max 3
 - watchlist bucket should be one of: 先導株 / 連想1軍 / 連想2軍 / 危険株
 - market_regime must be one of: attack / selective / avoid
 - market_regime_label must be one of: 攻めやすい / 選別相場 / 見送り寄り
@@ -651,82 +599,6 @@ Required JSON schema:
 
 Return ONLY JSON.
 """.strip()
-
-
-def run_claude_analysis_600(today, now, market, data_sources, key_news):
-    learning_ctx = load_learning_ctx()
-    today_str = today.strftime("%Y年%m月%d日")
-    prompt = build_analysis_prompt_600(today_str, learning_ctx, market, key_news)
-
-    raw = call_claude(prompt, max_tokens=2200)
-    save_text("claude_raw_600.txt", raw)
-
-    parsed = parse_json(raw)
-    validate_600_analysis_json(parsed)
-
-    result = {
-        "date": today.isoformat(),
-        "session": "600",
-        "generated_at": now,
-        "data_sources": data_sources,
-        "market_data": {
-            "indices": market["indices"][:6],
-            "world_indices": market["world_indices"][:6],
-            "forex": market["forex"][:4],
-            "futures": market["futures"][:4],
-            "sox": market["sox"][:2],
-            "oil": market["oil"][:2],
-            "search_results": market["search_results"][:10],
-            "key_news": key_news[:10],
-            "classified_news": market["classified_news"],
-        },
-        "strategy": parsed["strategy"],
-        "priority_themes": parsed["priority_themes"][:3],
-        "avoid_themes": parsed["avoid_themes"][:3],
-        "watchlist": parsed["watchlist"][:5],
-        "entry_conditions": parsed["entry_conditions"][:3],
-        "skip_conditions": parsed["skip_conditions"][:3],
-        "danger_patterns": parsed["danger_patterns"][:3],
-        "summary": parsed.get("summary", ""),
-    }
-
-    return build_trader_focus_from_strategy(result)
-
-
-def build_analysis_failure_600(today, now, market, data_sources, key_news, reason):
-    return {
-        "date": today.isoformat(),
-        "session": "600",
-        "generated_at": now,
-        "data_sources": data_sources,
-        "market_data": {
-            "indices": market["indices"][:6],
-            "world_indices": market["world_indices"][:6],
-            "forex": market["forex"][:4],
-            "futures": market["futures"][:4],
-            "sox": market["sox"][:2],
-            "oil": market["oil"][:2],
-            "search_results": market["search_results"][:10],
-            "key_news": key_news[:10],
-            "classified_news": market["classified_news"],
-        },
-        "strategy": {
-            "market_regime": "avoid",
-            "market_regime_label": "見送り寄り",
-            "entry_style": "skip",
-            "entry_style_label": "見送り",
-            "danger_level": "高",
-            "conclusion": "AI分析に失敗したため、今日は無理に攻めず主要指標とニュース確認を優先。"
-        },
-        "priority_themes": [],
-        "avoid_themes": [],
-        "watchlist": [],
-        "entry_conditions": ["主要指標が揃っても分析失敗日は無理に入らない"],
-        "skip_conditions": ["AI分析失敗時は見送り寄り"],
-        "danger_patterns": [f"AI分析失敗: {reason}"],
-        "summary": f"AI分析に失敗しました: {reason}",
-        "analysis_status": "failed",
-    }
 
 
 def build_analysis_prompt_905(today_str, morning_data, market, news):
@@ -748,15 +620,13 @@ def build_analysis_prompt_905(today_str, morning_data, market, news):
             "action_now": "80字以内",
             "do_not_chase": "80字以内"
         },
-        "theme_status": [
-            {"name": "テーマ名", "type": "継続上昇型", "comment": "60字以内"}
-        ],
+        "theme_status": [{"name": "テーマ名", "type": "継続上昇型", "comment": "60字以内"}],
         "summary": "120字以内"
     }
 
     return f"""
 You are a Japanese short-term stock trader's opening action assistant.
-Today is {today_str} 9:05.
+Today is {today_str} 9:10.
 
 Task:
 - decide what to do now
@@ -783,12 +653,85 @@ Return ONLY JSON.
 """.strip()
 
 
-def build_analysis_prompt_1535(today_str, pred_600, pred_905, market, news):
+def build_analysis_prompt_1200(today_str, morning_data, open_data, market, news):
+    compact = {
+        "morning_strategy": morning_data.get("strategy", {}),
+        "morning_priority_themes": morning_data.get("priority_themes", [])[:3],
+        "morning_watchlist": morning_data.get("watchlist", [])[:5],
+        "opening_action": open_data.get("action_judgement", {}) if open_data else {},
+        "opening_theme_status": open_data.get("theme_status", [])[:4] if open_data else [],
+        "top_gainers": market["top_gainers"][:10],
+        "top_losers": market["top_losers"][:8],
+        "volume_surge": market["volume_surge"][:8],
+        "recent_themes": market["themes"][:10],
+        "news": news[:10],
+    }
+
+    schema = {
+        "afternoon_plan": {
+            "status": "修正",
+            "status_label": "朝仮説を修正",
+            "pm_regime": "selective",
+            "pm_regime_label": "後場は選別相場",
+            "summary": "120字以内"
+        },
+        "strong_themes_am": ["テーマ名"],
+        "pm_core_themes": ["テーマ名"],
+        "drop_themes": ["テーマ名"],
+        "new_watchlist": [{
+            "name": "銘柄名",
+            "code": "1234",
+            "reason": "50字以内",
+            "trigger": "50字以内",
+            "invalidation": "50字以内",
+            "time_window": "12:30-14:00"
+        }],
+        "do_not_do_pm": ["60字以内"],
+        "entry_conditions_pm": ["60字以内"],
+        "skip_conditions_pm": ["60字以内"],
+        "summary": "120字以内"
+    }
+
+    return f"""
+You are a Japanese short-term stock trader's afternoon strategy assistant.
+Today is {today_str} 12:00.
+
+Task:
+- rebuild the afternoon plan
+- decide whether to maintain, revise, or discard the morning hypothesis
+- keep it practical and short
+
+Data:
+{json.dumps(compact, ensure_ascii=False)}
+
+Rules:
+- Return ONLY valid JSON
+- No markdown
+- Keep strings short
+- status must be one of: 維持 / 修正 / 破棄
+- status_label must be one of: 朝仮説を維持 / 朝仮説を修正 / 朝仮説を破棄
+- pm_regime must be one of: attack / selective / avoid
+- pm_regime_label must be one of: 後場は攻めやすい / 後場は選別相場 / 後場は見送り寄り
+- strong_themes_am max 3
+- pm_core_themes max 3
+- drop_themes max 3
+- new_watchlist max 3
+- do_not_do_pm max 3
+- entry_conditions_pm max 3
+- skip_conditions_pm max 3
+
+Required JSON schema:
+{json.dumps(schema, ensure_ascii=False)}
+
+Return ONLY JSON.
+""".strip()
+
+
+def build_analysis_prompt_1535(today_str, pred_600, pred_905, pred_1200, market, news):
     compact = {
         "morning_strategy": pred_600.get("strategy", {}),
-        "morning_priority_themes": pred_600.get("priority_themes", [])[:3],
-        "morning_watchlist": pred_600.get("watchlist", [])[:5],
         "opening_action": pred_905.get("action_judgement", {}) if pred_905 else {},
+        "afternoon_plan": pred_1200.get("afternoon_plan", {}) if pred_1200 else {},
         "top_gainers": market["top_gainers"][:10],
         "top_losers": market["top_losers"][:8],
         "volume_surge": market["volume_surge"][:8],
@@ -836,9 +779,80 @@ Return ONLY JSON.
 """.strip()
 
 
+def run_claude_analysis_600(today, now, market, data_sources, key_news):
+    learning_ctx = load_learning_ctx()
+    today_str = today.strftime("%Y年%m月%d日")
+    prompt = build_analysis_prompt_600(today_str, learning_ctx, market, key_news)
+    raw = call_claude(prompt, max_tokens=2200)
+    save_text("claude_raw_600.txt", raw)
+    parsed = parse_json(raw)
+    validate_600_analysis_json(parsed)
+
+    return {
+        "date": today.isoformat(),
+        "session": "600",
+        "generated_at": now,
+        "data_sources": data_sources,
+        "market_data": {
+            "indices": market["indices"][:6],
+            "world_indices": market["world_indices"][:6],
+            "forex": market["forex"][:4],
+            "futures": market["futures"][:4],
+            "sox": market["sox"][:2],
+            "oil": market["oil"][:2],
+            "search_results": market["search_results"][:10],
+            "key_news": key_news[:10],
+            "classified_news": market["classified_news"],
+        },
+        "strategy": parsed["strategy"],
+        "priority_themes": parsed["priority_themes"][:3],
+        "avoid_themes": parsed["avoid_themes"][:3],
+        "watchlist": parsed["watchlist"][:5],
+        "entry_conditions": parsed["entry_conditions"][:3],
+        "skip_conditions": parsed["skip_conditions"][:3],
+        "danger_patterns": parsed["danger_patterns"][:3],
+        "summary": parsed.get("summary", ""),
+    }
+
+
+def build_analysis_failure_600(today, now, market, data_sources, key_news, reason):
+    return {
+        "date": today.isoformat(),
+        "session": "600",
+        "generated_at": now,
+        "data_sources": data_sources,
+        "market_data": {
+            "indices": market["indices"][:6],
+            "world_indices": market["world_indices"][:6],
+            "forex": market["forex"][:4],
+            "futures": market["futures"][:4],
+            "sox": market["sox"][:2],
+            "oil": market["oil"][:2],
+            "search_results": market["search_results"][:10],
+            "key_news": key_news[:10],
+            "classified_news": market["classified_news"],
+        },
+        "strategy": {
+            "market_regime": "avoid",
+            "market_regime_label": "見送り寄り",
+            "entry_style": "skip",
+            "entry_style_label": "見送り",
+            "danger_level": "高",
+            "conclusion": "AI分析に失敗したため、今日は無理に攻めず主要指標とニュース確認を優先。"
+        },
+        "priority_themes": [],
+        "avoid_themes": [],
+        "watchlist": [],
+        "entry_conditions": ["主要指標が揃っても分析失敗日は無理に入らない"],
+        "skip_conditions": ["AI分析失敗時は見送り寄り"],
+        "danger_patterns": [f"AI分析失敗: {reason}"],
+        "summary": f"AI分析に失敗しました: {reason}",
+        "analysis_status": "failed",
+    }
+
+
 def run_600(today):
     now = datetime.now(JST).strftime("%H:%M")
-
     print("[6:00] データ収集中...")
     market = fetch_all_market_data()
     nhk = fetch_nhk_news()
@@ -863,7 +877,7 @@ def run_905(today):
     if not morning:
         raise FileNotFoundError("latest_600.json なし")
 
-    print("[9:05] データ収集中...")
+    print("[9:10] データ収集中...")
     market = fetch_all_market_data()
     nhk = fetch_nhk_news()
     data_sources = build_data_sources_summary(market, nhk, [])
@@ -871,16 +885,10 @@ def run_905(today):
     today_str = today.strftime("%Y年%m月%d日")
 
     try:
-        prompt = build_analysis_prompt_905(
-            today_str,
-            morning,
-            market,
-            market["news"] + nhk,
-        )
+        prompt = build_analysis_prompt_905(today_str, morning, market, market["news"] + nhk)
         raw = call_claude(prompt, max_tokens=1400)
         save_text("claude_raw_905.txt", raw)
         parsed = parse_json(raw)
-
         result = {
             "date": today.isoformat(),
             "session": "905",
@@ -891,7 +899,7 @@ def run_905(today):
             "summary": parsed["summary"],
         }
     except Exception as e:
-        print(f"[9:05] Claude分析失敗: {e}")
+        print(f"[9:10] Claude分析失敗: {e}")
         result = {
             "date": today.isoformat(),
             "session": "905",
@@ -914,10 +922,75 @@ def run_905(today):
     return result
 
 
+def run_1200(today):
+    morning = load("latest_600.json")
+    opening = load("latest_905.json") or {}
+    if not morning:
+        raise FileNotFoundError("latest_600.json なし")
+
+    print("[12:00] データ収集中...")
+    market = fetch_all_market_data()
+    nhk = fetch_nhk_news()
+    reuters = fetch_reuters_news()
+    data_sources = build_data_sources_summary(market, nhk, reuters)
+    now = datetime.now(JST).strftime("%H:%M")
+    today_str = today.strftime("%Y年%m月%d日")
+
+    try:
+        prompt = build_analysis_prompt_1200(today_str, morning, opening, market, market["news"] + nhk + reuters)
+        raw = call_claude(prompt, max_tokens=1600)
+        save_text("claude_raw_1200.txt", raw)
+        parsed = parse_json(raw)
+
+        result = {
+            "date": today.isoformat(),
+            "session": "1200",
+            "generated_at": now,
+            "data_sources": data_sources,
+            "afternoon_plan": parsed["afternoon_plan"],
+            "strong_themes_am": parsed["strong_themes_am"][:3],
+            "pm_core_themes": parsed["pm_core_themes"][:3],
+            "drop_themes": parsed["drop_themes"][:3],
+            "new_watchlist": parsed["new_watchlist"][:3],
+            "do_not_do_pm": parsed["do_not_do_pm"][:3],
+            "entry_conditions_pm": parsed["entry_conditions_pm"][:3],
+            "skip_conditions_pm": parsed["skip_conditions_pm"][:3],
+            "summary": parsed["summary"],
+        }
+    except Exception as e:
+        print(f"[12:00] Claude分析失敗: {e}")
+        result = {
+            "date": today.isoformat(),
+            "session": "1200",
+            "generated_at": now,
+            "data_sources": data_sources,
+            "afternoon_plan": {
+                "status": "修正",
+                "status_label": "朝仮説を修正",
+                "pm_regime": "avoid",
+                "pm_regime_label": "後場は見送り寄り",
+                "summary": f"AI分析に失敗しました: {e}",
+            },
+            "strong_themes_am": [],
+            "pm_core_themes": [],
+            "drop_themes": [],
+            "new_watchlist": [],
+            "do_not_do_pm": ["分析失敗時は後場で無理に増やさない"],
+            "entry_conditions_pm": [],
+            "skip_conditions_pm": ["後場は見送り寄り"],
+            "summary": f"AI分析に失敗しました: {e}",
+            "analysis_status": "failed",
+        }
+        save_text("analysis_error_1200.txt", str(e))
+
+    save("latest_1200.json", result)
+    return result
+
+
 def run_1535(today):
     pred_600 = load("latest_600.json")
     pred_905 = load("latest_905.json")
-
+    pred_1200 = load("latest_1200.json")
     if not pred_600:
         raise FileNotFoundError("latest_600.json なし")
 
@@ -930,17 +1003,10 @@ def run_1535(today):
     today_str = today.strftime("%Y年%m月%d日")
 
     try:
-        prompt = build_analysis_prompt_1535(
-            today_str,
-            pred_600,
-            pred_905 or {},
-            market,
-            market["news"] + nhk + reuters,
-        )
+        prompt = build_analysis_prompt_1535(today_str, pred_600, pred_905 or {}, pred_1200 or {}, market, market["news"] + nhk + reuters)
         raw = call_claude(prompt, max_tokens=1400)
         save_text("claude_raw_1535.txt", raw)
         parsed = parse_json(raw)
-
         review = parsed["review"]
         result = {
             "date": today.isoformat(),
@@ -999,10 +1065,13 @@ if __name__ == "__main__":
     session = os.environ.get("SESSION", "").strip()
     if not session:
         hour = now_jst.hour
+        minute = now_jst.minute
         if hour < 7:
             session = "600"
-        elif hour < 10:
+        elif hour < 11:
             session = "905"
+        elif hour < 13:
+            session = "1200"
         else:
             session = "1535"
 
@@ -1016,6 +1085,8 @@ if __name__ == "__main__":
         run_600(today)
     elif session == "905":
         run_905(today)
+    elif session == "1200":
+        run_1200(today)
     elif session == "1535":
         run_1535(today)
     else:
