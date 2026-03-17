@@ -89,6 +89,20 @@
       background: var(--panel2);
     }
 
+    .status-banner {
+      margin-bottom: 12px;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .status-banner.failed {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-line);
+      color: #ffd7d7;
+    }
+
     .hero {
       background: rgba(17,26,52,.96);
       border: 1px solid var(--line);
@@ -97,46 +111,11 @@
       margin-bottom: 14px;
     }
 
-    .hero-grid {
+    .quote-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(160px, 1fr));
       gap: 12px;
-      align-items: stretch;
-    }
-
-    .hero-main {
-      grid-column: 1 / -1;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 16px;
-    }
-
-    .hero-title {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .hero-headline {
-      font-size: 18px;
-      font-weight: 800;
-      line-height: 1.5;
-    }
-
-    .hero-tags {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-
-    .hero-tag {
-      background: var(--chip);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 7px 10px;
-      font-size: 12px;
+      margin-bottom: 14px;
     }
 
     .quote {
@@ -176,18 +155,47 @@
     .bad { color: var(--bad); }
     .warn { color: var(--warn); }
 
-    .status-banner {
-      margin-bottom: 12px;
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 14px;
-      line-height: 1.6;
+    .top-decision-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 12px;
     }
 
-    .status-banner.failed {
-      background: var(--danger-bg);
-      border: 1px solid var(--danger-line);
-      color: #ffd7d7;
+    .decision-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .decision-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .decision-main {
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .decision-sub {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .stance-chip {
+      display: inline-block;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--chip);
+      font-size: 12px;
+      margin-right: 8px;
+      margin-top: 8px;
     }
 
     .tabs {
@@ -268,18 +276,6 @@
       word-break: break-word;
     }
 
-    .kv {
-      display: grid;
-      grid-template-columns: 120px 1fr;
-      gap: 8px 12px;
-      font-size: 14px;
-      align-items: start;
-    }
-
-    .kv div:nth-child(odd) {
-      color: var(--muted);
-    }
-
     .chips {
       display: flex;
       flex-wrap: wrap;
@@ -291,34 +287,6 @@
       border: 1px solid var(--line);
       border-radius: 999px;
       padding: 7px 10px;
-      font-size: 12px;
-    }
-
-    .rank {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-    }
-
-    .theme-head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid #3650a8;
-      background: #21316b;
-      color: #dfe7ff;
       font-size: 12px;
     }
 
@@ -416,28 +384,20 @@
       font: inherit;
     }
 
-    .big {
-      font-size: 24px;
-      font-weight: 800;
-    }
-
     @media (max-width: 900px) {
-      .hero-grid,
+      .quote-grid,
+      .top-decision-grid,
       .grid.two,
       .grid.three {
         grid-template-columns: 1fr;
       }
 
-      .hero-main {
-        grid-column: auto;
-      }
-
-      .kv {
-        grid-template-columns: 1fr;
-      }
-
       .quote-value {
         font-size: 24px;
+      }
+
+      .decision-main {
+        font-size: 18px;
       }
     }
   </style>
@@ -449,7 +409,7 @@
         <div class="logo">株</div>
         <div>
           <div class="title">株式AI分析</div>
-          <div class="subtitle">寄り前予測 / 寄り確認 / 引け総括</div>
+          <div class="subtitle">毎朝の日本株トレード判断補助</div>
         </div>
       </div>
       <button class="btn" id="refreshBtn">↻ 再読込</button>
@@ -458,17 +418,17 @@
     <section class="hero" id="heroPanel"></section>
 
     <div class="tabs">
-      <button class="tab active" data-tab="tab600">6:00 予測</button>
-      <button class="tab" data-tab="tab905">9:05 確認</button>
-      <button class="tab" data-tab="tab1535">15:35 総括</button>
-      <button class="tab" data-tab="tabAcc">精度履歴</button>
+      <button class="tab active" data-tab="tab600">6:00 朝の予測</button>
+      <button class="tab" data-tab="tab905">9:05 寄り後確認</button>
+      <button class="tab" data-tab="tab1535">15:35 引け後総括</button>
+      <button class="tab" data-tab="tabLog">振り返りログ</button>
       <button class="tab" data-tab="tabSettings">設定</button>
     </div>
 
     <section class="panel active" id="tab600"></section>
     <section class="panel" id="tab905"></section>
     <section class="panel" id="tab1535"></section>
-    <section class="panel" id="tabAcc"></section>
+    <section class="panel" id="tabLog"></section>
     <section class="panel" id="tabSettings"></section>
   </div>
 
@@ -481,7 +441,7 @@
       tab600: document.getElementById("tab600"),
       tab905: document.getElementById("tab905"),
       tab1535: document.getElementById("tab1535"),
-      tabAcc: document.getElementById("tabAcc"),
+      tabLog: document.getElementById("tabLog"),
       tabSettings: document.getElementById("tabSettings"),
       refreshBtn: document.getElementById("refreshBtn"),
     };
@@ -503,40 +463,10 @@
       return Array.isArray(v) ? v : [];
     }
 
-    function formatValue(x) {
-      if (x == null) return "-";
-
-      if (typeof x === "string" || typeof x === "number" || typeof x === "boolean") {
-        return esc(String(x));
-      }
-
-      if (Array.isArray(x)) {
-        return x.map(formatValue).join("<br>");
-      }
-
-      if (typeof x === "object") {
-        const labels = {
-          name: "名称",
-          value: "値",
-          change: "変化",
-          percent: "変化率",
-          time: "時刻",
-          code: "コード",
-          price: "価格",
-          volume: "出来高",
-          source: "取得元",
-        };
-
-        const order = ["name", "value", "change", "percent", "time", "source", "code", "price", "volume"];
-        const keys = [...order.filter(k => k in x), ...Object.keys(x).filter(k => !order.includes(k))];
-
-        return keys
-          .filter(k => x[k] !== "" && x[k] !== null && x[k] !== undefined)
-          .map(k => `<strong>${esc(labels[k] || k)}</strong>: ${esc(String(x[k]))}`)
-          .join("<br>");
-      }
-
-      return esc(String(x));
+    function chipList(items) {
+      const list = arr(items).filter(Boolean);
+      if (!list.length) return `<div class="empty">データなし</div>`;
+      return `<div class="chips">${list.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>`;
     }
 
     function renderSimpleList(items, emptyText = "データなし") {
@@ -546,57 +476,11 @@
         <div class="list">
           ${list.map(x => `
             <div class="item">
-              <div class="item-sub">${formatValue(x)}</div>
-            </div>
-          `).join("")}
-        </div>
-      `;
-    }
-
-    function renderNewsLines(items) {
-      const list = arr(items).filter(Boolean);
-      if (!list.length) return `<div class="empty">ニュースなし</div>`;
-      return `
-        <div class="list">
-          ${list.map(x => `<div class="item"><div class="item-sub">${esc(x)}</div></div>`).join("")}
-        </div>
-      `;
-    }
-
-    function chipList(items) {
-      const list = arr(items).filter(Boolean);
-      if (!list.length) return `<div class="empty">データなし</div>`;
-      return `<div class="chips">${list.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>`;
-    }
-
-    function renderThemeCards(themes, keyword = "") {
-      let list = arr(themes);
-      if (keyword) {
-        list = list.filter(t =>
-          JSON.stringify(t).toLowerCase().includes(keyword.toLowerCase())
-        );
-      }
-
-      if (!list.length) return `<div class="empty">テーマ予測がまだありません</div>`;
-
-      return `
-        <div class="list">
-          ${list.map(t => `
-            <div class="item">
-              <div class="theme-head">
-                <span class="rank">${esc(t.rank ?? "-")}</span>
-                <div class="item-title">${esc(t.name || "テーマ名なし")}</div>
-                <span class="badge">信頼度 ${esc(t.confidence_score ?? "-")}</span>
-              </div>
-              <div class="kv">
-                <div>根拠</div><div>${nl2br(t.rationale || "-")}</div>
-                <div>関連銘柄</div>
-                <div>
-                  ${arr(t.key_stocks).length
-                    ? arr(t.key_stocks).map(s => `${esc(s.name || "-")} (${esc(s.code || "-")})：${esc(s.reason || "-")}`).join("<br>")
-                    : "-"}
-                </div>
-                <div>リスク</div><div>${nl2br(t.risk_factors || "-")}</div>
+              <div class="item-title">${esc(x.name || x.role || "")}</div>
+              <div class="item-sub">${Object.entries(x)
+                .filter(([k, v]) => !["name"].includes(k) && v !== "" && v != null)
+                .map(([k, v]) => `${esc(k)}: ${esc(String(v))}`)
+                .join("<br>")}
               </div>
             </div>
           `).join("")}
@@ -604,150 +488,73 @@
       `;
     }
 
-    function renderActualFlow(items) {
-      const list = arr(items);
-      if (!list.length) return `<div class="empty">実際の資金フローなし</div>`;
+    function renderTextList(items, emptyText = "データなし") {
+      const list = arr(items).filter(Boolean);
+      if (!list.length) return `<div class="empty">${esc(emptyText)}</div>`;
       return `
         <div class="list">
           ${list.map(x => `
             <div class="item">
-              <div class="item-title">${esc(x.theme || "-")} <span class="badge">${esc(x.strength || "-")}</span></div>
-              <div class="item-sub">${nl2br(x.evidence || "-")}</div>
+              <div class="item-sub">${typeof x === "string" ? esc(x) : esc(JSON.stringify(x))}</div>
             </div>
           `).join("")}
         </div>
       `;
     }
 
-    function renderGap(items) {
-      const list = arr(items);
-      if (!list.length) return `<div class="empty">比較データなし</div>`;
-      return `
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>予測テーマ</th>
-                <th>予測スコア</th>
-                <th>結果</th>
-                <th>ズレた理由</th>
-                <th>見落とし</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${list.map(x => `
-                <tr>
-                  <td>${esc(x.predicted_theme || "-")}</td>
-                  <td>${esc(x.predicted_score ?? "-")}</td>
-                  <td>${esc(x.actual_result || "-")}</td>
-                  <td>${esc(x.gap_reason || "-")}</td>
-                  <td>${esc(x.missed_factor || "-")}</td>
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    function renderThemeResults(items) {
-      const list = arr(items);
-      if (!list.length) return `<div class="empty">テーマ結果なし</div>`;
-      return `
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>テーマ</th>
-                <th>朝スコア</th>
-                <th>最終判定</th>
-                <th>詳細</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${list.map(x => `
-                <tr>
-                  <td>${esc(x.name || "-")}</td>
-                  <td>${esc(x.morning_score ?? "-")}</td>
-                  <td>${esc(x.final_result || "-")}</td>
-                  <td>${esc(x.detail || "-")}</td>
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    function renderStockResults(items) {
-      const list = arr(items);
-      if (!list.length) return `<div class="empty">銘柄結果なし</div>`;
-      return `
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>銘柄</th>
-                <th>コード</th>
-                <th>終値</th>
-                <th>変化率</th>
-                <th>コメント</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${list.map(x => `
-                <tr>
-                  <td>${esc(x.name || "-")}</td>
-                  <td>${esc(x.code || "-")}</td>
-                  <td>${esc(x.close || "-")}</td>
-                  <td>${esc(x.change || "-")}</td>
-                  <td>${esc(x.comment || "-")}</td>
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    function renderNewsImpact(items) {
-      const list = arr(items);
-      if (!list.length) return `<div class="empty">ニュース影響なし</div>`;
+    function renderThemeList(items, emptyText = "データなし") {
+      const list = arr(items).filter(Boolean);
+      if (!list.length) return `<div class="empty">${esc(emptyText)}</div>`;
       return `
         <div class="list">
           ${list.map(x => `
             <div class="item">
-              <div class="item-title">${esc(x.news || "-")}</div>
-              <div class="item-sub">${nl2br(x.impact || "-")}</div>
+              <div class="item-title">${esc(x.name || "-")}</div>
+              <div class="item-sub">${esc(x.reason || "-")}</div>
             </div>
           `).join("")}
         </div>
       `;
     }
 
-    function renderAccuracyTable(logs) {
+    function renderWatchlist(items, emptyText = "データなし") {
+      const list = arr(items).filter(Boolean);
+      if (!list.length) return `<div class="empty">${esc(emptyText)}</div>`;
+      return `
+        <div class="list">
+          ${list.map(x => `
+            <div class="item">
+              <div class="item-title">${esc(x.role || "-")} / ${esc(x.name || "-")} ${x.code ? `(${esc(x.code)})` : ""}</div>
+              <div class="item-sub">${esc(x.reason || "-")}</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderReviewLogs(logs) {
       const list = arr(logs).slice().reverse();
-      if (!list.length) return `<div class="empty">精度履歴がまだありません</div>`;
+      if (!list.length) return `<div class="empty">ログがまだありません</div>`;
       return `
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>日付</th>
-                <th>精度</th>
-                <th>強かったテーマ</th>
-                <th>弱かったテーマ</th>
-                <th>改善ヒント</th>
+                <th>使えた判断</th>
+                <th>取りやすかった型</th>
+                <th>危険だった型</th>
+                <th>次の注意点</th>
               </tr>
             </thead>
             <tbody>
               ${list.map(x => `
                 <tr>
                   <td>${esc(x.date || "-")}</td>
-                  <td>${esc(x.accuracy_score ?? "-")}</td>
-                  <td>${esc(x.strongest_theme || "-")}</td>
-                  <td>${esc(x.weakest_theme || "-")}</td>
-                  <td>${arr(x.improvement_hints).map(esc).join(" / ") || "-"}</td>
+                  <td>${esc(x.usefulness || "-")}</td>
+                  <td>${esc(x.easy_pattern || "-")}</td>
+                  <td>${esc(x.danger_pattern || "-")}</td>
+                  <td>${esc(x.next_note || "-")}</td>
                 </tr>
               `).join("")}
             </tbody>
@@ -781,55 +588,44 @@
       return "warn";
     }
 
-    function firstMatchItem(data, names, extraBucket = null) {
+    function firstMatchItem(data, names, buckets = []) {
       const market = data?.market_data || {};
-      const merged = [
-        ...arr(market.indices),
-        ...arr(market.world_indices),
-        ...arr(market.forex),
-        ...arr(market.futures),
-      ];
-      if (extraBucket && Array.isArray(market[extraBucket])) {
-        return market[extraBucket].find(x => names.includes(x.name)) || null;
-      }
+      const merged = [];
+      const useBuckets = buckets.length ? buckets : ["indices", "futures", "forex", "world_indices"];
+      useBuckets.forEach(b => merged.push(...arr(market[b])));
       return merged.find(x => names.includes(x.name)) || null;
     }
 
-    function renderHero(d600, d905, d1535) {
-      const current = d600 || d905 || d1535;
-      if (!current) {
+    function renderHero(d600) {
+      if (!d600) {
         els.heroPanel.innerHTML = `<div class="empty">データがありません</div>`;
         return;
       }
 
-      const nikkei = firstMatchItem(d600, ["日経平均"]);
-      const futures = firstMatchItem(d600, ["日経先物", "日経225先物"], "futures");
-      const usdjpy = firstMatchItem(d600, ["ドル円", "米ドル円"]);
-      const nydow = firstMatchItem(d600, ["NYダウ", "ＮＹダウ"]);
-      const focus = current.trader_focus || {};
+      const decision = d600.decision || {};
+      const nikkei = firstMatchItem(d600, ["日経平均"], ["indices"]);
+      const futures = firstMatchItem(d600, ["日経先物", "日経225先物"], ["futures"]);
+      const usdjpy = firstMatchItem(d600, ["ドル円", "米ドル円"], ["forex"]);
+      const nydow = firstMatchItem(d600, ["NYダウ", "ＮＹダウ"], ["world_indices"]);
+      const quotes = [nikkei, futures, usdjpy, nydow].filter(x => x && x.value && x.change && x.time);
 
-      const quotes = [nikkei, futures, usdjpy, nydow].filter(
-        x => x && x.value && x.change && x.time
-      );
-
-      const failedBanner = current.analysis_status === "failed"
+      const failedBanner = d600.analysis_status === "failed"
         ? `
           <div class="status-banner failed">
-            AI分析は失敗しました。いま表示している主要指標は取得済みデータです。分析部分は再実行やプロンプト調整が必要です。
+            AI分析は失敗しました。主要指標は取得済みデータです。分析部分は再実行またはプロンプト調整が必要です。
           </div>
         `
         : "";
 
       els.heroPanel.innerHTML = `
         ${failedBanner}
-        <div class="hero-grid">
+
+        <div class="quote-grid">
           ${quotes.length ? quotes.map(item => `
             <div class="quote">
               <div class="quote-name">${esc(item.name || "-")}</div>
               <div class="quote-value">${esc(item.value || "—")}</div>
-              <div class="quote-change ${quoteClass(item.change)}">
-                ${esc(item.change || "—")} ${esc(item.percent || "")}
-              </div>
+              <div class="quote-change ${quoteClass(item.change)}">${esc(item.change || "—")}</div>
               <div class="quote-time">${esc(item.time || "")}</div>
             </div>
           `).join("") : `
@@ -839,19 +635,29 @@
               <div class="quote-change warn">未取得</div>
             </div>
           `}
+        </div>
 
-          <div class="hero-main">
-            <div class="hero-title">トレーダーズビュー</div>
-            <div class="hero-headline">
-              ${esc(focus.headline || current.summary || "本日の見立てデータなし")}
+        <div class="top-decision-grid">
+          <div class="decision-card">
+            <div class="decision-label">今日の結論</div>
+            <div class="decision-main">${esc(decision.conclusion || d600.summary || "結論なし")}</div>
+            <div class="decision-sub">
+              ${decision.stance ? `<span class="stance-chip">${esc(decision.stance)}</span>` : ""}
+              ${decision.market_tone ? `<span class="stance-chip">${esc(decision.market_tone)}</span>` : ""}
+              ${decision.trading_style ? `<span class="stance-chip">${esc(decision.trading_style)}</span>` : ""}
             </div>
-            <div class="hero-tags">
-              ${
-                arr(focus.top_themes).length
-                  ? arr(focus.top_themes).map(x => `<span class="hero-tag">${esc(x)}</span>`).join("")
-                  : `<span class="hero-tag">テーマ未抽出</span>`
-              }
-            </div>
+          </div>
+
+          <div class="decision-card">
+            <div class="decision-label">地合い</div>
+            <div class="decision-main">${esc(decision.market_tone || "未判定")}</div>
+            <div class="decision-sub">${esc(decision.trading_style || "")}</div>
+          </div>
+
+          <div class="decision-card">
+            <div class="decision-label">今日の行動案</div>
+            <div class="decision-main">${arr(d600.action_plan).length ? esc(d600.action_plan[0]) : "未設定"}</div>
+            <div class="decision-sub">${arr(d600.action_plan).slice(1).map(esc).join(" / ")}</div>
           </div>
         </div>
       `;
@@ -863,94 +669,43 @@
         return;
       }
 
-      const market = data.market_data || {};
-      const focus = data.trader_focus || {};
-
       els.tab600.innerHTML = `
         <div class="mini-info">
           <span class="mini-pill">更新 ${esc(data.date || "-")} ${esc(data.generated_at || "-")}</span>
           ${data.analysis_status === "failed" ? `<span class="mini-pill">分析失敗</span>` : ""}
         </div>
 
-        <div class="grid two">
+        <div class="grid three">
           <div class="card">
-            <h3>結論</h3>
-            <div class="kv">
-              <div>最重要</div><div>${nl2br(data.big_picture || "-")}</div>
-              <div>相場展望</div><div>${nl2br(data.summary || "-")}</div>
-              <div>注目テーマ</div><div>${arr(focus.top_themes).map(esc).join(" / ") || "-"}</div>
-            </div>
+            <h3>強いテーマ</h3>
+            ${renderThemeList(data.strong_themes, "強いテーマなし")}
           </div>
           <div class="card">
-            <h3>主役候補銘柄</h3>
-            ${
-              arr(focus.top_stocks).length
-              ? `<div class="list">
-                  ${arr(focus.top_stocks).map(s => `
-                    <div class="item">
-                      <div class="item-title">${esc(s.name || "-")} ${s.code ? `(${esc(s.code)})` : ""}</div>
-                      <div class="item-sub">${esc(s.reason || "-")}</div>
-                    </div>
-                  `).join("")}
-                </div>`
-              : `<div class="empty">主役候補銘柄なし</div>`
-            }
+            <h3>弱いテーマ</h3>
+            ${renderThemeList(data.weak_themes, "弱いテーマなし")}
+          </div>
+          <div class="card">
+            <h3>監視銘柄</h3>
+            ${renderWatchlist(data.watchlist, "監視銘柄なし")}
+          </div>
+        </div>
+
+        <div class="grid two" style="margin-top:14px;">
+          <div class="card">
+            <h3>今日の行動案</h3>
+            ${renderTextList(data.action_plan, "行動案なし")}
+          </div>
+          <div class="card">
+            <h3>注意点</h3>
+            ${renderTextList(data.risk_notes, "注意点なし")}
           </div>
         </div>
 
         <div class="card" style="margin-top:14px;">
-          <h3>データソース</h3>
+          <h3>参考データ</h3>
           ${chipList(data.data_sources)}
         </div>
-
-        <div class="grid three" style="margin-top:14px;">
-          ${arr(market.indices).length ? `
-            <div class="card">
-              <h3>国内指数</h3>
-              ${renderSimpleList(market.indices, "国内指数データなし")}
-            </div>
-          ` : ""}
-          ${arr(market.world_indices).length || arr(market.futures).length ? `
-            <div class="card">
-              <h3>海外 / 先物</h3>
-              ${renderSimpleList([...arr(market.world_indices), ...arr(market.futures)], "海外・先物データなし")}
-            </div>
-          ` : ""}
-          <div class="card">
-            <h3>為替 / 主要ニュース</h3>
-            <div class="list">
-              ${arr(market.forex).length ? `
-                <div class="item">
-                  <div class="item-title">為替</div>
-                  <div class="item-sub">${arr(market.forex).map(formatValue).join("<br><br>")}</div>
-                </div>
-              ` : ""}
-              <div class="item">
-                <div class="item-title">主要ニュース</div>
-                ${renderNewsLines(market.key_news)}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:14px;">
-          <h3>予測テーマ</h3>
-          <div class="search-box">
-            <input id="themeSearchInput" placeholder="テーマ・銘柄・根拠で検索">
-          </div>
-          <div id="themeSearchResult">
-            ${renderThemeCards(data.themes)}
-          </div>
-        </div>
       `;
-
-      const themeInput = document.getElementById("themeSearchInput");
-      const resultBox = document.getElementById("themeSearchResult");
-      if (themeInput && resultBox) {
-        themeInput.addEventListener("input", (e) => {
-          resultBox.innerHTML = renderThemeCards(data.themes, e.target.value.trim());
-        });
-      }
     }
 
     function render905(data) {
@@ -959,8 +714,7 @@
         return;
       }
 
-      const opening = data.opening || {};
-      const corr = data.intraday_correction || {};
+      const memo = data.correction_memo || {};
 
       els.tab905.innerHTML = `
         <div class="mini-info">
@@ -970,34 +724,21 @@
 
         <div class="grid two">
           <div class="card">
-            <h3>寄り付き総評</h3>
-            <div class="kv">
-              <div>日経始値</div><div>${esc(opening.nikkei_open || "-")}</div>
-              <div>日経変化率</div><div>${esc(opening.nikkei_change || "-")}</div>
-              <div>市場トーン</div><div>${esc(opening.market_tone || "-")}</div>
-              <div>主役テーマ</div><div>${esc(opening.dominant_theme || "-")}</div>
-              <div>朝の精度</div><div class="big">${esc(data.morning_accuracy_score ?? "-")}</div>
-              <div>要約</div><div>${nl2br(data.summary || "-")}</div>
+            <h3>寄り後確認</h3>
+            <div class="list">
+              <div class="item"><div class="item-title">実際に何が強いか</div><div class="item-sub">${esc(memo.actual_leader || "-")}</div></div>
+              <div class="item"><div class="item-title">朝予測とのズレ</div><div class="item-sub">${esc(memo.gap_from_morning || "-")}</div></div>
+              <div class="item"><div class="item-title">今から触れるか</div><div class="item-sub">${esc(memo.tradable_now || "-")}</div></div>
+              <div class="item"><div class="item-title">見送りか</div><div class="item-sub">${esc(memo.skip_or_not || "-")}</div></div>
             </div>
           </div>
+
           <div class="card">
-            <h3>場中修正</h3>
-            <div class="kv">
-              <div>継続監視</div><div>${arr(corr.themes_to_watch).map(esc).join(" / ") || "-"}</div>
-              <div>失速テーマ</div><div>${arr(corr.themes_faded).map(esc).join(" / ") || "-"}</div>
-              <div>修正ヒント</div><div>${arr(corr.correction_hints).map(esc).join("<br>") || "-"}</div>
+            <h3>行動修正メモ</h3>
+            <div class="item">
+              <div class="item-sub">${nl2br(data.summary || "-")}</div>
             </div>
           </div>
-        </div>
-
-        <div class="card" style="margin-top:14px;">
-          <h3>実際の資金フロー</h3>
-          ${renderActualFlow(data.actual_flow)}
-        </div>
-
-        <div class="card" style="margin-top:14px;">
-          <h3>6:00予測との差分</h3>
-          ${renderGap(data.prediction_gap)}
         </div>
       `;
     }
@@ -1008,8 +749,7 @@
         return;
       }
 
-      const closing = data.closing || {};
-      const tomorrow = data.tomorrow_outlook || {};
+      const review = data.review || {};
 
       els.tab1535.innerHTML = `
         <div class="mini-info">
@@ -1019,49 +759,31 @@
 
         <div class="grid two">
           <div class="card">
-            <h3>大引け総括</h3>
-            <div class="kv">
-              <div>日経平均</div><div>${esc(closing.nikkei || "-")}</div>
-              <div>TOPIX</div><div>${esc(closing.topix || "-")}</div>
-              <div>総評</div><div>${nl2br(closing.total_assessment || "-")}</div>
-              <div>最終精度</div><div class="big">${esc(data.final_accuracy_score ?? "-")}</div>
-              <div>最も当たったテーマ</div><div>${esc(data.strongest_theme || "-")}</div>
-              <div>最も外れたテーマ</div><div>${esc(data.weakest_theme || "-")}</div>
+            <h3>翌日に活かす反省メモ</h3>
+            <div class="list">
+              <div class="item"><div class="item-title">実際に強かったテーマ</div><div class="item-sub">${arr(review.actually_strong).map(esc).join(" / ") || "-"}</div></div>
+              <div class="item"><div class="item-title">朝予測とのズレ</div><div class="item-sub">${esc(review.morning_gap || "-")}</div></div>
+              <div class="item"><div class="item-title">取りやすかった型</div><div class="item-sub">${esc(review.easy_pattern || "-")}</div></div>
+              <div class="item"><div class="item-title">危なかった型</div><div class="item-sub">${esc(review.danger_pattern || "-")}</div></div>
+              <div class="item"><div class="item-title">明日以降の注意点</div><div class="item-sub">${esc(review.next_note || "-")}</div></div>
             </div>
           </div>
+
           <div class="card">
-            <h3>明日への視点</h3>
-            <div class="kv">
-              <div>重要イベント</div><div>${arr(tomorrow.key_events).map(esc).join("<br>") || "-"}</div>
-              <div>注目テーマ</div><div>${arr(tomorrow.watch_themes).map(esc).join(" / ") || "-"}</div>
-              <div>ヒント</div><div>${nl2br(tomorrow.hint || "-")}</div>
-              <div>9:05修正評価</div><div>${nl2br(data.correction_evaluation || "-")}</div>
+            <h3>引け後総括</h3>
+            <div class="item">
+              <div class="item-sub">${nl2br(data.summary || "-")}</div>
             </div>
           </div>
-        </div>
-
-        <div class="card" style="margin-top:14px;">
-          <h3>テーマ別結果</h3>
-          ${renderThemeResults(data.theme_results)}
-        </div>
-
-        <div class="card" style="margin-top:14px;">
-          <h3>銘柄別結果</h3>
-          ${renderStockResults(data.stock_results)}
-        </div>
-
-        <div class="card" style="margin-top:14px;">
-          <h3>ニュース影響</h3>
-          ${renderNewsImpact(data.news_impact)}
         </div>
       `;
     }
 
-    function renderAccuracy(logs) {
-      els.tabAcc.innerHTML = `
+    function renderLog(logs) {
+      els.tabLog.innerHTML = `
         <div class="card">
-          <h3>精度履歴</h3>
-          ${renderAccuracyTable(logs)}
+          <h3>振り返りログ</h3>
+          ${renderReviewLogs(logs)}
         </div>
       `;
     }
@@ -1088,7 +810,7 @@
 
         <div class="field">
           <label>現在の接続先</label>
-          <div class="item-sub">${esc(user && repo ? `${user}/${repo}` : "未設定")}</div>
+          <div>${esc(user && repo ? `${user}/${repo}` : "未設定")}</div>
         </div>
 
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -1108,11 +830,11 @@
       document.getElementById("clearSettingsBtn").addEventListener("click", () => {
         localStorage.removeItem(STORAGE_USER);
         localStorage.removeItem(STORAGE_REPO);
-        renderHero(null, null, null);
+        renderHero(null);
         render600(null);
         render905(null);
         render1535(null);
-        renderAccuracy(null);
+        renderLog(null);
         renderSettings();
       });
     }
@@ -1127,11 +849,11 @@
 
     async function loadAll() {
       if (!baseUrl()) {
-        renderHero(null, null, null);
+        renderHero(null);
         render600(null);
         render905(null);
         render1535(null);
-        renderAccuracy(null);
+        renderLog(null);
         renderSettings();
         return;
       }
@@ -1140,20 +862,20 @@
       els.tab600.innerHTML = `<div class="empty">読み込み中...</div>`;
       els.tab905.innerHTML = `<div class="empty">読み込み中...</div>`;
       els.tab1535.innerHTML = `<div class="empty">読み込み中...</div>`;
-      els.tabAcc.innerHTML = `<div class="empty">読み込み中...</div>`;
+      els.tabLog.innerHTML = `<div class="empty">読み込み中...</div>`;
 
       const [d600, d905, d1535, logs] = await Promise.all([
         safeLoad("latest_600.json"),
         safeLoad("latest_905.json"),
         safeLoad("latest_1535.json"),
-        safeLoad("accuracy_log.json"),
+        safeLoad("review_log.json"),
       ]);
 
-      renderHero(d600, d905, d1535);
+      renderHero(d600);
       render600(d600);
       render905(d905);
       render1535(d1535);
-      renderAccuracy(logs);
+      renderLog(logs);
       renderSettings();
     }
 
