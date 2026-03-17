@@ -83,7 +83,7 @@ def fetch_kabutan():
         "source": "kabutan.jp"
     }
 
-        urls_to_check = [
+    urls_to_check = [
         ("news", "https://kabutan.jp/news/?b=n1"),
         ("gainers", "https://kabutan.jp/stock/ranking/?type=increase_rate"),
         ("losers", "https://kabutan.jp/stock/ranking/?type=decrease_rate"),
