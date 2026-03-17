@@ -210,32 +210,49 @@ def is_complete_quote(item):
     return bool(item.get("name") and item.get("value") and item.get("change") and item.get("time"))
 
 
+def looks_like_quote_line(text):
+    return bool(
+        re.search(r"\([^)]+\)", text)
+        and re.search(r"[0-9,]+\.\d+", text)
+        and re.search(r"[+\-][0-9,]+\.\d+", text)
+    )
+
+
+def push_quote(candidates, bucket, label, time_text, value_text, change_text, source_name):
+    item = {
+        "name": label,
+        "time": clean_text(time_text),
+        "value": clean_text(value_text),
+        "change": clean_text(change_text),
+        "percent": "",
+        "_source": source_name,
+    }
+    if is_complete_quote(item):
+        candidates[bucket].append(item)
+
+
 def extract_market_from_mobile_top(lines, source_name):
     candidates = {
         "indices": [],
         "world_indices": [],
         "forex": [],
+        "futures": [],
     }
 
     patterns = [
         ("indices", "日経平均", r"日経平均\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
         ("forex", "米ドル円", r"ドル円\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
         ("world_indices", "NYダウ", r"NYダウ\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
-        ("world_indices", "上海総合", r"上海総合\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
+        ("futures", "日経先物", r"日経先物\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
     ]
 
     for line in lines:
+        t = clean_text(line)
         for bucket, label, pattern in patterns:
-            m = re.search(pattern, line)
+            m = re.search(pattern, t)
             if m:
-                candidates[bucket].append({
-                    "name": label,
-                    "time": m.group(1),
-                    "value": m.group(2),
-                    "change": m.group(3),
-                    "percent": "",
-                    "_source": source_name,
-                })
+                push_quote(candidates, bucket, label, m.group(1), m.group(2), m.group(3), source_name)
+
     return candidates
 
 
@@ -244,6 +261,7 @@ def extract_market_from_desktop_text(lines, source_name):
         "indices": [],
         "world_indices": [],
         "forex": [],
+        "futures": [],
     }
 
     domestic_patterns = [
@@ -255,22 +273,37 @@ def extract_market_from_desktop_text(lines, source_name):
     ]
 
     for line in lines:
+        t = clean_text(line)
         for bucket, label, pattern in domestic_patterns:
-            m = re.search(pattern, line)
+            m = re.search(pattern, t)
             if m:
                 candidates[bucket].append({
                     "name": label,
                     "time": "",
-                    "value": m.group(1),
-                    "change": m.group(2),
+                    "value": clean_text(m.group(1)),
+                    "change": clean_text(m.group(2)),
                     "percent": "",
                     "_source": source_name,
                 })
+
+    # もし desktop 側に 先物表記が乗る場合だけ拾う
+    future_patterns = [
+        ("futures", "日経先物", r"日経先物\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
+        ("futures", "日経225先物", r"日経225先物\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"),
+    ]
+
+    for line in lines:
+        t = clean_text(line)
+        for bucket, label, pattern in future_patterns:
+            m = re.search(pattern, t)
+            if m:
+                push_quote(candidates, bucket, label, m.group(1), m.group(2), m.group(3), source_name)
 
     return candidates
 
 
 def is_valid_news_text(text):
+    text = clean_text(text)
     if len(text) < 14:
         return False
 
@@ -292,11 +325,17 @@ def is_valid_news_text(text):
         r"ドル円\s*\(",
         r"NYダウ\s*\(",
         r"上海総合\s*\(",
+        r"日経先物\s*\(",
+        r"日経225先物\s*\(",
+        r"^\s*PR\s*$",
     ]
 
     for p in ng_patterns:
         if re.search(p, text):
             return False
+
+    if looks_like_quote_line(text):
+        return False
 
     return True
 
@@ -306,6 +345,7 @@ def fetch_kabutan_home():
         "indices": [],
         "world_indices": [],
         "forex": [],
+        "futures": [],
         "themes": [],
         "sector": [],
         "news": [],
@@ -320,6 +360,7 @@ def fetch_kabutan_home():
     all_indices = []
     all_world = []
     all_forex = []
+    all_futures = []
     all_themes = []
     all_news = []
     search_results = []
@@ -336,22 +377,25 @@ def fetch_kabutan_home():
                 valid_i = [x for x in mobile["indices"] if is_complete_quote(x)]
                 valid_w = [x for x in mobile["world_indices"] if is_complete_quote(x)]
                 valid_f = [x for x in mobile["forex"] if is_complete_quote(x)]
+                valid_fu = [x for x in mobile["futures"] if is_complete_quote(x)]
 
                 all_indices.extend(valid_i)
                 all_world.extend(valid_w)
                 all_forex.extend(valid_f)
+                all_futures.extend(valid_fu)
 
                 search_results.append(
-                    f"{source_name}: 国内{len(valid_i)}件 / 海外{len(valid_w)}件 / 為替{len(valid_f)}件"
+                    f"{source_name}: 国内{len(valid_i)}件 / 海外{len(valid_w)}件 / 為替{len(valid_f)}件 / 先物{len(valid_fu)}件"
                 )
             else:
                 desktop = extract_market_from_desktop_text(lines, source_name)
                 all_indices.extend(desktop["indices"])
                 all_world.extend(desktop["world_indices"])
                 all_forex.extend(desktop["forex"])
+                all_futures.extend(desktop["futures"])
 
                 search_results.append(
-                    f"{source_name}: 国内{len(desktop['indices'])}件 / 海外{len(desktop['world_indices'])}件 / 為替{len(desktop['forex'])}件"
+                    f"{source_name}: 国内{len(desktop['indices'])}件 / 海外{len(desktop['world_indices'])}件 / 為替{len(desktop['forex'])}件 / 先物{len(desktop['futures'])}件"
                 )
 
             theme_candidates = []
@@ -375,6 +419,7 @@ def fetch_kabutan_home():
     result["indices"] = normalize_market_items(dedupe_best_market_items(all_indices))[:6]
     result["world_indices"] = normalize_market_items(dedupe_best_market_items(all_world))[:6]
     result["forex"] = normalize_market_items(dedupe_best_market_items(all_forex))[:4]
+    result["futures"] = normalize_market_items(dedupe_best_market_items(all_futures))[:4]
     result["themes"] = list(dict.fromkeys(all_themes))[:15]
     result["news"] = list(dict.fromkeys(all_news))[:12]
     result["search_results"] = search_results
@@ -520,6 +565,7 @@ def fetch_kabutan():
         "indices": [],
         "world_indices": [],
         "forex": [],
+        "futures": [],
         "sector": [],
         "top_gainers": [],
         "top_losers": [],
@@ -536,6 +582,7 @@ def fetch_kabutan():
     result["indices"] = home.get("indices", [])
     result["world_indices"] = home.get("world_indices", [])
     result["forex"] = home.get("forex", [])
+    result["futures"] = home.get("futures", [])
     result["sector"] = home.get("sector", [])
     result["themes"] = home.get("themes", [])
     result["news"] = home.get("news", [])
@@ -548,6 +595,7 @@ def fetch_kabutan():
     print(f"indices: {len(result['indices'])}")
     print(f"world_indices: {len(result['world_indices'])}")
     print(f"forex: {len(result['forex'])}")
+    print(f"futures: {len(result['futures'])}")
     print(f"sector: {len(result['sector'])}")
     print(f"top_gainers: {len(result['top_gainers'])}")
     print(f"top_losers: {len(result['top_losers'])}")
@@ -561,6 +609,8 @@ def fetch_kabutan():
         print(f"world data: {result['world_indices']}")
     if result["forex"]:
         print(f"forex data: {result['forex']}")
+    if result["futures"]:
+        print(f"futures data: {result['futures']}")
 
     return result
 
@@ -573,6 +623,8 @@ def build_data_sources_summary(kabutan, nhk, reuters):
         sources.append(f"かぶたん海外指数{len(kabutan['world_indices'])}件")
     if kabutan.get("forex"):
         sources.append(f"かぶたん為替{len(kabutan['forex'])}件")
+    if kabutan.get("futures"):
+        sources.append(f"かぶたん先物{len(kabutan['futures'])}件")
     if kabutan.get("top_gainers"):
         sources.append(f"値上がり{len(kabutan['top_gainers'])}件")
     if kabutan.get("top_losers"):
@@ -643,6 +695,7 @@ Return this JSON:
     "indices": {json.dumps(kabutan["indices"][:6], ensure_ascii=False)},
     "world_indices": {json.dumps(kabutan["world_indices"][:6], ensure_ascii=False)},
     "forex": {json.dumps(kabutan["forex"][:4], ensure_ascii=False)},
+    "futures": {json.dumps(kabutan["futures"][:4], ensure_ascii=False)},
     "search_results": {json.dumps(kabutan["search_results"][:10], ensure_ascii=False)},
     "key_news": {json.dumps(key_news, ensure_ascii=False)}
   }},
