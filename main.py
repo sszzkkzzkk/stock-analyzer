@@ -165,7 +165,6 @@ def unique_by_name(items):
             seen.add(name)
     return out
 
-
 def fetch_kabutan_home():
     result = {
         "indices": [],
@@ -179,96 +178,79 @@ def fetch_kabutan_home():
     try:
         r = safe_get("https://kabutan.jp/")
         soup = BeautifulSoup(r.text, "html.parser")
-        lines = [clean_text(x) for x in soup.get_text("\n", strip=True).splitlines()]
-        lines = [x for x in lines if x]
+        text = clean_text(soup.get_text("\n", strip=True))
 
-        top_times = extract_named_time(lines, ["日経平均", "米ドル円", "ＮＹダウ", "NYダウ", "上海総合"])
-
-        metric_line = ""
-        percent_line = ""
-        for i, line in enumerate(lines):
-            if re.search(r"\d[\d,]*\.\d+\s+[+\-]\d[\d,]*\.\d+", line):
-                if i + 1 < len(lines) and "%" in lines[i + 1]:
-                    metric_line = line
-                    percent_line = lines[i + 1]
-                    break
-
-        if metric_line:
-            pairs = parse_metric_pairs(metric_line)
-            percs = percent_line.split() if percent_line else []
-
-            names = ["日経平均", "米ドル円", "ＮＹダウ", "上海総合"]
-            for i, name in enumerate(names):
-                if i >= len(pairs):
-                    continue
-
-                item = {
-                    "name": name,
-                    "value": pairs[i][0],
-                    "change": pairs[i][1],
-                    "percent": percs[i] if i < len(percs) else "",
-                    "time": top_times.get(name, top_times.get("NYダウ", "")),
-                }
-
-                if name == "日経平均":
-                    result["indices"].append(item)
-                elif name == "米ドル円":
-                    result["forex"].append(item)
-                else:
-                    result["world_indices"].append(item)
-
-        # 国内指標ブロックから補完
-        domestic_patterns = [
-            ("日経平均", "indices"),
-            ("ＴＯＰＩＸ", "indices"),
-            ("TOPIX", "indices"),
-            ("JPX日経400", "indices"),
-            ("グロース250", "indices"),
+        # 指数・為替を全文検索で抜く
+        patterns = [
+            ("indices", "日経平均"),
+            ("world_indices", "ＮＹダウ"),
+            ("world_indices", "NYダウ"),
+            ("world_indices", "上海総合"),
+            ("forex", "米ドル円"),
         ]
 
-        for line in lines:
-            for name, bucket in domestic_patterns:
-                if name in line:
-                    m = re.search(rf"{re.escape(name)}\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)", line)
-                    if m:
-                        result[bucket].append({
-                            "name": name,
-                            "value": m.group(1),
-                            "change": m.group(2),
-                            "percent": "",
-                            "time": top_times.get("日経平均", ""),
-                        })
+        for bucket, name in patterns:
+            pattern = rf"{re.escape(name)}\s*(終値|\d{{1,2}}:\d{{2}})?\s*([0-9,]+\.\d+)?\s*([+\-][0-9,]+\.\d+)?\s*([+\-]?[0-9,]+\.\d+%)?"
+            m = re.search(pattern, text)
+            if m:
+                item = {
+                    "name": name,
+                    "time": m.group(1) or "",
+                    "value": m.group(2) or "",
+                    "change": m.group(3) or "",
+                    "percent": m.group(4) or "",
+                }
+                result[bucket].append(item)
 
-        result["indices"] = unique_by_name(result["indices"])[:6]
-        result["world_indices"] = unique_by_name(result["world_indices"])[:6]
-        result["forex"] = unique_by_name(result["forex"])[:4]
+        # 国内指標ブロックの補完
+        extra_domestic = [
+            "ＴＯＰＩＸ",
+            "TOPIX",
+            "JPX日経400",
+            "グロース250",
+        ]
+        for name in extra_domestic:
+            pattern = rf"{re.escape(name)}\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"
+            m = re.search(pattern, text)
+            if m:
+                result["indices"].append({
+                    "name": name,
+                    "time": "",
+                    "value": m.group(1),
+                    "change": m.group(2),
+                    "percent": "",
+                })
+
+        # 重複排除
+        def dedupe(items):
+            out = []
+            seen = set()
+            for x in items:
+                key = x.get("name", "")
+                if key and key not in seen:
+                    out.append(x)
+                    seen.add(key)
+            return out
+
+        result["indices"] = dedupe(result["indices"])[:6]
+        result["world_indices"] = dedupe(result["world_indices"])[:6]
+        result["forex"] = dedupe(result["forex"])[:4]
 
         # 人気テーマ
-        try:
-            theme_start = lines.index("人気テーマ")
-            theme_candidates = []
-            for line in lines[theme_start: theme_start + 100]:
-                if line.isdigit():
-                    continue
-                if line in ["人気テーマ", "(3日間のﾗﾝｷﾝｸﾞ)", "ベスト30を見る"]:
-                    continue
-                if 2 <= len(line) <= 30 and re.search(r"[ぁ-んァ-ン一-龥A-Za-z0-9]", line):
-                    if not re.search(r"%|日経平均|米ドル円|ＮＹダウ|NYダウ|上海総合", line):
-                        theme_candidates.append(line)
-            result["themes"] = list(dict.fromkeys(theme_candidates))[:15]
-        except Exception as e:
-            print(f"テーマ解析エラー: {e}")
+        theme_candidates = []
+        for a in soup.select("a[href*='/themes/?theme='], a[href*='/themes/']"):
+            t = clean_text(a.get_text(" ", strip=True))
+            if 2 <= len(t) <= 30:
+                theme_candidates.append(t)
+        result["themes"] = list(dict.fromkeys(theme_candidates))[:15]
 
-        # トップニュース
-        try:
-            news_candidates = []
-            for a in soup.select("a[href*='/news/']"):
-                text = clean_text(a.get_text(" ", strip=True))
-                if len(text) >= 12:
-                    news_candidates.append(text)
-            result["news"] = list(dict.fromkeys(news_candidates))[:12]
-        except Exception as e:
-            print(f"ニュース解析エラー: {e}")
+        # ニュース
+        news_candidates = []
+        for a in soup.select("a[href*='/news/']"):
+            t = clean_text(a.get_text(" ", strip=True))
+            if len(t) >= 12:
+                news_candidates.append(t)
+        result["news"] = list(dict.fromkeys(news_candidates))[:12]
 
     except Exception as e:
         print(f"ホーム取得エラー: {e}")
