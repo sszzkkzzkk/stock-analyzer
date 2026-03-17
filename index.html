@@ -14,9 +14,6 @@
       --line: #2c396b;
       --accent: #6ea8fe;
       --accent2: #8b5cf6;
-      --good: #30d158;
-      --bad: #ff6b6b;
-      --warn: #f7b731;
       --chip: #23305e;
       --radius: 18px;
     }
@@ -414,24 +411,36 @@
 
     function formatValue(x) {
       if (x == null) return "-";
+
       if (typeof x === "string" || typeof x === "number" || typeof x === "boolean") {
         return esc(String(x));
       }
+
       if (Array.isArray(x)) {
         return x.map(formatValue).join("<br>");
       }
+
       if (typeof x === "object") {
-        const preferredOrder = ["name", "value", "change", "percent", "time", "code", "price", "volume"];
-        const keys = Object.keys(x);
-        const sorted = [
-          ...preferredOrder.filter(k => keys.includes(k)),
-          ...keys.filter(k => !preferredOrder.includes(k))
-        ];
-        return sorted
-          .filter(k => x[k] !== null && x[k] !== undefined && x[k] !== "")
-          .map(k => `<strong>${esc(k)}</strong>: ${esc(String(x[k]))}`)
+        const labels = {
+          name: "名称",
+          value: "値",
+          change: "変化",
+          percent: "変化率",
+          time: "時刻",
+          code: "コード",
+          price: "価格",
+          volume: "出来高",
+        };
+
+        const order = ["name", "value", "change", "percent", "time", "code", "price", "volume"];
+        const keys = [...order.filter(k => k in x), ...Object.keys(x).filter(k => !order.includes(k))];
+
+        return keys
+          .filter(k => x[k] !== "" && x[k] !== null && x[k] !== undefined)
+          .map(k => `<strong>${esc(labels[k] || k)}</strong>: ${esc(String(x[k]))}`)
           .join("<br>");
       }
+
       return esc(String(x));
     }
 
@@ -931,14 +940,6 @@
         document.getElementById(btn.dataset.tab).classList.add("active");
       });
     });
-
-    function setStatus(el, data) {
-      if (!data) {
-        el.textContent = "未取得";
-        return;
-      }
-      el.textContent = `${data.date || "-"} ${data.generated_at || "-"}`;
-    }
 
     els.refreshBtn.addEventListener("click", loadAll);
 
