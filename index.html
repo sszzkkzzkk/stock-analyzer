@@ -1,421 +1,1014 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0a0e1a">
-<title>株式AI分析</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#0a0e1a;--bg2:#111627;--bg3:#1a2035;--border:#1f2d4a;
-  --dim:#3a4f72;--muted:#6b82a8;--text:#c8d8f0;--bright:#e8f2ff;
-  --accent:#3b82f6;--accent2:#06b6d4;--green:#22d3a0;--red:#f87171;--amber:#fbbf24;
-  --mono:'DM Mono',monospace;--sans:'Noto Sans JP',sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;-webkit-text-size-adjust:100%}
-body{min-height:100dvh;padding-bottom:env(safe-area-inset-bottom)}
-.header{position:sticky;top:0;z-index:100;background:rgba(10,14,26,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 16px 10px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-family:var(--mono);font-size:13px;color:var(--accent2);letter-spacing:.12em}
-.logo span{color:var(--muted)}
-.hright{display:flex;align-items:center;gap:10px}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,211,160,.4)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(34,211,160,0)}}
-.tstamp{font-family:var(--mono);font-size:11px;color:var(--muted)}
-.rbtn{background:none;border:1px solid var(--border);color:var(--muted);font-size:16px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.rbtn:active{background:var(--bg3)}
-.tabs{display:flex;background:rgba(10,14,26,.92);border-bottom:1px solid var(--border);padding:0 4px;position:sticky;top:53px;z-index:90;backdrop-filter:blur(12px)}
-.tab{flex:1;padding:10px 2px;font-size:11px;color:var(--muted);border:none;background:none;cursor:pointer;font-family:var(--sans);border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
-.tab.active{color:var(--accent2);border-bottom-color:var(--accent2)}
-.page{display:none;padding:12px 12px 24px;animation:fadeIn .2s ease}
-.page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-.slabel{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.15em;text-transform:uppercase;margin:16px 0 8px}
-.slabel:first-child{margin-top:4px}
-.mstrip{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:4px}
-.mc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px}
-.mc-l{font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px}
-.mc-v{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--bright)}
-.mc-v.up{color:var(--green)}.mc-v.dn{color:var(--red)}
-.mstrip2{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:4px}
-.news-list{display:flex;flex-direction:column;gap:6px}
-.news-item{background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.6}
-.news-item.high{border-left-color:var(--red)}
-.news-item.medium{border-left-color:var(--amber)}
-.theme-list{display:flex;flex-direction:column;gap:8px}
-.tc{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative;overflow:hidden}
-.tc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
-.tc.r1::before{background:var(--amber)}.tc.r2::before{background:var(--accent2)}.tc.r3::before{background:var(--green)}.tc.r4::before,.tc.r5::before,.tc.r6::before,.tc.r7::before,.tc.r8::before{background:var(--dim)}
-.ttop{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
-.tname{font-size:15px;font-weight:500;color:var(--bright)}
-.trnk{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px}
-.sbadge{font-family:var(--mono);font-size:12px;font-weight:500;padding:3px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0}
-.sh{background:rgba(251,191,36,.15);color:var(--amber)}.sm{background:rgba(59,130,246,.15);color:var(--accent)}.sl{background:rgba(107,130,168,.1);color:var(--muted)}
-.sbar{height:2px;background:var(--bg3);border-radius:2px;margin-bottom:8px}
-.sbf{height:100%;border-radius:2px;background:var(--accent);transition:width .6s ease}
-.trat{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px}
-.stocks-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
-.spill{font-family:var(--mono);font-size:10px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:2px 7px;border-radius:5px}
-.risk{font-size:10px;color:var(--red);margin-top:4px}
-.usc{font-size:10px;color:var(--accent2);margin-top:2px}
-.sumbox{background:var(--bg2);border:1px solid var(--border);border-top:2px solid var(--accent2);border-radius:12px;padding:14px;font-size:13px;line-height:1.75}
-.bigpic{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);border-radius:12px;padding:12px;font-size:13px;line-height:1.7;margin-bottom:4px}
-.eval-list{display:flex;flex-direction:column;gap:6px}
-.eval-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;align-items:flex-start;gap:10px}
-.eval-icon{font-size:16px;flex-shrink:0;margin-top:1px}
-.eval-theme{font-size:13px;font-weight:500;color:var(--bright);margin-bottom:2px}
-.eval-detail{font-size:11px;color:var(--muted);line-height:1.5}
-.score-section{display:flex;align-items:center;gap:16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:4px}
-.score-ring{position:relative;width:64px;height:64px;flex-shrink:0}
-.score-ring svg{transform:rotate(-90deg)}
-.score-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:17px;font-weight:500;color:var(--bright)}
-.score-info{flex:1}
-.score-title{font-size:13px;font-weight:500;color:var(--bright);margin-bottom:4px}
-.score-sub{font-size:11px;color:var(--muted);line-height:1.6}
-.actual-list{display:flex;flex-direction:column;gap:6px}
-.actual-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px}
-.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sh-dot{background:var(--red)}.sm-dot{background:var(--amber)}.sl-dot{background:var(--dim)}
-.actual-name{font-size:13px;font-weight:500;color:var(--bright);margin-bottom:2px}
-.actual-ev{font-size:11px;color:var(--muted)}
-.hint-list{display:flex;flex-direction:column;gap:6px}
-.hint-card{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.6}
-.hint-card::before{content:'💡 '}
-.chart-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px}
-.chart-bars{display:flex;align-items:flex-end;gap:5px;height:80px;margin-bottom:6px}
-.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-.bar{width:100%;border-radius:3px 3px 0 0;min-height:3px}
-.bar-date{font-family:var(--mono);font-size:9px;color:var(--dim);white-space:nowrap}
-.bar-score{font-family:var(--mono);font-size:9px;color:var(--muted)}
-.avg-line{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
-.avg-val{color:var(--accent2)}
-.no-data{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:32px 16px;text-align:center;color:var(--muted);font-size:13px}
-.no-data .icon{font-size:32px;margin-bottom:12px;display:block}
-.loading{padding:48px 16px;text-align:center;color:var(--muted);font-size:13px}
-.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.settings-form{display:flex;flex-direction:column;gap:12px}
-.field{display:flex;flex-direction:column;gap:5px}
-.field label{font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:.08em}
-.field input{background:var(--bg2);border:1px solid var(--border);color:var(--bright);border-radius:8px;padding:10px 12px;font-size:13px;font-family:var(--sans);outline:none;transition:border-color .15s}
-.field input:focus{border-color:var(--accent)}
-.save-btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-family:var(--sans);font-weight:500;cursor:pointer;margin-top:4px}
-.info-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7;margin-top:8px}
-.tag-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.tag{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);color:var(--muted)}
-.sector-list{display:flex;flex-direction:column;gap:4px}
-.sector-row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg2);border-radius:8px;font-size:12px}
-.source-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
-.source-badge{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);color:var(--accent2)}
-.data-basis-row{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
-.basis-tag{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:4px;background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border)}
-.tomorrow-box{background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.2);border-radius:12px;padding:12px;font-size:13px;line-height:1.7}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>株式AI分析</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121933;
+      --panel-2: #182145;
+      --text: #e8ecf7;
+      --muted: #9aa6c7;
+      --line: #2b3767;
+      --accent: #6ea8fe;
+      --good: #2ecc71;
+      --bad: #ff6b6b;
+      --warn: #f7b731;
+      --chip: #23305e;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: linear-gradient(180deg, #08101f 0%, #0d1530 100%);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6ea8fe, #8b5cf6);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: var(--panel-2);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #4677ff, #6a5cff);
+      border: none;
+    }
+
+    .statusbar {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      background: rgba(18, 25, 51, 0.92);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat .label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .stat .value {
+      font-size: 18px;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, #1d4ed8, #6d28d9);
+      border-color: transparent;
+    }
+
+    .panel {
+      display: none;
+      background: rgba(18, 25, 51, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      min-width: 0;
+    }
+
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .big {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+    .warn { color: var(--warn); }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background: var(--chip);
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .item-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .item-sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .theme-rank {
+      display: inline-grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      font-size: 13px;
+      font-weight: 800;
+      margin-right: 8px;
+    }
+
+    .theme-head {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .score {
+      display: inline-block;
+      margin-left: 8px;
+      font-size: 12px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #1f2b59;
+      border: 1px solid #33427e;
+      color: #cfd9ff;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 8px 12px;
+      font-size: 14px;
+      align-items: start;
+    }
+
+    .kv div:nth-child(odd) {
+      color: var(--muted);
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+      background: var(--panel);
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      background: rgba(255,255,255,0.02);
+      position: sticky;
+      top: 0;
+    }
+
+    .settings {
+      display: grid;
+      gap: 12px;
+      max-width: 560px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+    }
+
+    .notice {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(110, 168, 254, 0.1);
+      border: 1px solid rgba(110, 168, 254, 0.3);
+      color: #dbe8ff;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .empty {
+      padding: 18px;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .statusbar,
+      .grid.two,
+      .grid.three {
+        grid-template-columns: 1fr;
+      }
+
+      .kv {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="header">
-  <div class="logo">AI<span>/</span>MARKET</div>
-  <div class="hright">
-    <div class="dot"></div>
-    <span class="tstamp" id="update-time">—</span>
-    <button class="rbtn" onclick="loadAll()">↻</button>
-  </div>
-</div>
-<div class="tabs">
-  <button class="tab active" onclick="switchTab('t600')">6:00 予測</button>
-  <button class="tab" onclick="switchTab('t905')">9:05 確認</button>
-  <button class="tab" onclick="switchTab('t1535')">15:35 総括</button>
-  <button class="tab" onclick="switchTab('history')">精度履歴</button>
-  <button class="tab" onclick="switchTab('settings')">設定</button>
-</div>
-<div id="page-t600" class="page active"><div id="c600"><div class="loading"><div class="spinner"></div>読み込み中...</div></div></div>
-<div id="page-t905" class="page"><div id="c905"><div class="loading"><div class="spinner"></div>読み込み中...</div></div></div>
-<div id="page-t1535" class="page"><div id="c1535"><div class="loading"><div class="spinner"></div>読み込み中...</div></div></div>
-<div id="page-history" class="page"><div id="chistory"><div class="loading"><div class="spinner"></div>読み込み中...</div></div></div>
-<div id="page-settings" class="page">
-  <div class="slabel">データソース設定</div>
-  <div class="settings-form">
-    <div class="field"><label>GitHub ユーザー名</label><input type="text" id="gh-user" placeholder="yourusername"></div>
-    <div class="field"><label>リポジトリ名</label><input type="text" id="gh-repo" placeholder="stock-analyzer"></div>
-    <button class="save-btn" onclick="saveSettings()">保存して接続</button>
-  </div>
-  <div class="info-box">
-    GitHub Pages が有効なリポジトリの data/ フォルダを参照します。<br>
-    Settings → Pages → Source: gh-pages branch → Save
-  </div>
-</div>
-<script>
-let d600=null,d905=null,d1535=null,dHist=null;
-const GHU='stock_gh_user',GHR='stock_gh_repo';
-function base(){
-  const u=localStorage.getItem(GHU)||'',r=localStorage.getItem(GHR)||'';
-  return u&&r?`https://${u}.github.io/${r}`:'./data';
-}
-function switchTab(n){
-  ['t600','t905','t1535','history','settings'].forEach((t,i)=>{
-    document.querySelectorAll('.tab')[i].classList.toggle('active',t===n);
-    document.getElementById('page-'+t).classList.toggle('active',t===n);
-    document.getElementById('page-'+t).style.display=t===n?'block':'none';
-  });
-}
-document.querySelectorAll('.page').forEach(p=>{if(!p.classList.contains('active'))p.style.display='none'});
-async function fetchJ(url){
-  try{const r=await fetch(url+'?t='+Date.now());if(!r.ok)throw new Error(r.status);return await r.json();}
-  catch(e){return null;}
-}
-async function loadAll(){
-  document.getElementById('update-time').textContent='更新中...';
-  const b=base();
-  await Promise.all([
-    fetchJ(`${b}/data/latest_600.json`).then(d=>{d600=d;render600();}),
-    fetchJ(`${b}/data/latest_905.json`).then(d=>{d905=d;render905();}),
-    fetchJ(`${b}/data/latest_1535.json`).then(d=>{d1535=d;render1535();}),
-    fetchJ(`${b}/data/accuracy_log.json`).then(d=>{dHist=d;renderHistory();}),
-  ]);
-  document.getElementById('update-time').textContent=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
-}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function noData(msg,sub){return `<div class="no-data"><span class="icon">📭</span>${esc(msg)}<br><span style="font-size:11px">${esc(sub)}</span></div>`;}
-function scoreColor(s){return s>=70?'#22d3a0':s>=50?'#fbbf24':'#f87171';}
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">株</div>
+        <div>
+          <div class="brand-title">株式AI分析</div>
+          <div class="brand-sub">6:00予測 / 9:05確認 / 15:35総括</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="refreshBtn">↻ 再読込</button>
+      </div>
+    </div>
 
-function render600(){
-  const el=document.getElementById('c600');
-  const d=d600;
-  if(!d||Object.keys(d).length===0){el.innerHTML=noData('まだ本日の6:00分析がありません','毎朝6:00に自動更新されます');return;}
-  const md=d.market_data||{};
-  const us=md.us_stocks||{};
-  const fu=md.futures||{};
-  const fx=md.forex||{};
-  const cm=md.commodities||{};
-  const bn=md.bonds||{};
-  const spC=((us.sp500||'').startsWith('+')?'up':(us.sp500||'').startsWith('-')?'dn':'');
-  const news=(md.key_news||[]).map(n=>`<div class="news-item ${esc(n.impact||'')}"><strong>${esc(n.title||'')}</strong><br><span style="font-size:11px;color:var(--muted)">${esc(n.detail||'')}</span></div>`).join('');
-  const cal=(md.economic_calendar||[]).map(e=>`<div class="news-item">${esc(e.time||'')} ${esc(e.event||'')} <span style="color:var(--accent2)">${esc(e.forecast||'')}</span></div>`).join('');
-  const sectors=(md.us_sector_moves||[]).slice(0,5).map(s=>`<div class="sector-row"><span>${esc(s.sector||'')}</span><span class="${(s.change||'').startsWith('+')?'mc-v up':'mc-v dn'}">${esc(s.change||'')}</span></div>`).join('');
-  const hotStocks=(md.us_hot_stocks||[]).slice(0,5).map(s=>`<div class="news-item">${esc(s.name||'')} <strong>${esc(s.change||'')}</strong> — ${esc(s.reason||'')}</div>`).join('');
-  const themes=(d.themes||[]).map(t=>{
-    const sc=t.confidence_score||0;
-    const rc=`rank-${Math.min(t.rank||1,8)}`;
-    const bc=sc>=80?'sh':sc>=60?'sm':'sl';
-    const stocks=(t.key_stocks||[]).map(s=>`<span class="spill">${esc(s.name||'')}(${esc(s.code||'')})</span>`).join('');
-    return `<div class="tc ${rc}">
-      <div class="ttop"><div><div class="tname">${esc(t.name||'')}</div><div class="trnk">#${t.rank||''}</div></div><div class="sbadge ${bc}">${sc}点</div></div>
-      <div class="sbar"><div class="sbf" data-sc="${sc}" style="width:0%"></div></div>
-      <div class="trat">${esc(t.rationale||'')}</div>
-      <div class="stocks-row">${stocks}</div>
-      ${t.us_connection?`<div class="usc">🇺🇸 ${esc(t.us_connection)}</div>`:''}
-      ${t.risk_factors?`<div class="risk">⚠ ${esc(t.risk_factors)}</div>`:''}
-    </div>`;
-  }).join('');
-  el.innerHTML=`
-    <div class="slabel">マーケットデータ — ${esc(d.date||'')} ${esc(d.generated_at||'')}</div>
-    <div class="mstrip">
-      <div class="mc"><div class="mc-l">S&P500</div><div class="mc-v ${spC}">${esc(us.sp500||'—')}</div></div>
-      <div class="mc"><div class="mc-l">NASDAQ</div><div class="mc-v">${esc(us.nasdaq||'—')}</div></div>
-      <div class="mc"><div class="mc-l">日経先物</div><div class="mc-v">${esc(fu.nikkei225||'—')}</div></div>
+    <div class="statusbar">
+      <div class="stat">
+        <div class="label">接続先</div>
+        <div class="value" id="repoStatus">未設定</div>
+      </div>
+      <div class="stat">
+        <div class="label">最新6:00</div>
+        <div class="value" id="status600">-</div>
+      </div>
+      <div class="stat">
+        <div class="label">最新9:05</div>
+        <div class="value" id="status905">-</div>
+      </div>
+      <div class="stat">
+        <div class="label">最新15:35</div>
+        <div class="value" id="status1535">-</div>
+      </div>
     </div>
-    <div class="mstrip">
-      <div class="mc"><div class="mc-l">USD/JPY</div><div class="mc-v">${esc(fx.usdjpy||'—')}</div></div>
-      <div class="mc"><div class="mc-l">原油WTI</div><div class="mc-v">${esc(cm.oil_wti||'—')}</div></div>
-      <div class="mc"><div class="mc-l">VIX</div><div class="mc-v">${esc(bn.vix||'—')}</div></div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="tab600">6:00 予測</button>
+      <button class="tab" data-tab="tab905">9:05 確認</button>
+      <button class="tab" data-tab="tab1535">15:35 総括</button>
+      <button class="tab" data-tab="tabAcc">精度履歴</button>
+      <button class="tab" data-tab="tabSettings">設定</button>
     </div>
-    <div class="mstrip">
-      <div class="mc"><div class="mc-l">金</div><div class="mc-v">${esc(cm.gold||'—')}</div></div>
-      <div class="mc"><div class="mc-l">米10年債</div><div class="mc-v">${esc(bn.us10y||'—')}</div></div>
-      <div class="mc"><div class="mc-l">SGX先物</div><div class="mc-v">${esc(fu.sgx||'—')}</div></div>
-    </div>
-    ${d.big_picture?`<div class="bigpic">🎯 ${esc(d.big_picture)}</div>`:''}
-    ${sectors?`<div class="slabel">米国セクター動向</div><div class="sector-list">${sectors}</div>`:''}
-    ${hotStocks?`<div class="slabel">米国注目銘柄</div><div class="news-list">${hotStocks}</div>`:''}
-    ${news?`<div class="slabel">重要ニュース</div><div class="news-list">${news}</div>`:''}
-    ${cal?`<div class="slabel">本日の経済指標</div><div class="news-list">${cal}</div>`:''}
-    <div class="slabel">本日のテーマ予測</div>
-    <div class="theme-list">${themes}</div>
-    <div class="slabel">相場展望</div>
-    <div class="sumbox">${esc(d.summary||'—')}</div>
-  `;
-  requestAnimationFrame(()=>{
-    document.querySelectorAll('.sbf').forEach(el=>{
-      const s=el.dataset.sc||0;
-      setTimeout(()=>{el.style.width=s+'%';},100);
+
+    <section class="panel active" id="tab600"></section>
+    <section class="panel" id="tab905"></section>
+    <section class="panel" id="tab1535"></section>
+    <section class="panel" id="tabAcc"></section>
+    <section class="panel" id="tabSettings"></section>
+  </div>
+
+  <script>
+    const els = {
+      repoStatus: document.getElementById("repoStatus"),
+      status600: document.getElementById("status600"),
+      status905: document.getElementById("status905"),
+      status1535: document.getElementById("status1535"),
+      tab600: document.getElementById("tab600"),
+      tab905: document.getElementById("tab905"),
+      tab1535: document.getElementById("tab1535"),
+      tabAcc: document.getElementById("tabAcc"),
+      tabSettings: document.getElementById("tabSettings"),
+      refreshBtn: document.getElementById("refreshBtn"),
+    };
+
+    const STORAGE_USER = "stock-ai-user";
+    const STORAGE_REPO = "stock-ai-repo";
+
+    function esc(v) {
+      return String(v ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function nl2br(v) {
+      return esc(v).replace(/\n/g, "<br>");
+    }
+
+    function arr(v) {
+      return Array.isArray(v) ? v : [];
+    }
+
+    function pick(obj, path, fallback = "") {
+      try {
+        return path.split(".").reduce((a, b) => a?.[b], obj) ?? fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function chipList(items) {
+      const list = arr(items).filter(Boolean);
+      if (!list.length) return `<div class="empty">データなし</div>`;
+      return `<div class="chips">${list.map(x => `<span class="chip">${esc(x)}</span>`).join("")}</div>`;
+    }
+
+    function renderSimpleList(items, emptyText = "データなし") {
+      const list = arr(items).filter(Boolean);
+      if (!list.length) return `<div class="empty">${esc(emptyText)}</div>`;
+      return `
+        <div class="list">
+          ${list.map(x => `
+            <div class="item">
+              <div class="item-sub">${esc(typeof x === "string" ? x : JSON.stringify(x))}</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderThemeCards(themes) {
+      const list = arr(themes);
+      if (!list.length) return `<div class="empty">テーマ予測がまだありません</div>`;
+
+      return `
+        <div class="list">
+          ${list.map(t => `
+            <div class="item">
+              <div class="theme-head">
+                <span class="theme-rank">${esc(t.rank ?? "-")}</span>
+                <div>
+                  <div class="item-title">
+                    ${esc(t.name || "テーマ名なし")}
+                    <span class="score">信頼度 ${esc(t.confidence_score ?? "-")}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="kv">
+                <div>根拠</div><div>${nl2br(t.rationale || "-")}</div>
+                <div>データ根拠</div><div>${arr(t.data_basis).map(esc).join(" / ") || "-"}</div>
+                <div>関連銘柄</div>
+                <div>
+                  ${arr(t.key_stocks).length
+                    ? arr(t.key_stocks).map(s =>
+                      `${esc(s.name || "-")} (${esc(s.code || "-")})：${esc(s.reason || "-")}`
+                    ).join("<br>")
+                    : "-"}
+                </div>
+                <div>リスク</div><div>${nl2br(t.risk_factors || "-")}</div>
+                <div>米国連動</div><div>${nl2br(t.us_connection || "-")}</div>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderActualFlow(items) {
+      const list = arr(items);
+      if (!list.length) return `<div class="empty">寄り後の資金フローはまだありません</div>`;
+      return `
+        <div class="list">
+          ${list.map(x => `
+            <div class="item">
+              <div class="item-title">
+                ${esc(x.theme || "-")}
+                <span class="score">${esc(x.strength || "-")}</span>
+              </div>
+              <div class="item-sub">${nl2br(x.evidence || "-")}</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderGap(items) {
+      const list = arr(items);
+      if (!list.length) return `<div class="empty">比較データなし</div>`;
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>予測テーマ</th>
+                <th>予測スコア</th>
+                <th>実績</th>
+                <th>ズレた理由</th>
+                <th>見落とし</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.map(x => `
+                <tr>
+                  <td>${esc(x.predicted_theme || "-")}</td>
+                  <td>${esc(x.predicted_score ?? "-")}</td>
+                  <td>${esc(x.actual_result || "-")}</td>
+                  <td>${esc(x.gap_reason || "-")}</td>
+                  <td>${esc(x.missed_factor || "-")}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderThemeResults(items) {
+      const list = arr(items);
+      if (!list.length) return `<div class="empty">結果データなし</div>`;
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>テーマ</th>
+                <th>朝スコア</th>
+                <th>最終判定</th>
+                <th>詳細</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.map(x => `
+                <tr>
+                  <td>${esc(x.name || "-")}</td>
+                  <td>${esc(x.morning_score ?? "-")}</td>
+                  <td>${esc(x.final_result || "-")}</td>
+                  <td>${esc(x.detail || "-")}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderStockResults(items) {
+      const list = arr(items);
+      if (!list.length) return `<div class="empty">銘柄結果なし</div>`;
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>銘柄</th>
+                <th>コード</th>
+                <th>終値</th>
+                <th>変化率</th>
+                <th>コメント</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.map(x => `
+                <tr>
+                  <td>${esc(x.name || "-")}</td>
+                  <td>${esc(x.code || "-")}</td>
+                  <td>${esc(x.close || "-")}</td>
+                  <td>${esc(x.change || "-")}</td>
+                  <td>${esc(x.comment || "-")}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderNewsImpact(items) {
+      const list = arr(items);
+      if (!list.length) return `<div class="empty">ニュース影響データなし</div>`;
+      return `
+        <div class="list">
+          ${list.map(x => `
+            <div class="item">
+              <div class="item-title">${esc(x.news || "-")}</div>
+              <div class="item-sub">${nl2br(x.impact || "-")}</div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderAccuracyTable(logs) {
+      const list = arr(logs).slice().reverse();
+      if (!list.length) return `<div class="empty">精度履歴がまだありません</div>`;
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>日付</th>
+                <th>精度</th>
+                <th>最も当たったテーマ</th>
+                <th>最も外れたテーマ</th>
+                <th>改善ヒント</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.map(x => `
+                <tr>
+                  <td>${esc(x.date || "-")}</td>
+                  <td>${esc(x.accuracy_score ?? "-")}</td>
+                  <td>${esc(x.strongest_theme || "-")}</td>
+                  <td>${esc(x.weakest_theme || "-")}</td>
+                  <td>${arr(x.improvement_hints).map(esc).join(" / ") || "-"}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function baseUrl() {
+      const user = localStorage.getItem(STORAGE_USER) || "";
+      const repo = localStorage.getItem(STORAGE_REPO) || "";
+      if (!user || !repo) return "";
+      return `https://${user}.github.io/${repo}`;
+    }
+
+    async function fetchJson(path) {
+      const base = baseUrl();
+      if (!base) throw new Error("GitHub設定が未入力です");
+      const url = `${base}/data/${path}?t=${Date.now()}`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) {
+        throw new Error(`${path} の取得に失敗 (${res.status})`);
+      }
+      return await res.json();
+    }
+
+    function updateRepoStatus() {
+      const user = localStorage.getItem(STORAGE_USER) || "";
+      const repo = localStorage.getItem(STORAGE_REPO) || "";
+      els.repoStatus.textContent = user && repo ? `${user}/${repo}` : "未設定";
+    }
+
+    function render600(data) {
+      if (!data) {
+        els.tab600.innerHTML = `<div class="empty">6:00データがありません</div>`;
+        return;
+      }
+
+      const market = data.market_data || {};
+
+      els.tab600.innerHTML = `
+        <div class="grid two">
+          <div class="card">
+            <h3>6:00 予測サマリー</h3>
+            <div class="kv">
+              <div>日付</div><div>${esc(data.date || "-")}</div>
+              <div>生成時刻</div><div>${esc(data.generated_at || "-")}</div>
+              <div>最重要ファクター</div><div>${nl2br(data.big_picture || "-")}</div>
+              <div>相場展望</div><div>${nl2br(data.summary || "-")}</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>データソース</h3>
+            ${chipList(data.data_sources)}
+          </div>
+        </div>
+
+        <div class="grid three" style="margin-top:14px;">
+          <div class="card">
+            <h3>国内指数</h3>
+            ${renderSimpleList(market.indices, "国内指数データなし")}
+          </div>
+          <div class="card">
+            <h3>海外指数</h3>
+            ${renderSimpleList(market.world_indices, "海外指数データなし")}
+          </div>
+          <div class="card">
+            <h3>為替 / 主要ニュース</h3>
+            <div class="list">
+              <div class="item">
+                <div class="item-title">為替</div>
+                <div class="item-sub">${arr(market.forex).map(esc).join("<br>") || "データなし"}</div>
+              </div>
+              <div class="item">
+                <div class="item-title">主要ニュース</div>
+                <div class="item-sub">${arr(market.key_news).map(esc).join("<br>") || "データなし"}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <h3>予測テーマ</h3>
+          ${renderThemeCards(data.themes)}
+        </div>
+      `;
+    }
+
+    function render905(data) {
+      if (!data) {
+        els.tab905.innerHTML = `<div class="empty">9:05データがありません</div>`;
+        return;
+      }
+
+      const opening = data.opening || {};
+      const corr = data.intraday_correction || {};
+
+      els.tab905.innerHTML = `
+        <div class="grid two">
+          <div class="card">
+            <h3>寄り付き総評</h3>
+            <div class="kv">
+              <div>日付</div><div>${esc(data.date || "-")}</div>
+              <div>生成時刻</div><div>${esc(data.generated_at || "-")}</div>
+              <div>日経始値</div><div>${esc(opening.nikkei_open || "-")}</div>
+              <div>日経変化率</div><div>${esc(opening.nikkei_change || "-")}</div>
+              <div>市場トーン</div><div>${esc(opening.market_tone || "-")}</div>
+              <div>主役テーマ</div><div>${esc(opening.dominant_theme || "-")}</div>
+              <div>朝の精度</div><div class="big">${esc(data.morning_accuracy_score ?? "-")}</div>
+              <div>要約</div><div>${nl2br(data.summary || "-")}</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>場中修正</h3>
+            <div class="kv">
+              <div>継続監視</div><div>${arr(corr.themes_to_watch).map(esc).join(" / ") || "-"}</div>
+              <div>失速テーマ</div><div>${arr(corr.themes_faded).map(esc).join(" / ") || "-"}</div>
+              <div>修正ヒント</div><div>${arr(corr.correction_hints).map(esc).join("<br>") || "-"}</div>
+              <div>データソース</div><div>${arr(data.data_sources).map(esc).join(" / ") || "-"}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <h3>実際の資金フロー</h3>
+          ${renderActualFlow(data.actual_flow)}
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <h3>6:00予測との差分</h3>
+          ${renderGap(data.prediction_gap)}
+        </div>
+      `;
+    }
+
+    function render1535(data) {
+      if (!data) {
+        els.tab1535.innerHTML = `<div class="empty">15:35データがありません</div>`;
+        return;
+      }
+
+      const closing = data.closing || {};
+      const tomorrow = data.tomorrow_outlook || {};
+
+      els.tab1535.innerHTML = `
+        <div class="grid two">
+          <div class="card">
+            <h3>大引け総括</h3>
+            <div class="kv">
+              <div>日付</div><div>${esc(data.date || "-")}</div>
+              <div>生成時刻</div><div>${esc(data.generated_at || "-")}</div>
+              <div>日経平均</div><div>${esc(closing.nikkei || "-")}</div>
+              <div>TOPIX</div><div>${esc(closing.topix || "-")}</div>
+              <div>総評</div><div>${nl2br(closing.total_assessment || "-")}</div>
+              <div>最終精度</div><div class="big">${esc(data.final_accuracy_score ?? "-")}</div>
+              <div>最も当たったテーマ</div><div>${esc(data.strongest_theme || "-")}</div>
+              <div>最も外れたテーマ</div><div>${esc(data.weakest_theme || "-")}</div>
+              <div>総括</div><div>${nl2br(data.summary || "-")}</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>明日への視点</h3>
+            <div class="kv">
+              <div>重要イベント</div><div>${arr(tomorrow.key_events).map(esc).join("<br>") || "-"}</div>
+              <div>注目テーマ</div><div>${arr(tomorrow.watch_themes).map(esc).join(" / ") || "-"}</div>
+              <div>ヒント</div><div>${nl2br(tomorrow.hint || "-")}</div>
+              <div>9:05修正評価</div><div>${nl2br(data.correction_evaluation || "-")}</div>
+              <div>学習ポイント</div><div>${arr(data.learning_points).map(esc).join("<br>") || "-"}</div>
+              <div>データソース</div><div>${arr(data.data_sources).map(esc).join(" / ") || "-"}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <h3>テーマ別結果</h3>
+          ${renderThemeResults(data.theme_results)}
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <h3>銘柄別結果</h3>
+          ${renderStockResults(data.stock_results)}
+        </div>
+
+        <div class="card" style="margin-top:14px;">
+          <h3>ニュース影響</h3>
+          ${renderNewsImpact(data.news_impact)}
+        </div>
+      `;
+    }
+
+    function renderSettings() {
+      const user = localStorage.getItem(STORAGE_USER) || "";
+      const repo = localStorage.getItem(STORAGE_REPO) || "";
+
+      els.tabSettings.innerHTML = `
+        <div class="settings">
+          <div class="notice">
+            GitHub Pages 上の <code>data/</code> を読み込みます。<br>
+            例: <code>https://ユーザー名.github.io/リポジトリ名/data/latest_600.json</code>
+          </div>
+
+          <div class="field">
+            <label for="ghUser">GitHub ユーザー名</label>
+            <input id="ghUser" value="${esc(user)}" placeholder="例: sszzkkzzkk" />
+          </div>
+
+          <div class="field">
+            <label for="ghRepo">リポジトリ名</label>
+            <input id="ghRepo" value="${esc(repo)}" placeholder="例: stock-analyzer" />
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn primary" id="saveSettingsBtn">保存して接続</button>
+            <button class="btn" id="clearSettingsBtn">設定クリア</button>
+          </div>
+
+          <div class="footer-note">
+            GitHub Pages は <code>gh-pages</code> ブランチ公開になっている必要があります。<br>
+            JSONが読めない場合は、Actions が成功しているか、Pages に <code>data/latest_600.json</code> などが存在するか確認してください。
+          </div>
+        </div>
+      `;
+
+      document.getElementById("saveSettingsBtn").addEventListener("click", async () => {
+        const u = document.getElementById("ghUser").value.trim();
+        const r = document.getElementById("ghRepo").value.trim();
+
+        localStorage.setItem(STORAGE_USER, u);
+        localStorage.setItem(STORAGE_REPO, r);
+        updateRepoStatus();
+        await loadAll();
+      });
+
+      document.getElementById("clearSettingsBtn").addEventListener("click", () => {
+        localStorage.removeItem(STORAGE_USER);
+        localStorage.removeItem(STORAGE_REPO);
+        updateRepoStatus();
+        els.status600.textContent = "-";
+        els.status905.textContent = "-";
+        els.status1535.textContent = "-";
+        render600(null);
+        render905(null);
+        render1535(null);
+        renderAccuracy(null);
+        renderSettings();
+      });
+    }
+
+    function renderAccuracy(logs) {
+      els.tabAcc.innerHTML = `
+        <div class="card">
+          <h3>精度履歴</h3>
+          ${renderAccuracyTable(logs)}
+        </div>
+      `;
+    }
+
+    function setStatus(el, data, fallback = "未取得") {
+      if (!data) {
+        el.textContent = fallback;
+        return;
+      }
+      const date = data.date || "-";
+      const time = data.generated_at || "-";
+      el.textContent = `${date} ${time}`;
+    }
+
+    async function safeLoad(path) {
+      try {
+        return await fetchJson(path);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function loadAll() {
+      updateRepoStatus();
+
+      const hasConfig = baseUrl();
+      if (!hasConfig) {
+        render600(null);
+        render905(null);
+        render1535(null);
+        renderAccuracy(null);
+        renderSettings();
+        return;
+      }
+
+      els.tab600.innerHTML = `<div class="empty">読み込み中...</div>`;
+      els.tab905.innerHTML = `<div class="empty">読み込み中...</div>`;
+      els.tab1535.innerHTML = `<div class="empty">読み込み中...</div>`;
+      els.tabAcc.innerHTML = `<div class="empty">読み込み中...</div>`;
+
+      const [d600, d905, d1535, logs] = await Promise.all([
+        safeLoad("latest_600.json"),
+        safeLoad("latest_905.json"),
+        safeLoad("latest_1535.json"),
+        safeLoad("accuracy_log.json"),
+      ]);
+
+      setStatus(els.status600, d600);
+      setStatus(els.status905, d905);
+      setStatus(els.status1535, d1535);
+
+      render600(d600);
+      render905(d905);
+      render1535(d1535);
+      renderAccuracy(logs);
+      renderSettings();
+    }
+
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+        document.querySelectorAll(".panel").forEach(x => x.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      });
     });
-  });
-}
 
-function render905(){
-  const el=document.getElementById('c905');
-  const d=d905;
-  if(!d||Object.keys(d).length===0){el.innerHTML=noData('まだ本日の9:05確認がありません','9:05以降に自動更新されます');return;}
-  const sources905=(d.data_sources||[]).map(s=>`<span class="source-badge">${esc(s)}</span>`).join('');
-  const op=d.opening||{};
-  const sc=d.morning_accuracy_score||0;
-  const circ=2*Math.PI*24;
-  const offset=circ*(1-sc/100);
-  const col=scoreColor(sc);
-  const flow=(d.actual_flow||[]).map(a=>`<div class="actual-card">
-    <div class="sdot ${a.strength==='high'?'sh-dot':a.strength==='medium'?'sm-dot':'sl-dot'}"></div>
-    <div><div class="actual-name">${esc(a.theme||'')}</div><div class="actual-ev">${esc(a.evidence||'')}</div></div>
-  </div>`).join('');
-  const gaps=(d.prediction_gap||[]).map(g=>{
-    const icon=g.actual_result==='的中'?'✅':g.actual_result==='外れ'?'❌':'🔶';
-    return `<div class="eval-card"><div class="eval-icon">${icon}</div>
-      <div><div class="eval-theme">${esc(g.predicted_theme||'')} <span style="font-size:10px;color:var(--muted)">${esc(g.actual_result||'')}</span></div>
-      <div class="eval-detail">${esc(g.gap_reason||'')}${g.missed_factor?` / 見落とし: ${esc(g.missed_factor)}`:''}
-      </div></div></div>`;
-  }).join('');
-  const cor=d.intraday_correction||{};
-  const watch=(cor.themes_to_watch||[]).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
-  const faded=(cor.themes_faded||[]).map(t=>`<span class="tag" style="opacity:.5">${esc(t)}</span>`).join('');
-  const hints=(cor.correction_hints||[]).map(h=>`<div class="hint-card">${esc(h)}</div>`).join('');
-  el.innerHTML=`
-    ${sources905?'<div class="slabel">参照データ</div><div class="source-row">'+sources905+'</div>':''}
-    <div class="slabel">寄り付きスコア — ${esc(d.date||'')} ${esc(d.generated_at||'')}</div>
-    <div class="score-section">
-      <div class="score-ring">
-        <svg width="64" height="64" viewBox="0 0 64 64">
-          <circle cx="32" cy="32" r="24" fill="none" stroke="#1a2035" stroke-width="5"/>
-          <circle cx="32" cy="32" r="24" fill="none" stroke-width="5" stroke="${col}"
-            stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${circ.toFixed(1)}"
-            stroke-linecap="round" id="ring905"/>
-        </svg>
-        <div class="score-num">${sc}</div>
-      </div>
-      <div class="score-info">
-        <div class="score-title">寄り付き精度</div>
-        <div class="score-sub">
-          日経: ${esc(op.nikkei_open||'—')} (${esc(op.nikkei_change||'—')})<br>
-          市場: ${esc(op.market_tone||'—')}<br>
-          主役: ${esc(op.dominant_theme||'—')}
-        </div>
-      </div>
-    </div>
-    <div class="slabel">実際の資金の流れ</div>
-    <div class="actual-list">${flow||noData('データなし','')}</div>
-    <div class="slabel">予測との差分</div>
-    <div class="eval-list">${gaps||noData('データなし','')}</div>
-    ${watch?`<div class="slabel">午後も注目</div><div class="tag-row">${watch}</div>`:''}
-    ${faded?`<div class="slabel">朝だけのテーマ</div><div class="tag-row">${faded}</div>`:''}
-    ${hints?`<div class="slabel">15:35への修正ヒント</div><div class="hint-list">${hints}</div>`:''}
-    <div class="slabel">寄り付き総評</div>
-    <div class="sumbox">${esc(d.summary||'—')}</div>
-  `;
-  requestAnimationFrame(()=>{
-    const r=document.getElementById('ring905');
-    if(r)setTimeout(()=>{r.style.transition='stroke-dashoffset .9s ease';r.setAttribute('stroke-dashoffset',offset.toFixed(1));},150);
-  });
-}
+    els.refreshBtn.addEventListener("click", loadAll);
 
-function render1535(){
-  const el=document.getElementById('c1535');
-  const d=d1535;
-  if(!d||Object.keys(d).length===0){el.innerHTML=noData('まだ本日の15:35総括がありません','15:35以降に自動更新されます');return;}
-  const sources1535=(d.data_sources||[]).map(s=>`<span class="source-badge">${esc(s)}</span>`).join('');
-  const sc=d.final_accuracy_score||0;
-  const circ=2*Math.PI*24;
-  const offset=circ*(1-sc/100);
-  const col=scoreColor(sc);
-  const cl=d.closing||{};
-  const themes=(d.theme_results||[]).map(t=>{
-    const icon=t.final_result==='的中'?'✅':t.final_result==='外れ'?'❌':'🔶';
-    return `<div class="eval-card"><div class="eval-icon">${icon}</div>
-      <div><div class="eval-theme">${esc(t.name||'')} <span style="font-size:10px;color:var(--muted)">${esc(t.final_result||'')}</span></div>
-      <div class="eval-detail">${esc(t.detail||'')}</div></div></div>`;
-  }).join('');
-  const stocks=(d.stock_results||[]).map(s=>{
-    const up=(s.change||'').startsWith('+');
-    const dn=(s.change||'').startsWith('-');
-    return `<div class="actual-card">
-      <div class="sdot" style="background:${up?'#22d3a0':dn?'#f87171':'#3a4f72'}"></div>
-      <div style="flex:1"><div class="actual-name">${esc(s.name||'')} <span style="font-size:10px;color:var(--muted)">${esc(s.code||'')}</span></div>
-      <div class="actual-ev">${esc(s.close||'—')} (${esc(s.change||'—')}) ${esc(s.comment||'')}</div></div>
-    </div>`;
-  }).join('');
-  const news=(d.news_impact||[]).map(n=>`<div class="news-item">${esc(n.news||'')} — ${esc(n.impact||'')}</div>`).join('');
-  const learning=(d.learning_points||[]).map(h=>`<div class="hint-card">${esc(h)}</div>`).join('');
-  const tw=d.tomorrow_outlook||{};
-  const tevents=(tw.key_events||[]).map(e=>`<span class="tag">${esc(e)}</span>`).join('');
-  const tthemes=(tw.watch_themes||[]).map(t=>`<span class="tag" style="color:var(--accent2)">${esc(t)}</span>`).join('');
-  el.innerHTML=`
-    ${sources1535?'<div class="slabel">参照データ</div><div class="source-row">'+sources1535+'</div>':''}
-    <div class="slabel">最終精度スコア — ${esc(d.date||'')} ${esc(d.generated_at||'')}</div>
-    <div class="score-section">
-      <div class="score-ring">
-        <svg width="64" height="64" viewBox="0 0 64 64">
-          <circle cx="32" cy="32" r="24" fill="none" stroke="#1a2035" stroke-width="5"/>
-          <circle cx="32" cy="32" r="24" fill="none" stroke-width="5" stroke="${col}"
-            stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${circ.toFixed(1)}"
-            stroke-linecap="round" id="ring1535"/>
-        </svg>
-        <div class="score-num">${sc}</div>
-      </div>
-      <div class="score-info">
-        <div class="score-title">本日の最終精度</div>
-        <div class="score-sub">
-          日経: ${esc(cl.nikkei||'—')}<br>
-          TOPIX: ${esc(cl.topix||'—')}<br>
-          ${esc(cl.total_assessment||'')}
-        </div>
-      </div>
-    </div>
-    <div class="slabel">テーマ最終結果</div>
-    <div class="eval-list">${themes||noData('データなし','')}</div>
-    <div class="slabel">注目銘柄の動き</div>
-    <div class="actual-list">${stocks||noData('データなし','')}</div>
-    ${news?`<div class="slabel">場中ニュースの影響</div><div class="news-list">${news}</div>`:''}
-    ${d.correction_evaluation?`<div class="slabel">9:05修正の評価</div><div class="bigpic">${esc(d.correction_evaluation)}</div>`:''}
-    ${learning?`<div class="slabel">明日への学習ポイント</div><div class="hint-list">${learning}</div>`:''}
-    ${tevents||tthemes?`<div class="slabel">明日の注目</div><div class="tag-row">${tevents}${tthemes}</div>`:''}
-    ${tw.hint?`<div class="slabel">明日の相場ヒント</div><div class="tomorrow-box">${esc(tw.hint)}</div>`:''}
-    <div class="slabel">本日の総括</div>
-    <div class="sumbox">${esc(d.summary||'—')}</div>
-  `;
-  requestAnimationFrame(()=>{
-    const r=document.getElementById('ring1535');
-    if(r)setTimeout(()=>{r.style.transition='stroke-dashoffset .9s ease';r.setAttribute('stroke-dashoffset',offset.toFixed(1));},150);
-  });
-}
-
-function renderHistory(){
-  const el=document.getElementById('chistory');
-  const logs=dHist;
-  if(!logs||!logs.length){el.innerHTML=noData('精度履歴がまだありません','15:35評価が蓄積されると表示されます');return;}
-  const recent=logs.slice(-12);
-  const avg=Math.round(recent.reduce((s,r)=>s+r.accuracy_score,0)/recent.length);
-  const bars=recent.map(r=>{
-    const h=Math.round((r.accuracy_score/100)*68)+4;
-    const col=r.accuracy_score>=70?'#3b82f6':r.accuracy_score>=50?'#fbbf24':'#f87171';
-    const dt=(r.date||'').slice(5);
-    return `<div class="bar-col"><div class="bar-score">${r.accuracy_score}</div><div class="bar" style="height:${h}px;background:${col}"></div><div class="bar-date">${dt}</div></div>`;
-  }).join('');
-  const tc={};
-  logs.forEach(r=>{if(r.strongest_theme)tc[r.strongest_theme]=(tc[r.strongest_theme]||0)+1;});
-  const tops=Object.entries(tc).sort((a,b)=>b[1]-a[1]).slice(0,5)
-    .map(([n,c])=>`<div class="actual-card"><div class="sdot sh-dot"></div><div><div class="actual-name">${esc(n)}</div><div class="actual-ev">${c}回 首位</div></div></div>`).join('');
-  el.innerHTML=`
-    <div class="slabel">精度トレンド（直近${recent.length}営業日）</div>
-    <div class="chart-wrap"><div class="chart-bars">${bars}</div><div class="avg-line">平均精度: <span class="avg-val">${avg}/100</span></div></div>
-    <div class="slabel">的中しやすいテーマ TOP5</div>
-    <div class="actual-list">${tops||noData('データ蓄積中','')}</div>
-  `;
-}
-
-function saveSettings(){
-  const u=document.getElementById('gh-user').value.trim();
-  const r=document.getElementById('gh-repo').value.trim();
-  if(!u||!r){alert('入力してください');return;}
-  localStorage.setItem(GHU,u);localStorage.setItem(GHR,r);
-  switchTab('t600');loadAll();
-}
-
-window.addEventListener('DOMContentLoaded',()=>{
-  const u=localStorage.getItem(GHU)||'',r=localStorage.getItem(GHR)||'';
-  if(u)document.getElementById('gh-user').value=u;
-  if(r)document.getElementById('gh-repo').value=r;
-  loadAll();
-});
-</script>
+    updateRepoStatus();
+    loadAll();
+  </script>
 </body>
 </html>
