@@ -71,20 +71,76 @@ def load(filename):
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
-
 def parse_json(raw):
     cleaned = re.sub(r"```json|```", "", raw).strip()
-    m = re.search(r"\{[\s\S]*\}", cleaned)
-    if not m:
-        raise ValueError(f"JSON not found: {raw[:300]}")
 
-    body = m.group(0)
+    # 最初の { から最後の } を切り出す
+    start = cleaned.find("{")
+    end = cleaned.rfind("}")
+    if start == -1 or end == -1 or end <= start:
+        print("JSON not found in Claude response")
+        Path("data").mkdir(exist_ok=True)
+        with open("data/claude_raw.txt", "w", encoding="utf-8") as f:
+            f.write(raw)
+        return {
+            "date": datetime.now(JST).date().isoformat(),
+            "generated_at": datetime.now(JST).strftime("%H:%M"),
+            "summary": "Claudeの返答からJSONを抽出できませんでした",
+            "themes": [],
+            "market_data": {},
+            "data_sources": [],
+            "raw_saved": "data/claude_raw.txt",
+        }
+
+    body = cleaned[start:end + 1]
+
+    # まず素直に読む
     try:
         return json.loads(body)
-    except json.JSONDecodeError:
-        body = re.sub(r",\s*}", "}", body)
-        body = re.sub(r",\s*]", "]", body)
-        return json.loads(body)
+    except json.JSONDecodeError as e1:
+        pass
+
+    # よくある壊れ方を雑に補正
+    fixed = body
+
+    # 全角引用符を半角に
+    fixed = fixed.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
+
+    # 末尾カンマ除去
+    fixed = re.sub(r",\s*}", "}", fixed)
+    fixed = re.sub(r",\s*]", "]", fixed)
+
+    # 改行そのものが文字列中に混ざった時の保険
+    fixed = fixed.replace("\r", "\\r").replace("\n", "\\n")
+
+    # \\n にしすぎた場合に JSON 構造の外側まで壊れないよう少し戻す
+    fixed = fixed.replace("\\n  ", "\\n").replace("\\n    ", "\\n")
+
+    try:
+        return json.loads(fixed)
+    except json.JSONDecodeError as e2:
+        print(f"JSON parse error original: {e1}")
+        print(f"JSON parse error fixed: {e2}")
+
+        Path("data").mkdir(exist_ok=True)
+        with open("data/claude_raw.txt", "w", encoding="utf-8") as f:
+            f.write(raw)
+        with open("data/claude_extracted.json.txt", "w", encoding="utf-8") as f:
+            f.write(body)
+        with open("data/claude_fixed.json.txt", "w", encoding="utf-8") as f:
+            f.write(fixed)
+
+        return {
+            "date": datetime.now(JST).date().isoformat(),
+            "generated_at": datetime.now(JST).strftime("%H:%M"),
+            "summary": "ClaudeのJSON解析に失敗したため、フォールバック結果を返しました",
+            "themes": [],
+            "market_data": {},
+            "data_sources": [],
+            "raw_saved": "data/claude_raw.txt",
+            "extracted_saved": "data/claude_extracted.json.txt",
+            "fixed_saved": "data/claude_fixed.json.txt",
+        }
 
 
 def call_claude(prompt):
