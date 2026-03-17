@@ -71,16 +71,14 @@ def load(filename):
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
+
 def parse_json(raw):
     cleaned = re.sub(r"```json|```", "", raw).strip()
 
-    # 最初の { から最後の } を切り出す
     start = cleaned.find("{")
     end = cleaned.rfind("}")
     if start == -1 or end == -1 or end <= start:
-        print("JSON not found in Claude response")
-        Path("data").mkdir(exist_ok=True)
-        with open("data/claude_raw.txt", "w", encoding="utf-8") as f:
+        with open(DATA / "claude_raw.txt", "w", encoding="utf-8") as f:
             f.write(raw)
         return {
             "date": datetime.now(JST).date().isoformat(),
@@ -94,53 +92,37 @@ def parse_json(raw):
 
     body = cleaned[start:end + 1]
 
-    # まず素直に読む
     try:
         return json.loads(body)
     except json.JSONDecodeError as e1:
-        pass
+        fixed = body
+        fixed = fixed.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
+        fixed = re.sub(r",\s*}", "}", fixed)
+        fixed = re.sub(r",\s*]", "]", fixed)
 
-    # よくある壊れ方を雑に補正
-    fixed = body
+        try:
+            return json.loads(fixed)
+        except json.JSONDecodeError as e2:
+            print(f"JSON parse error original: {e1}")
+            print(f"JSON parse error fixed: {e2}")
+            with open(DATA / "claude_raw.txt", "w", encoding="utf-8") as f:
+                f.write(raw)
+            with open(DATA / "claude_extracted.json.txt", "w", encoding="utf-8") as f:
+                f.write(body)
+            with open(DATA / "claude_fixed.json.txt", "w", encoding="utf-8") as f:
+                f.write(fixed)
 
-    # 全角引用符を半角に
-    fixed = fixed.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
-
-    # 末尾カンマ除去
-    fixed = re.sub(r",\s*}", "}", fixed)
-    fixed = re.sub(r",\s*]", "]", fixed)
-
-    # 改行そのものが文字列中に混ざった時の保険
-    fixed = fixed.replace("\r", "\\r").replace("\n", "\\n")
-
-    # \\n にしすぎた場合に JSON 構造の外側まで壊れないよう少し戻す
-    fixed = fixed.replace("\\n  ", "\\n").replace("\\n    ", "\\n")
-
-    try:
-        return json.loads(fixed)
-    except json.JSONDecodeError as e2:
-        print(f"JSON parse error original: {e1}")
-        print(f"JSON parse error fixed: {e2}")
-
-        Path("data").mkdir(exist_ok=True)
-        with open("data/claude_raw.txt", "w", encoding="utf-8") as f:
-            f.write(raw)
-        with open("data/claude_extracted.json.txt", "w", encoding="utf-8") as f:
-            f.write(body)
-        with open("data/claude_fixed.json.txt", "w", encoding="utf-8") as f:
-            f.write(fixed)
-
-        return {
-            "date": datetime.now(JST).date().isoformat(),
-            "generated_at": datetime.now(JST).strftime("%H:%M"),
-            "summary": "ClaudeのJSON解析に失敗したため、フォールバック結果を返しました",
-            "themes": [],
-            "market_data": {},
-            "data_sources": [],
-            "raw_saved": "data/claude_raw.txt",
-            "extracted_saved": "data/claude_extracted.json.txt",
-            "fixed_saved": "data/claude_fixed.json.txt",
-        }
+            return {
+                "date": datetime.now(JST).date().isoformat(),
+                "generated_at": datetime.now(JST).strftime("%H:%M"),
+                "summary": "ClaudeのJSON解析に失敗したため、フォールバック結果を返しました",
+                "themes": [],
+                "market_data": {},
+                "data_sources": [],
+                "raw_saved": "data/claude_raw.txt",
+                "extracted_saved": "data/claude_extracted.json.txt",
+                "fixed_saved": "data/claude_fixed.json.txt",
+            }
 
 
 def call_claude(prompt):
@@ -189,37 +171,91 @@ def extract_table_rows(table, limit=40):
     return rows
 
 
-def extract_named_time(lines, names):
-    result = {}
-    for i, line in enumerate(lines):
-        if line in names and i + 1 < len(lines):
-            nxt = lines[i + 1]
-            if re.fullmatch(r"(終値|\d{1,2}:\d{2})", nxt):
-                result[line] = nxt
-    return result
+def score_market_item(item):
+    score = 0
+    if item.get("value"):
+        score += 3
+    if item.get("change"):
+        score += 3
+    if item.get("time"):
+        score += 2
+    if item.get("percent"):
+        score += 1
+    if item.get("_source"):
+        score += 1
+    return score
 
 
-def parse_metric_pairs(metric_line):
-    nums = metric_line.split()
-    pairs = []
-    for i in range(0, len(nums), 2):
-        if i + 1 < len(nums):
-            left = nums[i]
-            right = nums[i + 1]
-            if re.fullmatch(r"[0-9,]+\.\d+", left) and re.fullmatch(r"[+\-][0-9,]+\.\d+", right):
-                pairs.append((left, right))
-    return pairs
+def dedupe_best_market_items(items):
+    best = {}
+    for item in items:
+        name = item.get("name", "")
+        if not name:
+            continue
+        if name not in best or score_market_item(item) > score_market_item(best[name]):
+            best[name] = item
+    return list(best.values())
 
 
-def unique_by_name(items):
-    out = []
-    seen = set()
+def parse_market_candidates_from_lines(lines, source_name):
+    candidates = {
+        "indices": [],
+        "world_indices": [],
+        "forex": [],
+    }
+
+    strict_patterns = [
+        ("indices", r"日経平均\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)", "日経平均"),
+        ("forex", r"(?:米)?ドル円\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)", "米ドル円"),
+        ("world_indices", r"(?:ＮＹダウ|NYダウ)\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)", "NYダウ"),
+        ("world_indices", r"上海総合\s*\(([^)]+)\)\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)", "上海総合"),
+    ]
+
+    for line in lines:
+        for bucket, pattern, label in strict_patterns:
+            m = re.search(pattern, line)
+            if m:
+                candidates[bucket].append({
+                    "name": label,
+                    "time": m.group(1),
+                    "value": m.group(2),
+                    "change": m.group(3),
+                    "percent": "",
+                    "_source": source_name,
+                })
+
+    domestic_patterns = [
+        ("日経平均", "indices"),
+        ("ＴＯＰＩＸ", "indices"),
+        ("TOPIX", "indices"),
+        ("JPX日経400", "indices"),
+        ("グロース250", "indices"),
+    ]
+
+    for line in lines:
+        for name, bucket in domestic_patterns:
+            m = re.search(rf"{re.escape(name)}\s+([0-9,]+\.\d+)\s+([+\-][0-9,]+\.\d+)", line)
+            if m:
+                candidates[bucket].append({
+                    "name": name,
+                    "time": "",
+                    "value": m.group(1),
+                    "change": m.group(2),
+                    "percent": "",
+                    "_source": source_name,
+                })
+
+    return candidates
+
+
+def normalize_market_items(items):
+    normalized = []
     for x in items:
-        name = x.get("name", "")
-        if name and name not in seen:
-            out.append(x)
-            seen.add(name)
-    return out
+        y = dict(x)
+        y.pop("_source", None)
+        normalized.append(y)
+    return normalized
+
 
 def fetch_kabutan_home():
     result = {
@@ -229,87 +265,73 @@ def fetch_kabutan_home():
         "themes": [],
         "sector": [],
         "news": [],
+        "search_results": [],
     }
 
-    try:
-        r = safe_get("https://kabutan.jp/")
-        soup = BeautifulSoup(r.text, "html.parser")
-        text = clean_text(soup.get_text("\n", strip=True))
+    urls = [
+        ("mobile", "https://s.kabutan.jp/"),
+        ("desktop", "https://kabutan.jp/"),
+    ]
 
-        # 指数・為替を全文検索で抜く
-        patterns = [
-            ("indices", "日経平均"),
-            ("world_indices", "ＮＹダウ"),
-            ("world_indices", "NYダウ"),
-            ("world_indices", "上海総合"),
-            ("forex", "米ドル円"),
-        ]
+    all_indices = []
+    all_world = []
+    all_forex = []
+    all_themes = []
+    all_news = []
+    search_results = []
 
-        for bucket, name in patterns:
-            pattern = rf"{re.escape(name)}\s*(終値|\d{{1,2}}:\d{{2}})?\s*([0-9,]+\.\d+)?\s*([+\-][0-9,]+\.\d+)?\s*([+\-]?[0-9,]+\.\d+%)?"
-            m = re.search(pattern, text)
-            if m:
-                item = {
-                    "name": name,
-                    "time": m.group(1) or "",
-                    "value": m.group(2) or "",
-                    "change": m.group(3) or "",
-                    "percent": m.group(4) or "",
-                }
-                result[bucket].append(item)
+    for source_name, url in urls:
+        try:
+            r = safe_get(url)
+            soup = BeautifulSoup(r.text, "html.parser")
+            lines = [clean_text(x) for x in soup.get_text("\n", strip=True).splitlines()]
+            lines = [x for x in lines if x]
 
-        # 国内指標ブロックの補完
-        extra_domestic = [
-            "ＴＯＰＩＸ",
-            "TOPIX",
-            "JPX日経400",
-            "グロース250",
-        ]
-        for name in extra_domestic:
-            pattern = rf"{re.escape(name)}\s*([0-9,]+\.\d+)\s*([+\-][0-9,]+\.\d+)"
-            m = re.search(pattern, text)
-            if m:
-                result["indices"].append({
-                    "name": name,
-                    "time": "",
-                    "value": m.group(1),
-                    "change": m.group(2),
-                    "percent": "",
-                })
+            market_candidates = parse_market_candidates_from_lines(lines, source_name)
+            all_indices.extend(market_candidates["indices"])
+            all_world.extend(market_candidates["world_indices"])
+            all_forex.extend(market_candidates["forex"])
 
-        # 重複排除
-        def dedupe(items):
-            out = []
-            seen = set()
-            for x in items:
-                key = x.get("name", "")
-                if key and key not in seen:
-                    out.append(x)
-                    seen.add(key)
-            return out
+            search_results.append(
+                f"{source_name}: 国内{len(market_candidates['indices'])}件 / 海外{len(market_candidates['world_indices'])}件 / 為替{len(market_candidates['forex'])}件"
+            )
 
-        result["indices"] = dedupe(result["indices"])[:6]
-        result["world_indices"] = dedupe(result["world_indices"])[:6]
-        result["forex"] = dedupe(result["forex"])[:4]
+            theme_candidates = []
+            for a in soup.select("a[href*='theme'], a[href*='/themes/'], a[href*='人気']"):
+                t = clean_text(a.get_text(" ", strip=True))
+                if 2 <= len(t) <= 30:
+                    theme_candidates.append(t)
 
-        # 人気テーマ
-        theme_candidates = []
-        for a in soup.select("a[href*='/themes/?theme='], a[href*='/themes/']"):
-            t = clean_text(a.get_text(" ", strip=True))
-            if 2 <= len(t) <= 30:
-                theme_candidates.append(t)
-        result["themes"] = list(dict.fromkeys(theme_candidates))[:15]
+            if not theme_candidates:
+                for a in soup.select("a"):
+                    t = clean_text(a.get_text(" ", strip=True))
+                    if 2 <= len(t) <= 30 and re.search(r"[ぁ-んァ-ン一-龥A-Za-z0-9]", t):
+                        if t not in [
+                            "TOP", "決算", "開示", "人気", "コラム",
+                            "ログイン", "お知らせ", "銘柄検索", "メニュー",
+                            "PC版を表示"
+                        ] and not re.fullmatch(r"\d+", t):
+                            theme_candidates.append(t)
 
-        # ニュース
-        news_candidates = []
-        for a in soup.select("a[href*='/news/']"):
-            t = clean_text(a.get_text(" ", strip=True))
-            if len(t) >= 12:
-                news_candidates.append(t)
-        result["news"] = list(dict.fromkeys(news_candidates))[:12]
+            all_themes.extend(theme_candidates)
 
-    except Exception as e:
-        print(f"ホーム取得エラー: {e}")
+            news_candidates = []
+            for a in soup.select("a[href]"):
+                t = clean_text(a.get_text(" ", strip=True))
+                if len(t) >= 12:
+                    news_candidates.append(t)
+            all_news.extend(news_candidates)
+
+        except Exception as e:
+            print(f"ホーム取得エラー {source_name}: {e}")
+            search_results.append(f"{source_name}: 取得失敗")
+
+    result["indices"] = normalize_market_items(dedupe_best_market_items(all_indices))[:6]
+    result["world_indices"] = normalize_market_items(dedupe_best_market_items(all_world))[:6]
+    result["forex"] = normalize_market_items(dedupe_best_market_items(all_forex))[:4]
+    result["themes"] = list(dict.fromkeys(all_themes))[:15]
+    result["news"] = list(dict.fromkeys(all_news))[:12]
+    result["search_results"] = search_results
 
     return result
 
@@ -458,6 +480,7 @@ def fetch_kabutan():
         "volume_surge": [],
         "themes": [],
         "news": [],
+        "search_results": [],
         "source": "kabutan.jp",
     }
 
@@ -470,6 +493,7 @@ def fetch_kabutan():
     result["sector"] = home.get("sector", [])
     result["themes"] = home.get("themes", [])
     result["news"] = home.get("news", [])
+    result["search_results"] = home.get("search_results", [])
     result["top_gainers"] = ranking.get("top_gainers", [])
     result["top_losers"] = ranking.get("top_losers", [])
     result["volume_surge"] = ranking.get("volume_surge", [])
@@ -484,6 +508,13 @@ def fetch_kabutan():
     print(f"volume_surge: {len(result['volume_surge'])}")
     print(f"themes: {len(result['themes'])}")
     print(f"news: {len(result['news'])}")
+
+    if result["indices"]:
+        print(f"indices data: {result['indices']}")
+    if result["world_indices"]:
+        print(f"world data: {result['world_indices']}")
+    if result["forex"]:
+        print(f"forex data: {result['forex']}")
 
     return result
 
@@ -543,6 +574,7 @@ Return this JSON:
     "indices": {json.dumps(kabutan["indices"][:6], ensure_ascii=False)},
     "world_indices": {json.dumps(kabutan["world_indices"][:6], ensure_ascii=False)},
     "forex": {json.dumps(kabutan["forex"][:4], ensure_ascii=False)},
+    "search_results": {json.dumps(kabutan["search_results"][:10], ensure_ascii=False)},
     "key_news": {json.dumps(key_news, ensure_ascii=False)}
   }},
   "themes": [
