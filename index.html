@@ -18,6 +18,8 @@
       --good: #31d158;
       --bad: #ff6b6b;
       --warn: #f7b731;
+      --danger-bg: rgba(255, 107, 107, 0.12);
+      --danger-line: rgba(255, 107, 107, 0.35);
       --radius: 18px;
     }
 
@@ -173,6 +175,20 @@
     .good { color: var(--good); }
     .bad { color: var(--bad); }
     .warn { color: var(--warn); }
+
+    .status-banner {
+      margin-bottom: 12px;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .status-banner.failed {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-line);
+      color: #ffd7d7;
+    }
 
     .tabs {
       display: flex;
@@ -574,7 +590,6 @@
               </div>
               <div class="kv">
                 <div>根拠</div><div>${nl2br(t.rationale || "-")}</div>
-                <div>データ根拠</div><div>${arr(t.data_basis).map(esc).join(" / ") || "-"}</div>
                 <div>関連銘柄</div>
                 <div>
                   ${arr(t.key_stocks).length
@@ -582,7 +597,6 @@
                     : "-"}
                 </div>
                 <div>リスク</div><div>${nl2br(t.risk_factors || "-")}</div>
-                <div>米国連動</div><div>${nl2br(t.us_connection || "-")}</div>
               </div>
             </div>
           `).join("")}
@@ -798,7 +812,16 @@
         x => x && x.value && x.change && x.time
       );
 
+      const failedBanner = current.analysis_status === "failed"
+        ? `
+          <div class="status-banner failed">
+            AI分析は失敗しました。いま表示している主要指標は取得済みデータです。分析部分は再実行やプロンプト調整が必要です。
+          </div>
+        `
+        : "";
+
       els.heroPanel.innerHTML = `
+        ${failedBanner}
         <div class="hero-grid">
           ${quotes.length ? quotes.map(item => `
             <div class="quote">
@@ -846,6 +869,7 @@
       els.tab600.innerHTML = `
         <div class="mini-info">
           <span class="mini-pill">更新 ${esc(data.date || "-")} ${esc(data.generated_at || "-")}</span>
+          ${data.analysis_status === "failed" ? `<span class="mini-pill">分析失敗</span>` : ""}
         </div>
 
         <div class="grid two">
@@ -941,6 +965,7 @@
       els.tab905.innerHTML = `
         <div class="mini-info">
           <span class="mini-pill">更新 ${esc(data.date || "-")} ${esc(data.generated_at || "-")}</span>
+          ${data.analysis_status === "failed" ? `<span class="mini-pill">分析失敗</span>` : ""}
         </div>
 
         <div class="grid two">
@@ -989,6 +1014,7 @@
       els.tab1535.innerHTML = `
         <div class="mini-info">
           <span class="mini-pill">更新 ${esc(data.date || "-")} ${esc(data.generated_at || "-")}</span>
+          ${data.analysis_status === "failed" ? `<span class="mini-pill">分析失敗</span>` : ""}
         </div>
 
         <div class="grid two">
