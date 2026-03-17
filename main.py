@@ -123,23 +123,63 @@ def safe_get(url, timeout=15):
 def clean_text(text):
     if not text:
         return ""
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+    return re.sub(r"\s+", " ", text).strip()
 
 
-def to_num_str(text):
-    return clean_text(text).replace("\xa0", " ")
-
-
-def extract_table_rows(table, limit=20):
+def extract_table_rows(table, limit=30):
     rows = []
     for tr in table.select("tr"):
         cells = [clean_text(td.get_text(" ", strip=True)) for td in tr.select("th, td")]
-        if cells and any(cells):
+        cells = [c for c in cells if c]
+        if cells:
             rows.append(cells)
         if len(rows) >= limit:
             break
     return rows
+
+
+def find_first_code(row):
+    for cell in row:
+        m = re.fullmatch(r"\d{4}", cell)
+        if m:
+            return cell
+    return ""
+
+
+def parse_rank_rows(rows, mode="gainers"):
+    parsed = []
+    for row in rows[1:]:
+        if len(row) < 4:
+            continue
+
+        code = find_first_code(row)
+        if not code:
+            continue
+
+        try:
+            code_idx = row.index(code)
+        except ValueError:
+            continue
+
+        name = row[code_idx + 1] if code_idx + 1 < len(row) else ""
+        if not name:
+            continue
+
+        item = {
+            "code": code,
+            "name": name,
+        }
+
+        if mode in ("gainers", "losers"):
+            item["price"] = row[-2] if len(row) >= 2 else ""
+            item["change"] = row[-1] if len(row) >= 1 else ""
+        elif mode == "volume":
+            item["volume"] = row[-2] if len(row) >= 2 else ""
+            item["change"] = row[-1] if len(row) >= 1 else ""
+
+        parsed.append(item)
+
+    return parsed[:15]
 
 
 def fetch_kabutan_news():
@@ -157,10 +197,11 @@ def fetch_kabutan_news():
             for a in soup.select("a[href*='/news/']"):
                 text = clean_text(a.get_text(" ", strip=True))
                 href = a.get("href", "")
-                if len(text) >= 12 and "/news/" in href and text not in news:
+                if "/news/" in href and len(text) >= 12 and text not in news:
                     news.append(text)
                 if len(news) >= 12:
-                    return news
+                    return news[:12]
+
             time.sleep(0.5)
         except Exception as e:
             print(f"かぶたんニュース取得エラー {url}: {e}")
@@ -175,19 +216,19 @@ def fetch_kabutan_ranking():
         "volume_surge": [],
     }
 
-    urls = [
-        "https://kabutan.jp/stock/ranking/",
-        "https://kabutan.jp/stock/ranking/?market=0&updown=1",
-        "https://kabutan.jp/stock/ranking/?market=0&updown=2",
-        "https://kabutan.jp/stock/ranking/?market=0&info=volume",
+    pages = [
+        ("gainers", "https://kabutan.jp/stock/ranking/?market=0&updown=1"),
+        ("losers", "https://kabutan.jp/stock/ranking/?market=0&updown=2"),
+        ("volume", "https://kabutan.jp/stock/ranking/?market=0&info=volume"),
+        ("fallback", "https://kabutan.jp/stock/ranking/"),
     ]
 
-    for url in urls:
+    for kind, url in pages:
         try:
             r = safe_get(url)
             soup = BeautifulSoup(r.text, "html.parser")
-
             tables = soup.find_all("table")
+
             for table in tables:
                 rows = extract_table_rows(table, limit=25)
                 if len(rows) < 3:
@@ -195,82 +236,29 @@ def fetch_kabutan_ranking():
 
                 header = " | ".join(rows[0])
 
-                # 値上がり
-                if (
-                    "コード" in header
-                    and "銘柄名" in header
-                    and ("前日比" in header or "騰落率" in header)
-                    and not result["top_gainers"]
-                ):
-                    parsed = []
-                    for row in rows[1:20]:
-                        if len(row) < 5:
-                            continue
-                        if not re.search(r"\d{4}", "".join(row)):
-                            continue
-                        code = next((x for x in row if re.fullmatch(r"\d{4}", x)), "")
-                        name_idx = row.index(code) + 1 if code in row and row.index(code) + 1 < len(row) else None
-                        name = row[name_idx] if name_idx is not None else row[1]
-                        price = row[-2] if len(row) >= 2 else ""
-                        change = row[-1] if len(row) >= 1 else ""
-                        parsed.append({
-                            "code": code,
-                            "name": name,
-                            "price": price,
-                            "change": change,
-                        })
-                    if parsed:
-                        result["top_gainers"] = parsed[:15]
+                if kind == "gainers" and not result["top_gainers"]:
+                    if "コード" in header and "銘柄名" in header:
+                        parsed = parse_rank_rows(rows, "gainers")
+                        if parsed:
+                            result["top_gainers"] = parsed
 
-                # 値下がり
-                if (
-                    "コード" in header
-                    and "銘柄名" in header
-                    and ("前日比" in header or "騰落率" in header)
-                    and result["top_gainers"]
-                    and not result["top_losers"]
-                ):
-                    parsed = []
-                    for row in rows[1:20]:
-                        if len(row) < 5:
-                            continue
-                        if not re.search(r"\d{4}", "".join(row)):
-                            continue
-                        code = next((x for x in row if re.fullmatch(r"\d{4}", x)), "")
-                        name_idx = row.index(code) + 1 if code in row and row.index(code) + 1 < len(row) else None
-                        name = row[name_idx] if name_idx is not None else row[1]
-                        price = row[-2] if len(row) >= 2 else ""
-                        change = row[-1] if len(row) >= 1 else ""
-                        parsed.append({
-                            "code": code,
-                            "name": name,
-                            "price": price,
-                            "change": change,
-                        })
-                    if parsed:
-                        result["top_losers"] = parsed[:15]
+                elif kind == "losers" and not result["top_losers"]:
+                    if "コード" in header and "銘柄名" in header:
+                        parsed = parse_rank_rows(rows, "losers")
+                        if parsed:
+                            result["top_losers"] = parsed
 
-                # 出来高急増
-                if ("出来高" in header or "売買高" in header) and "コード" in header and not result["volume_surge"]:
-                    parsed = []
-                    for row in rows[1:20]:
-                        if len(row) < 5:
-                            continue
-                        if not re.search(r"\d{4}", "".join(row)):
-                            continue
-                        code = next((x for x in row if re.fullmatch(r"\d{4}", x)), "")
-                        name_idx = row.index(code) + 1 if code in row and row.index(code) + 1 < len(row) else None
-                        name = row[name_idx] if name_idx is not None else row[1]
-                        volume = row[-2] if len(row) >= 2 else ""
-                        change = row[-1] if len(row) >= 1 else ""
-                        parsed.append({
-                            "code": code,
-                            "name": name,
-                            "volume": volume,
-                            "change": change,
-                        })
-                    if parsed:
-                        result["volume_surge"] = parsed[:15]
+                elif kind == "volume" and not result["volume_surge"]:
+                    if "コード" in header and ("出来高" in header or "売買高" in header):
+                        parsed = parse_rank_rows(rows, "volume")
+                        if parsed:
+                            result["volume_surge"] = parsed
+
+                elif kind == "fallback":
+                    if not result["top_gainers"] and "コード" in header and "銘柄名" in header:
+                        result["top_gainers"] = parse_rank_rows(rows, "gainers")
+                    if not result["volume_surge"] and "コード" in header and ("出来高" in header or "売買高" in header):
+                        result["volume_surge"] = parse_rank_rows(rows, "volume")
 
             time.sleep(0.5)
         except Exception as e:
@@ -288,41 +276,28 @@ def fetch_kabutan_market():
         "themes": [],
     }
 
-    urls = [
-        "https://kabutan.jp/market/",
-        "https://kabutan.jp/themes/",
-    ]
-
-    # market
     try:
-        r = safe_get(urls[0])
+        r = safe_get("https://kabutan.jp/market/")
         soup = BeautifulSoup(r.text, "html.parser")
 
-        # ページ全体から指数っぽい行を広めに拾う
-        all_text_blocks = []
         for tr in soup.select("tr"):
             row = [clean_text(x.get_text(" ", strip=True)) for x in tr.select("th, td")]
             row = [x for x in row if x]
-            if row:
-                all_text_blocks.append(row)
+            if not row:
+                continue
 
-        for row in all_text_blocks:
             joined = " | ".join(row)
 
-            # 国内指数
             if any(k in joined for k in ["日経平均", "TOPIX", "東証グロース", "JPX日経"]):
                 result["indices"].append(joined)
 
-            # 海外指数
             if any(k in joined for k in ["NYダウ", "NASDAQ", "S&P500", "SOX", "DAX", "上海総合"]):
                 result["world_indices"].append(joined)
 
-            # 為替
             if any(k in joined for k in ["ドル円", "ユーロ円", "ユーロドル"]):
                 result["forex"].append(joined)
 
-            # 業種別
-            if any(k in joined for k in ["水産・農林", "鉱業", "建設", "電気機器", "銀行業", "輸送用機器"]):
+            if any(k in joined for k in ["水産・農林", "鉱業", "建設", "電気機器", "銀行業", "輸送用機器", "情報・通信", "不動産業"]):
                 result["sector"].append(joined)
 
         result["indices"] = list(dict.fromkeys(result["indices"]))[:10]
@@ -333,19 +308,16 @@ def fetch_kabutan_market():
     except Exception as e:
         print(f"market取得エラー: {e}")
 
-    # themes
     try:
-        r = safe_get(urls[1])
+        r = safe_get("https://kabutan.jp/themes/")
         soup = BeautifulSoup(r.text, "html.parser")
 
         theme_candidates = []
-        for a in soup.select("a"):
+        for a in soup.select("a[href*='/themes/']"):
             text = clean_text(a.get_text(" ", strip=True))
-            href = a.get("href", "")
-            if len(text) >= 2 and len(text) <= 30 and "/themes/" in href:
+            if 2 <= len(text) <= 30:
                 theme_candidates.append(text)
 
-        # ざっくり重複排除
         result["themes"] = list(dict.fromkeys(theme_candidates))[:20]
 
     except Exception as e:
