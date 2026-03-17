@@ -8,84 +8,68 @@
     :root {
       --bg: #0b1020;
       --panel: #121933;
-      --panel-2: #182145;
-      --text: #e8ecf7;
+      --panel2: #182145;
+      --text: #eef2ff;
       --muted: #9aa6c7;
-      --line: #2b3767;
+      --line: #2c396b;
       --accent: #6ea8fe;
-      --good: #2ecc71;
+      --accent2: #8b5cf6;
+      --good: #30d158;
       --bad: #ff6b6b;
       --warn: #f7b731;
       --chip: #23305e;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-      --radius: 16px;
+      --radius: 18px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
-      background: linear-gradient(180deg, #08101f 0%, #0d1530 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: linear-gradient(180deg, #07101d 0%, #0d1630 100%);
       color: var(--text);
     }
 
     .wrap {
-      max-width: 1180px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 16px;
     }
 
-    .topbar {
+    .header {
       display: flex;
-      gap: 12px;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      gap: 12px;
       flex-wrap: wrap;
       margin-bottom: 16px;
     }
 
     .brand {
       display: flex;
-      gap: 12px;
       align-items: center;
+      gap: 12px;
     }
 
     .logo {
       width: 44px;
       height: 44px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #6ea8fe, #8b5cf6);
       display: grid;
       place-items: center;
       font-weight: 800;
-      box-shadow: var(--shadow);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
     }
 
-    .brand-title {
-      font-size: 22px;
+    .title {
+      font-size: 24px;
       font-weight: 800;
-      letter-spacing: 0.02em;
     }
 
-    .brand-sub {
-      color: var(--muted);
+    .subtitle {
       font-size: 13px;
+      color: var(--muted);
       margin-top: 2px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    button,
-    input {
-      font: inherit;
     }
 
     .btn {
@@ -95,17 +79,16 @@
       border-radius: 12px;
       padding: 10px 14px;
       cursor: pointer;
-      transition: 0.2s ease;
+      font: inherit;
     }
 
     .btn:hover {
-      transform: translateY(-1px);
-      background: var(--panel-2);
+      background: var(--panel2);
     }
 
     .btn.primary {
-      background: linear-gradient(135deg, #4677ff, #6a5cff);
       border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
     }
 
     .statusbar {
@@ -116,16 +99,15 @@
     }
 
     .stat {
-      background: rgba(18, 25, 51, 0.92);
+      background: rgba(18,25,51,.95);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      padding: 14px 16px;
-      box-shadow: var(--shadow);
+      padding: 14px;
     }
 
     .stat .label {
-      font-size: 12px;
       color: var(--muted);
+      font-size: 12px;
       margin-bottom: 8px;
     }
 
@@ -149,40 +131,32 @@
       border-radius: 999px;
       padding: 10px 14px;
       cursor: pointer;
-      transition: 0.2s ease;
+      font: inherit;
     }
 
     .tab.active {
-      background: linear-gradient(135deg, #1d4ed8, #6d28d9);
       border-color: transparent;
+      background: linear-gradient(135deg, #2457f5, #6f3ff5);
     }
 
     .panel {
       display: none;
-      background: rgba(18, 25, 51, 0.92);
+      background: rgba(18,25,51,.95);
       border: 1px solid var(--line);
       border-radius: 22px;
       padding: 18px;
-      box-shadow: var(--shadow);
       margin-bottom: 16px;
     }
 
-    .panel.active {
-      display: block;
-    }
+    .panel.active { display: block; }
 
     .grid {
       display: grid;
       gap: 14px;
     }
 
-    .grid.two {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .grid.three {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
     .card {
       background: var(--panel);
@@ -197,42 +171,13 @@
       font-size: 16px;
     }
 
-    .muted {
-      color: var(--muted);
-    }
-
-    .big {
-      font-size: 24px;
-      font-weight: 800;
-    }
-
-    .good { color: var(--good); }
-    .bad { color: var(--bad); }
-    .warn { color: var(--warn); }
-
-    .chips {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .chip {
-      background: var(--chip);
-      border: 1px solid var(--line);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 7px 10px;
-      font-size: 12px;
-      line-height: 1.2;
-    }
-
     .list {
       display: grid;
       gap: 10px;
     }
 
     .item {
-      background: rgba(255,255,255,0.02);
+      background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 14px;
       padding: 12px;
@@ -244,38 +189,24 @@
     }
 
     .item-sub {
-      font-size: 13px;
       color: var(--muted);
-      line-height: 1.6;
+      line-height: 1.7;
+      font-size: 14px;
+      word-break: break-word;
     }
 
-    .theme-rank {
-      display: inline-grid;
-      place-items: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      font-size: 13px;
-      font-weight: 800;
-      margin-right: 8px;
-    }
-
-    .theme-head {
+    .chips {
       display: flex;
-      align-items: center;
-      margin-bottom: 6px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .score {
-      display: inline-block;
-      margin-left: 8px;
-      font-size: 12px;
-      padding: 5px 8px;
+    .chip {
+      background: var(--chip);
+      border: 1px solid var(--line);
       border-radius: 999px;
-      background: #1f2b59;
-      border: 1px solid #33427e;
-      color: #cfd9ff;
+      padding: 7px 10px;
+      font-size: 12px;
     }
 
     .kv {
@@ -290,9 +221,40 @@
       color: var(--muted);
     }
 
-    .section-title {
-      margin: 0 0 14px;
-      font-size: 18px;
+    .theme-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .rank {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #3650a8;
+      background: #21316b;
+      color: #dfe7ff;
+      font-size: 12px;
+    }
+
+    .empty {
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+      color: var(--muted);
     }
 
     .table-wrap {
@@ -303,9 +265,8 @@
 
     table {
       width: 100%;
+      min-width: 640px;
       border-collapse: collapse;
-      min-width: 600px;
-      background: var(--panel);
     }
 
     th, td {
@@ -318,20 +279,23 @@
 
     th {
       color: var(--muted);
-      background: rgba(255,255,255,0.02);
-      position: sticky;
-      top: 0;
+      background: rgba(255,255,255,0.03);
     }
 
-    .settings {
-      display: grid;
-      gap: 12px;
-      max-width: 560px;
+    .notice {
+      background: rgba(110,168,254,.10);
+      border: 1px solid rgba(110,168,254,.30);
+      color: #dce7ff;
+      border-radius: 14px;
+      padding: 14px;
+      line-height: 1.7;
+      font-size: 14px;
     }
 
     .field {
       display: grid;
       gap: 6px;
+      margin-bottom: 12px;
     }
 
     .field label {
@@ -346,35 +310,12 @@
       border: 1px solid var(--line);
       background: var(--panel);
       color: var(--text);
+      font: inherit;
     }
 
-    .notice {
-      padding: 12px 14px;
-      border-radius: 12px;
-      background: rgba(110, 168, 254, 0.1);
-      border: 1px solid rgba(110, 168, 254, 0.3);
-      color: #dbe8ff;
-      line-height: 1.7;
-      font-size: 14px;
-    }
-
-    .footer-note {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 8px;
-      line-height: 1.6;
-    }
-
-    .center {
-      text-align: center;
-    }
-
-    .empty {
-      padding: 18px;
-      border: 1px dashed var(--line);
-      border-radius: 14px;
-      color: var(--muted);
-      text-align: center;
+    .big {
+      font-size: 24px;
+      font-weight: 800;
     }
 
     @media (max-width: 900px) {
@@ -392,17 +333,15 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="topbar">
+    <div class="header">
       <div class="brand">
         <div class="logo">株</div>
         <div>
-          <div class="brand-title">株式AI分析</div>
-          <div class="brand-sub">6:00予測 / 9:05確認 / 15:35総括</div>
+          <div class="title">株式AI分析</div>
+          <div class="subtitle">6:00予測 / 9:05確認 / 15:35総括</div>
         </div>
       </div>
-      <div class="actions">
-        <button class="btn" id="refreshBtn">↻ 再読込</button>
-      </div>
+      <button class="btn" id="refreshBtn">↻ 再読込</button>
     </div>
 
     <div class="statusbar">
@@ -440,6 +379,9 @@
   </div>
 
   <script>
+    const STORAGE_USER = "stock-ai-user";
+    const STORAGE_REPO = "stock-ai-repo";
+
     const els = {
       repoStatus: document.getElementById("repoStatus"),
       status600: document.getElementById("status600"),
@@ -453,9 +395,6 @@
       refreshBtn: document.getElementById("refreshBtn"),
     };
 
-    const STORAGE_USER = "stock-ai-user";
-    const STORAGE_REPO = "stock-ai-repo";
-
     function esc(v) {
       return String(v ?? "")
         .replaceAll("&", "&amp;")
@@ -466,19 +405,34 @@
     }
 
     function nl2br(v) {
-      return esc(v).replace(/\n/g, "<br>");
+      return esc(v ?? "").replace(/\n/g, "<br>");
     }
 
     function arr(v) {
       return Array.isArray(v) ? v : [];
     }
 
-    function pick(obj, path, fallback = "") {
-      try {
-        return path.split(".").reduce((a, b) => a?.[b], obj) ?? fallback;
-      } catch {
-        return fallback;
+    function formatValue(x) {
+      if (x == null) return "-";
+      if (typeof x === "string" || typeof x === "number" || typeof x === "boolean") {
+        return esc(String(x));
       }
+      if (Array.isArray(x)) {
+        return x.map(formatValue).join("<br>");
+      }
+      if (typeof x === "object") {
+        const preferredOrder = ["name", "value", "change", "percent", "time", "code", "price", "volume"];
+        const keys = Object.keys(x);
+        const sorted = [
+          ...preferredOrder.filter(k => keys.includes(k)),
+          ...keys.filter(k => !preferredOrder.includes(k))
+        ];
+        return sorted
+          .filter(k => x[k] !== null && x[k] !== undefined && x[k] !== "")
+          .map(k => `<strong>${esc(k)}</strong>: ${esc(String(x[k]))}`)
+          .join("<br>");
+      }
+      return esc(String(x));
     }
 
     function chipList(items) {
@@ -494,7 +448,7 @@
         <div class="list">
           ${list.map(x => `
             <div class="item">
-              <div class="item-sub">${esc(typeof x === "string" ? x : JSON.stringify(x))}</div>
+              <div class="item-sub">${formatValue(x)}</div>
             </div>
           `).join("")}
         </div>
@@ -510,13 +464,9 @@
           ${list.map(t => `
             <div class="item">
               <div class="theme-head">
-                <span class="theme-rank">${esc(t.rank ?? "-")}</span>
-                <div>
-                  <div class="item-title">
-                    ${esc(t.name || "テーマ名なし")}
-                    <span class="score">信頼度 ${esc(t.confidence_score ?? "-")}</span>
-                  </div>
-                </div>
+                <span class="rank">${esc(t.rank ?? "-")}</span>
+                <div class="item-title">${esc(t.name || "テーマ名なし")}</div>
+                <span class="badge">信頼度 ${esc(t.confidence_score ?? "-")}</span>
               </div>
               <div class="kv">
                 <div>根拠</div><div>${nl2br(t.rationale || "-")}</div>
@@ -524,9 +474,7 @@
                 <div>関連銘柄</div>
                 <div>
                   ${arr(t.key_stocks).length
-                    ? arr(t.key_stocks).map(s =>
-                      `${esc(s.name || "-")} (${esc(s.code || "-")})：${esc(s.reason || "-")}`
-                    ).join("<br>")
+                    ? arr(t.key_stocks).map(s => `${esc(s.name || "-")} (${esc(s.code || "-")})：${esc(s.reason || "-")}`).join("<br>")
                     : "-"}
                 </div>
                 <div>リスク</div><div>${nl2br(t.risk_factors || "-")}</div>
@@ -540,15 +488,12 @@
 
     function renderActualFlow(items) {
       const list = arr(items);
-      if (!list.length) return `<div class="empty">寄り後の資金フローはまだありません</div>`;
+      if (!list.length) return `<div class="empty">実際の資金フローなし</div>`;
       return `
         <div class="list">
           ${list.map(x => `
             <div class="item">
-              <div class="item-title">
-                ${esc(x.theme || "-")}
-                <span class="score">${esc(x.strength || "-")}</span>
-              </div>
+              <div class="item-title">${esc(x.theme || "-")} <span class="badge">${esc(x.strength || "-")}</span></div>
               <div class="item-sub">${nl2br(x.evidence || "-")}</div>
             </div>
           `).join("")}
@@ -566,7 +511,7 @@
               <tr>
                 <th>予測テーマ</th>
                 <th>予測スコア</th>
-                <th>実績</th>
+                <th>結果</th>
                 <th>ズレた理由</th>
                 <th>見落とし</th>
               </tr>
@@ -589,7 +534,7 @@
 
     function renderThemeResults(items) {
       const list = arr(items);
-      if (!list.length) return `<div class="empty">結果データなし</div>`;
+      if (!list.length) return `<div class="empty">テーマ結果なし</div>`;
       return `
         <div class="table-wrap">
           <table>
@@ -649,7 +594,7 @@
 
     function renderNewsImpact(items) {
       const list = arr(items);
-      if (!list.length) return `<div class="empty">ニュース影響データなし</div>`;
+      if (!list.length) return `<div class="empty">ニュース影響なし</div>`;
       return `
         <div class="list">
           ${list.map(x => `
@@ -672,8 +617,8 @@
               <tr>
                 <th>日付</th>
                 <th>精度</th>
-                <th>最も当たったテーマ</th>
-                <th>最も外れたテーマ</th>
+                <th>強かったテーマ</th>
+                <th>弱かったテーマ</th>
                 <th>改善ヒント</th>
               </tr>
             </thead>
@@ -702,11 +647,11 @@
 
     async function fetchJson(path) {
       const base = baseUrl();
-      if (!base) throw new Error("GitHub設定が未入力です");
+      if (!base) throw new Error("GitHub設定が未入力");
       const url = `${base}/data/${path}?t=${Date.now()}`;
       const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) {
-        throw new Error(`${path} の取得に失敗 (${res.status})`);
+        throw new Error(`${path} の取得失敗: ${res.status}`);
       }
       return await res.json();
     }
@@ -717,6 +662,14 @@
       els.repoStatus.textContent = user && repo ? `${user}/${repo}` : "未設定";
     }
 
+    function setStatus(el, data) {
+      if (!data) {
+        el.textContent = "未取得";
+        return;
+      }
+      el.textContent = `${data.date || "-"} ${data.generated_at || "-"}`;
+    }
+
     function render600(data) {
       if (!data) {
         els.tab600.innerHTML = `<div class="empty">6:00データがありません</div>`;
@@ -724,11 +677,10 @@
       }
 
       const market = data.market_data || {};
-
       els.tab600.innerHTML = `
         <div class="grid two">
           <div class="card">
-            <h3>6:00 予測サマリー</h3>
+            <h3>6:00予測サマリー</h3>
             <div class="kv">
               <div>日付</div><div>${esc(data.date || "-")}</div>
               <div>生成時刻</div><div>${esc(data.generated_at || "-")}</div>
@@ -756,7 +708,7 @@
             <div class="list">
               <div class="item">
                 <div class="item-title">為替</div>
-                <div class="item-sub">${arr(market.forex).map(esc).join("<br>") || "データなし"}</div>
+                <div class="item-sub">${arr(market.forex).length ? arr(market.forex).map(formatValue).join("<br><br>") : "データなし"}</div>
               </div>
               <div class="item">
                 <div class="item-title">主要ニュース</div>
@@ -875,64 +827,6 @@
       `;
     }
 
-    function renderSettings() {
-      const user = localStorage.getItem(STORAGE_USER) || "";
-      const repo = localStorage.getItem(STORAGE_REPO) || "";
-
-      els.tabSettings.innerHTML = `
-        <div class="settings">
-          <div class="notice">
-            GitHub Pages 上の <code>data/</code> を読み込みます。<br>
-            例: <code>https://ユーザー名.github.io/リポジトリ名/data/latest_600.json</code>
-          </div>
-
-          <div class="field">
-            <label for="ghUser">GitHub ユーザー名</label>
-            <input id="ghUser" value="${esc(user)}" placeholder="例: sszzkkzzkk" />
-          </div>
-
-          <div class="field">
-            <label for="ghRepo">リポジトリ名</label>
-            <input id="ghRepo" value="${esc(repo)}" placeholder="例: stock-analyzer" />
-          </div>
-
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn primary" id="saveSettingsBtn">保存して接続</button>
-            <button class="btn" id="clearSettingsBtn">設定クリア</button>
-          </div>
-
-          <div class="footer-note">
-            GitHub Pages は <code>gh-pages</code> ブランチ公開になっている必要があります。<br>
-            JSONが読めない場合は、Actions が成功しているか、Pages に <code>data/latest_600.json</code> などが存在するか確認してください。
-          </div>
-        </div>
-      `;
-
-      document.getElementById("saveSettingsBtn").addEventListener("click", async () => {
-        const u = document.getElementById("ghUser").value.trim();
-        const r = document.getElementById("ghRepo").value.trim();
-
-        localStorage.setItem(STORAGE_USER, u);
-        localStorage.setItem(STORAGE_REPO, r);
-        updateRepoStatus();
-        await loadAll();
-      });
-
-      document.getElementById("clearSettingsBtn").addEventListener("click", () => {
-        localStorage.removeItem(STORAGE_USER);
-        localStorage.removeItem(STORAGE_REPO);
-        updateRepoStatus();
-        els.status600.textContent = "-";
-        els.status905.textContent = "-";
-        els.status1535.textContent = "-";
-        render600(null);
-        render905(null);
-        render1535(null);
-        renderAccuracy(null);
-        renderSettings();
-      });
-    }
-
     function renderAccuracy(logs) {
       els.tabAcc.innerHTML = `
         <div class="card">
@@ -942,14 +836,48 @@
       `;
     }
 
-    function setStatus(el, data, fallback = "未取得") {
-      if (!data) {
-        el.textContent = fallback;
-        return;
-      }
-      const date = data.date || "-";
-      const time = data.generated_at || "-";
-      el.textContent = `${date} ${time}`;
+    function renderSettings() {
+      const user = localStorage.getItem(STORAGE_USER) || "";
+      const repo = localStorage.getItem(STORAGE_REPO) || "";
+
+      els.tabSettings.innerHTML = `
+        <div class="notice">
+          GitHub Pages 上の <code>data/latest_600.json</code> などを読み込みます。
+        </div>
+        <div style="height:12px;"></div>
+        <div class="field">
+          <label for="ghUser">GitHub ユーザー名</label>
+          <input id="ghUser" value="${esc(user)}" placeholder="例: sszzkkzzkk">
+        </div>
+        <div class="field">
+          <label for="ghRepo">リポジトリ名</label>
+          <input id="ghRepo" value="${esc(repo)}" placeholder="例: stock-analyzer">
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn primary" id="saveSettingsBtn">保存して接続</button>
+          <button class="btn" id="clearSettingsBtn">設定クリア</button>
+        </div>
+      `;
+
+      document.getElementById("saveSettingsBtn").addEventListener("click", async () => {
+        const userVal = document.getElementById("ghUser").value.trim();
+        const repoVal = document.getElementById("ghRepo").value.trim();
+        localStorage.setItem(STORAGE_USER, userVal);
+        localStorage.setItem(STORAGE_REPO, repoVal);
+        updateRepoStatus();
+        await loadAll();
+      });
+
+      document.getElementById("clearSettingsBtn").addEventListener("click", () => {
+        localStorage.removeItem(STORAGE_USER);
+        localStorage.removeItem(STORAGE_REPO);
+        updateRepoStatus();
+        render600(null);
+        render905(null);
+        render1535(null);
+        renderAccuracy(null);
+        renderSettings();
+      });
     }
 
     async function safeLoad(path) {
@@ -963,8 +891,7 @@
     async function loadAll() {
       updateRepoStatus();
 
-      const hasConfig = baseUrl();
-      if (!hasConfig) {
+      if (!baseUrl()) {
         render600(null);
         render905(null);
         render1535(null);
@@ -1004,6 +931,14 @@
         document.getElementById(btn.dataset.tab).classList.add("active");
       });
     });
+
+    function setStatus(el, data) {
+      if (!data) {
+        el.textContent = "未取得";
+        return;
+      }
+      el.textContent = `${data.date || "-"} ${data.generated_at || "-"}`;
+    }
 
     els.refreshBtn.addEventListener("click", loadAll);
 
