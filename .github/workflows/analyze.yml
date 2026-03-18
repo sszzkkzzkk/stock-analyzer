@@ -9,15 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       session:
-        description: "600 or 905 or 1200 or 1535"
-        required: true
+        description: "600 / 905 / 1200 / 1535 を入力"
+        required: false
         default: "600"
-        type: choice
-        options:
-          - "600"
-          - "905"
-          - "1200"
-          - "1535"
 
 permissions:
   contents: write
@@ -79,10 +73,20 @@ jobs:
         id: session
         shell: bash
         run: |
-          if [ -n "${{ github.event.inputs.session }}" ]; then
-            echo "session=${{ github.event.inputs.session }}" >> "$GITHUB_OUTPUT"
-            echo "run_now=true" >> "$GITHUB_OUTPUT"
-            exit 0
+          INPUT_SESSION="${{ github.event.inputs.session }}"
+
+          if [ -n "$INPUT_SESSION" ]; then
+            case "$INPUT_SESSION" in
+              600|905|1200|1535)
+                echo "session=$INPUT_SESSION" >> "$GITHUB_OUTPUT"
+                echo "run_now=true" >> "$GITHUB_OUTPUT"
+                exit 0
+                ;;
+              *)
+                echo "Invalid manual session: $INPUT_SESSION"
+                exit 1
+                ;;
+            esac
           fi
 
           NOW_JST=$(TZ='Asia/Tokyo' date '+%H:%M')
