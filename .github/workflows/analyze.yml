@@ -2,10 +2,10 @@ name: 株式AI自動分析
 
 on:
   schedule:
-    - cron: "0,2,4 21 * * 0-4"   # JST 06:00 / 06:02 / 06:04
-    - cron: "5,7,9 0 * * 1-5"    # JST 09:05 / 09:07 / 09:09
-    - cron: "0,2,4 3 * * 1-5"    # JST 12:00 / 12:02 / 12:04
-    - cron: "35,37,39 6 * * 1-5" # JST 15:35 / 15:37 / 15:39
+    - cron: "0 21 * * 0-4"
+    - cron: "5 0 * * 1-5"
+    - cron: "0 3 * * 1-5"
+    - cron: "35 6 * * 1-5"
   workflow_dispatch:
     inputs:
       session:
@@ -41,7 +41,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Checkout gh-pages to publish dir
+      - name: Checkout gh-pages
         uses: actions/checkout@v4
         with:
           ref: gh-pages
@@ -74,74 +74,60 @@ jobs:
         id: session
         shell: bash
         run: |
-          INPUT_SESSION="${{ github.event.inputs.session }}"
+          INPUT="${{ github.event.inputs.session }}"
+          NOW=$(TZ='Asia/Tokyo' date '+%H:%M')
+          TODAY=$(TZ='Asia/Tokyo' date '+%F')
 
-          if [ -n "$INPUT_SESSION" ]; then
-            case "$INPUT_SESSION" in
-              600|905|1200|1535)
-                echo "session=$INPUT_SESSION" >> "$GITHUB_OUTPUT"
-                echo "run_now=true" >> "$GITHUB_OUTPUT"
-                exit 0
-                ;;
-              *)
-                echo "Invalid manual session: $INPUT_SESSION"
-                exit 1
-                ;;
-            esac
+          echo "now_jst=$NOW" >> "$GITHUB_OUTPUT"
+          echo "today_jst=$TODAY" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$INPUT" ]; then
+            echo "session=$INPUT" >> "$GITHUB_OUTPUT"
+            echo "run_now=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
-          NOW_JST=$(TZ='Asia/Tokyo' date '+%H:%M')
-          TODAY_JST=$(TZ='Asia/Tokyo' date '+%F')
-
-          get_json_date () {
+          get_date() {
             FILE="$1"
-            if [ -f "$FILE" ]; then
-              python - <<PY
-import json
+            [ -f "$FILE" ] && python3 -c "
+import json,sys
 try:
-    with open("$FILE", encoding="utf-8") as f:
-        data = json.load(f)
-    print(data.get("date", ""))
-except Exception:
-    print("")
-PY
-            else
-              echo ""
-            fi
+    d=json.load(open('$FILE',encoding='utf-8'))
+    print(d.get('date',''))
+except:
+    print('')
+" || echo ""
           }
 
-          D600=$(get_json_date "data/latest_600.json")
-          D905=$(get_json_date "data/latest_905.json")
-          D1200=$(get_json_date "data/latest_1200.json")
-          D1535=$(get_json_date "data/latest_1535.json")
+          D600=$(get_date "data/latest_600.json")
+          D905=$(get_date "data/latest_905.json")
+          D1200=$(get_date "data/latest_1200.json")
+          D1535=$(get_date "data/latest_1535.json")
 
           SESSION=""
           RUN_NOW="false"
 
-          if [[ "$NOW_JST" > "05:59" && "$NOW_JST" < "06:10" && "$D600" != "$TODAY_JST" ]]; then
-            SESSION="600"
-            RUN_NOW="true"
-          elif [[ "$NOW_JST" > "09:04" && "$NOW_JST" < "09:15" && "$D905" != "$TODAY_JST" ]]; then
-            SESSION="905"
-            RUN_NOW="true"
-          elif [[ "$NOW_JST" > "11:59" && "$NOW_JST" < "12:10" && "$D1200" != "$TODAY_JST" ]]; then
-            SESSION="1200"
-            RUN_NOW="true"
-          elif [[ "$NOW_JST" > "15:34" && "$NOW_JST" < "15:45" && "$D1535" != "$TODAY_JST" ]]; then
-            SESSION="1535"
-            RUN_NOW="true"
+          H=$(TZ='Asia/Tokyo' date '+%H')
+          M=$(TZ='Asia/Tokyo' date '+%M')
+          HM="${H}${M}"
+
+          if [ "$H" = "06" ] && [ "$D600" != "$TODAY" ]; then
+            SESSION="600"; RUN_NOW="true"
+          elif [ "$H" = "09" ] && [ "$M" -ge "05" ] && [ "$D905" != "$TODAY" ]; then
+            SESSION="905"; RUN_NOW="true"
+          elif [ "$H" = "12" ] && [ "$D1200" != "$TODAY" ]; then
+            SESSION="1200"; RUN_NOW="true"
+          elif [ "$H" = "15" ] && [ "$M" -ge "35" ] && [ "$D1535" != "$TODAY" ]; then
+            SESSION="1535"; RUN_NOW="true"
           fi
 
-          echo "now_jst=$NOW_JST" >> "$GITHUB_OUTPUT"
-          echo "today_jst=$TODAY_JST" >> "$GITHUB_OUTPUT"
           echo "session=$SESSION" >> "$GITHUB_OUTPUT"
           echo "run_now=$RUN_NOW" >> "$GITHUB_OUTPUT"
 
       - name: Stop when no session is due
         if: steps.session.outputs.run_now != 'true'
         run: |
-          echo "No session due now."
-          echo "JST now: ${{ steps.session.outputs.now_jst }}"
+          echo "No session due. JST=${{ steps.session.outputs.now_jst }}"
           exit 0
 
       - name: Run analyzer
@@ -149,27 +135,6 @@ PY
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SESSION: ${{ steps.session.outputs.session }}
         run: python main.py
-
-      - name: Inspect generated files
-        shell: bash
-        run: |
-          echo "=== data files ==="
-          ls -la data || true
-
-          echo "=== latest_600.json ==="
-          test -f data/latest_600.json && head -40 data/latest_600.json || true
-
-          echo "=== latest_905.json ==="
-          test -f data/latest_905.json && head -40 data/latest_905.json || true
-
-          echo "=== latest_1200.json ==="
-          test -f data/latest_1200.json && head -40 data/latest_1200.json || true
-
-          echo "=== latest_1535.json ==="
-          test -f data/latest_1535.json && head -40 data/latest_1535.json || true
-
-          echo "=== review_log.json ==="
-          test -f data/review_log.json && head -40 data/review_log.json || true
 
       - name: Copy publish files
         shell: bash
@@ -186,5 +151,5 @@ PY
           cd publish
           git add index.html data .nojekyll
           git diff --cached --quiet && echo "No changes" && exit 0
-          git commit -m "update site data: ${{ steps.session.outputs.session }}"
+          git commit -m "update: ${{ steps.session.outputs.session }} ${{ steps.session.outputs.today_jst }}"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:gh-pages
