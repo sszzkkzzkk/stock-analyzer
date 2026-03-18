@@ -3,9 +3,17 @@ name: 株式AI自動分析
 on:
   schedule:
     - cron: "0 21 * * 0-4"
+    - cron: "2 21 * * 0-4"
+    - cron: "4 21 * * 0-4"
     - cron: "5 0 * * 1-5"
+    - cron: "7 0 * * 1-5"
+    - cron: "9 0 * * 1-5"
     - cron: "0 3 * * 1-5"
+    - cron: "2 3 * * 1-5"
+    - cron: "4 3 * * 1-5"
     - cron: "35 6 * * 1-5"
+    - cron: "37 6 * * 1-5"
+    - cron: "39 6 * * 1-5"
   workflow_dispatch:
     inputs:
       session:
@@ -16,21 +24,28 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: stock-analyzer
+  cancel-in-progress: false
+
 jobs:
   run:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout main
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
 
-      - run: pip install -r requirements.txt
+      - name: Install deps
+        run: pip install -r requirements.txt
 
       - name: Git config
         run: |
@@ -45,6 +60,7 @@ jobs:
         continue-on-error: true
 
       - name: Prepare publish dir
+        shell: bash
         run: |
           if [ ! -d publish/.git ]; then
             rm -rf publish
@@ -53,9 +69,11 @@ jobs:
             git init
             git checkout -b gh-pages
             touch .nojekyll
+            cd ..
           fi
 
       - name: Restore previous data
+        shell: bash
         run: |
           mkdir -p data
           if [ -d publish/data ]; then
@@ -64,43 +82,65 @@ jobs:
 
       - name: Decide session
         id: session
+        shell: bash
         run: |
+          EVENT="${{ github.event_name }}"
           INPUT="${{ github.event.inputs.session }}"
-          NOW=$(TZ='Asia/Tokyo' date '+%H:%M')
+          SCHED="${{ github.event.schedule }}"
           TODAY=$(TZ='Asia/Tokyo' date '+%F')
-          H=$(TZ='Asia/Tokyo' date '+%H')
-          M=$(TZ='Asia/Tokyo' date '+%M')
-          echo "now_jst=$NOW" >> "$GITHUB_OUTPUT"
+
           echo "today_jst=$TODAY" >> "$GITHUB_OUTPUT"
-          if [ -n "$INPUT" ]; then
-            echo "session=$INPUT" >> "$GITHUB_OUTPUT"
-            echo "run_now=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
+
           get_date() {
             [ -f "$1" ] && python3 -c "import json; d=json.load(open('$1',encoding='utf-8')); print(d.get('date',''))" 2>/dev/null || echo ""
           }
-          D600=$(get_date "data/latest_600.json")
-          D905=$(get_date "data/latest_905.json")
-          D1200=$(get_date "data/latest_1200.json")
-          D1535=$(get_date "data/latest_1535.json")
+
           SESSION=""
           RUN_NOW="false"
-          if [ "$H" = "06" ] && [ "$D600" != "$TODAY" ]; then
-            SESSION="600"; RUN_NOW="true"
-          elif [ "$H" = "09" ] && [ "$M" -ge "05" ] && [ "$D905" != "$TODAY" ]; then
-            SESSION="905"; RUN_NOW="true"
-          elif [ "$H" = "12" ] && [ "$D1200" != "$TODAY" ]; then
-            SESSION="1200"; RUN_NOW="true"
-          elif [ "$H" = "15" ] && [ "$M" -ge "35" ] && [ "$D1535" != "$TODAY" ]; then
-            SESSION="1535"; RUN_NOW="true"
+
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            case "$INPUT" in
+              600|905|1200|1535)
+                SESSION="$INPUT"
+                RUN_NOW="true"
+                ;;
+              *)
+                echo "Invalid session: $INPUT"
+                exit 1
+                ;;
+            esac
+          else
+            case "$SCHED" in
+              "0 21 * * 0-4"|"2 21 * * 0-4"|"4 21 * * 0-4")
+                SESSION="600"
+                LAST=$(get_date "data/latest_600.json")
+                ;;
+              "5 0 * * 1-5"|"7 0 * * 1-5"|"9 0 * * 1-5")
+                SESSION="905"
+                LAST=$(get_date "data/latest_905.json")
+                ;;
+              "0 3 * * 1-5"|"2 3 * * 1-5"|"4 3 * * 1-5")
+                SESSION="1200"
+                LAST=$(get_date "data/latest_1200.json")
+                ;;
+              "35 6 * * 1-5"|"37 6 * * 1-5"|"39 6 * * 1-5")
+                SESSION="1535"
+                LAST=$(get_date "data/latest_1535.json")
+                ;;
+              *)
+                echo "Unknown schedule: $SCHED"
+                exit 1
+                ;;
+            esac
+            [ "$LAST" != "$TODAY" ] && RUN_NOW="true"
           fi
+
           echo "session=$SESSION" >> "$GITHUB_OUTPUT"
           echo "run_now=$RUN_NOW" >> "$GITHUB_OUTPUT"
 
       - name: Stop when no session is due
         if: steps.session.outputs.run_now != 'true'
-        run: echo "No session due. JST=${{ steps.session.outputs.now_jst }}" && exit 0
+        run: echo "No session due today." && exit 0
 
       - name: Run analyzer
         env:
@@ -109,6 +149,7 @@ jobs:
         run: python main.py
 
       - name: Copy publish files
+        shell: bash
         run: |
           rm -rf publish/*
           cp index.html publish/index.html
@@ -117,6 +158,7 @@ jobs:
           touch publish/.nojekyll
 
       - name: Push gh-pages
+        shell: bash
         run: |
           cd publish
           git add -A
