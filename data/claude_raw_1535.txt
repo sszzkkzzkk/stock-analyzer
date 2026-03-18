@@ -1,17 +1,17 @@
 ```json
 {
   "review": {
-    "actually_best_theme": "原油資源",
-    "danger_theme_in_morning": "半導体",
-    "best_leader_stock": "三菱商事",
-    "weak_secondary_stock": "東京エレクトロン",
-    "wrong_hypothesis": "半導体をB評価で残したが、日経先物-785円の逆行安環境では指数寄与株も機能せず。SOX高でも先物弱の局面では完全スキップが正解だった",
-    "next_ban_rule": "先物-500円超の逆行安時は、SOX高でも半導体全面見送り。指数寄与期待は禁止",
-    "next_focus": "原油+4%超の急騰時は商社・INPEXに絞り込み。地政学+資源高は連想2軍まで手を広げず主力のみ",
-    "theme_score": 85,
-    "execution_score": 70,
-    "skip_score": 60
+    "actually_best_theme": "決算好材料株",
+    "danger_theme_in_morning": "資源株・商社",
+    "best_leader_stock": "千代建",
+    "weak_secondary_stock": "INPEX",
+    "wrong_hypothesis": "原油反落で資源株見送りは正解だったが、決算サプライズ株の選別が不十分。千代建等の上方修正組を朝段階で網羅できず機会損失。東電HD等エネルギー個別材料も後追い",
+    "next_ban_rule": "原油-3%以上の反落時は資源株の寄り天完全回避。前日急騰テーマの追撃禁止を徹底",
+    "next_focus": "決算発表直後の上方修正・増配サプライズ銘柄を寄り前に特定。個別材料株優先で選別",
+    "theme_score": 65,
+    "execution_score": 55,
+    "skip_score": 75
   },
-  "summary": "原油資源テーマは的中。商社・INPEX優先は正解。半導体を様子見としたが先物大幅安局面では完全除外すべきだった。連想2軍の東エレは時間窓設定も機能不全。逆行安-500円超では指数寄与期待を捨て、テーマ直撃の主力株のみに集中すべき"
+  "summary": "原油反落で資源株見送りは機能、様子見判断も適切。しかし決算好材料株の事前選別が甘く、千代建・東電HD等の上位浮上組を取り逃した。選別相場では個別材料の精査強化が必須。スキップ判断は高評価だが攻めの準備不足"
 }
 ```
