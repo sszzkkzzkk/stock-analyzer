@@ -2,10 +2,10 @@ name: 株式AI自動分析
 
 on:
   schedule:
-    - cron: "2 21 * * 0-4"   # JST 06:02
-    - cron: "10 0 * * 1-5"   # JST 09:10
-    - cron: "2 3 * * 1-5"    # JST 12:02
-    - cron: "35 6 * * 1-5"   # JST 15:35
+    - cron: "0,2,4 21 * * 0-4"   # JST 06:00 / 06:02 / 06:04
+    - cron: "5,7,9 0 * * 1-5"    # JST 09:05 / 09:07 / 09:09
+    - cron: "0,2,4 3 * * 1-5"    # JST 12:00 / 12:02 / 12:04
+    - cron: "35,37,39 6 * * 1-5" # JST 15:35 / 15:37 / 15:39
   workflow_dispatch:
     inputs:
       session:
@@ -81,19 +81,63 @@ jobs:
         run: |
           if [ -n "${{ github.event.inputs.session }}" ]; then
             echo "session=${{ github.event.inputs.session }}" >> "$GITHUB_OUTPUT"
-          else
-            HM=$(TZ='Asia/Tokyo' date +%H%M)
-
-            if [ "$HM" -lt 700 ]; then
-              echo "session=600" >> "$GITHUB_OUTPUT"
-            elif [ "$HM" -lt 1130 ]; then
-              echo "session=905" >> "$GITHUB_OUTPUT"
-            elif [ "$HM" -lt 1300 ]; then
-              echo "session=1200" >> "$GITHUB_OUTPUT"
-            else
-              echo "session=1535" >> "$GITHUB_OUTPUT"
-            fi
+            echo "run_now=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+
+          NOW_JST=$(TZ='Asia/Tokyo' date '+%H:%M')
+          TODAY_JST=$(TZ='Asia/Tokyo' date '+%F')
+
+          get_json_date () {
+            FILE="$1"
+            if [ -f "$FILE" ]; then
+              python - <<PY
+import json
+try:
+    with open("$FILE", encoding="utf-8") as f:
+        data = json.load(f)
+    print(data.get("date", ""))
+except Exception:
+    print("")
+PY
+            else
+              echo ""
+            fi
+          }
+
+          D600=$(get_json_date "data/latest_600.json")
+          D905=$(get_json_date "data/latest_905.json")
+          D1200=$(get_json_date "data/latest_1200.json")
+          D1535=$(get_json_date "data/latest_1535.json")
+
+          SESSION=""
+          RUN_NOW="false"
+
+          if [[ "$NOW_JST" > "05:59" && "$NOW_JST" < "06:10" && "$D600" != "$TODAY_JST" ]]; then
+            SESSION="600"
+            RUN_NOW="true"
+          elif [[ "$NOW_JST" > "09:04" && "$NOW_JST" < "09:15" && "$D905" != "$TODAY_JST" ]]; then
+            SESSION="905"
+            RUN_NOW="true"
+          elif [[ "$NOW_JST" > "11:59" && "$NOW_JST" < "12:10" && "$D1200" != "$TODAY_JST" ]]; then
+            SESSION="1200"
+            RUN_NOW="true"
+          elif [[ "$NOW_JST" > "15:34" && "$NOW_JST" < "15:45" && "$D1535" != "$TODAY_JST" ]]; then
+            SESSION="1535"
+            RUN_NOW="true"
+          fi
+
+          echo "now_jst=$NOW_JST" >> "$GITHUB_OUTPUT"
+          echo "today_jst=$TODAY_JST" >> "$GITHUB_OUTPUT"
+          echo "session=$SESSION" >> "$GITHUB_OUTPUT"
+          echo "run_now=$RUN_NOW" >> "$GITHUB_OUTPUT"
+
+      - name: stop when no session is due
+        if: steps.session.outputs.run_now != 'true'
+        run: |
+          echo "No session due now."
+          echo "JST now: ${{ steps.session.outputs.now_jst }}"
+          exit 0
 
       - name: run analyzer
         env:
