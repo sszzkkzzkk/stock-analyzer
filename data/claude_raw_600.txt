@@ -6,8 +6,8 @@
     "entry_style": "skip",
     "entry_style_label": "見送り",
     "danger_level": "高",
-    "battlefield": "原油ETF一極集中",
-    "one_line": "日経先物-3%の急落でリスクオフ。個別株より原油ETFに資金集中"
+    "battlefield": "原油ETF集中",
+    "one_line": "日経-3.1%の急落相場、原油ETFに限定集中し個別株は全面安リスク"
   },
   "themes": [
     {
@@ -15,83 +15,73 @@
       "rank_label": "本命",
       "name": "原油ETF",
       "score": 88,
-      "reason": "前日教訓通り商品ETFが個別株を圧倒。WTI96ドル台で中東懸念継続",
+      "reason": "WTI96ドル台、2038原油Wブルが値上がり上位独占。前日教訓通り商品ETFが個別株凌駕",
       "continuity": "継続",
       "leader_strength": "強",
       "ripple": "狭",
-      "leader_stock": "原油先Ｗブル",
-      "entry_hint": "ETF専門。個別エネルギー株は分散で手薄"
+      "leader_stock": "原油先Wブル",
+      "entry_hint": "ETF限定、個別株の資源は連動せず前日実績確認済"
     },
     {
       "rank": "B",
       "rank_label": "対抗",
-      "name": "ディフェンシブ",
-      "score": 62,
-      "reason": "日経-3%の急落局面で防衛的資金が内需系へ逃避する可能性",
-      "continuity": "新規",
+      "name": "エネルギーETF",
+      "score": 72,
+      "reason": "1685WTエナジー、1689天然ガスも上位。中東不透明感継続で商品ETF全般に資金",
+      "continuity": "継続",
       "leader_strength": "中",
-      "ripple": "中",
-      "leader_stock": "不明確",
-      "entry_hint": "リスクオフ局面でも出来高確認必須"
+      "ripple": "狭",
+      "leader_stock": "WTエナジー",
+      "entry_hint": "原油ブルの次位として9:30までの動向確認"
     }
   ],
   "watchlist": [
     {
       "bucket": "先導株",
-      "name": "原油先Ｗブル",
+      "name": "原油先Wブル",
       "code": "2038",
       "theme": "原油ETF",
-      "reason": "前日上位。WTI96ドル台で続伸確認",
-      "trigger": "寄り後も高値維持",
-      "invalidation": "前日高値割れ",
+      "reason": "値上がり上位筆頭、原油96ドル台で継続買い",
+      "trigger": "寄り後も上昇維持なら本物確認",
+      "invalidation": "9:30までに失速",
       "time_window": "9:00-9:30"
     },
     {
-      "bucket": "連想1軍",
-      "name": "ＷＴエナジー",
-      "code": "1685",
-      "theme": "原油ETF",
-      "reason": "前日上位のエネルギーETF。連動性確認",
-      "trigger": "原油先Ｗブルに追随",
-      "invalidation": "出来高低迷",
-      "time_window": "9:00-10:00"
-    },
-    {
       "bucket": "危険株",
-      "name": "半導体関連",
-      "code": "－",
-      "theme": "半導体",
-      "reason": "SOX-0.5%、日経先物-3%で逆風強い",
+      "name": "日経レバ",
+      "code": "1570",
+      "theme": "指数連動",
+      "reason": "日経先物-3.1%、レバレッジで-6%超の大幅安",
       "trigger": "触らない",
-      "invalidation": "－",
+      "invalidation": "常時回避",
       "time_window": "終日"
     },
     {
       "bucket": "危険株",
-      "name": "グロース全般",
-      "code": "－",
-      "theme": "－",
-      "reason": "PTS下落230銘柄と売り優勢。リスクオフ鮮明",
+      "name": "半導体関連",
+      "code": "8035",
+      "theme": "半導体",
+      "reason": "円高とNY急落で輸出株全滅、前日も分散で集中せず",
       "trigger": "触らない",
-      "invalidation": "－",
+      "invalidation": "常時回避",
       "time_window": "終日"
     }
   ],
   "avoid_themes": [
     {
       "name": "半導体",
-      "reason": "SOX微減だが日経先物-3%で全体売り圧力が強すぎる"
+      "reason": "SOX-0.53%、円高、日経急落で輸出株壊滅"
     },
     {
-      "name": "個別材料株",
-      "reason": "PTS下落優勢でテーマ分散。一極集中せず資金効率悪い"
+      "name": "防衛",
+      "reason": "前日も分散で集中せず、NY急落で物色余力なし"
     },
     {
       "name": "蓄電池",
-      "reason": "ニュースランク2位も日経急落で新規買い入らず"
+      "reason": "ニュースあるも日経-3.1%の地合いで買い手不在"
     }
   ],
-  "skip_rule": "日経-3%の急落日に個別株で勝負しない。ETF以外は全て見送り",
-  "summary": "NYダウ-1.6%、日経先物-2.9%の急落でリスクオフ全開。前日教訓通り原油ETF（2038等）のみに資金集中。個別株は全面安で手出し無用。WTI96ドル台維持でもETF限定戦略。"
+  "skip_rule": "個別株の資源エネルギー銘柄に手を出さない。ETF以外全面安リスク",
+  "summary": "日経先物-3.1%の急落相場。資金集中は原油ETF(2038)等の商品ETFのみ。前日教訓通り個別株の資源銘柄は連動せず。NY-1.63%、円高進行で個別株は全面安リスク高く見送り優先。ETFも値幅限定的で無理追い禁物"
 }
 ```
