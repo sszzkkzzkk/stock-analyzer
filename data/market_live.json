@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19 20:03:07",
+  "generated_at": "2026-03-19 20:08:34",
   "items": [
     {
       "name": "日経平均",
@@ -14,21 +14,21 @@
     },
     {
       "name": "日経先物",
-      "value": "52,385.00",
-      "value_raw": 52385.0,
-      "change": "-1,060.00",
-      "change_raw": -1060.0,
-      "percent": "-1.98%",
-      "percent_raw": -1.98,
+      "value": "52,440.00",
+      "value_raw": 52440.0,
+      "change": "-1,005.00",
+      "change_raw": -1005.0,
+      "percent": "-1.88%",
+      "percent_raw": -1.88,
       "time": "N/A",
       "source": "yfinance:NIY=F"
     },
     {
       "name": "ドル円",
-      "value": "159.10",
-      "value_raw": 159.10400390625,
-      "change": "-0.69",
-      "change_raw": -0.69,
+      "value": "159.12",
+      "value_raw": 159.1199951171875,
+      "change": "-0.68",
+      "change_raw": -0.68,
       "percent": "-0.43%",
       "percent_raw": -0.43,
       "time": "N/A",
@@ -58,12 +58,12 @@
     },
     {
       "name": "WTI原油",
-      "value": "96.24",
-      "value_raw": 96.23999786376953,
-      "change": "-0.13",
-      "change_raw": -0.13,
-      "percent": "-0.13%",
-      "percent_raw": -0.13,
+      "value": "96.31",
+      "value_raw": 96.30999755859375,
+      "change": "-0.06",
+      "change_raw": -0.06,
+      "percent": "-0.06%",
+      "percent_raw": -0.06,
       "time": "N/A",
       "source": "yfinance:CL=F"
     }
