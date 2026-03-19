@@ -417,13 +417,16 @@ function renderMetrics(){
   grid.innerHTML=items.map(item=>{
     const klass=quoteClass(item.change);
     const active=item.name===selectedMarket?"active":"";
-    // 時刻があれば表示、なければライブ状態で色ドット
-    const timeStr = item.time && item.time!=="N/A" ? item.time : "";
+    // 時刻表示: あれば時刻、なければドットだけ
+    const rawTime = item.time && item.time!=="N/A" && item.time!=="—" ? item.time : "";
     const dotCls = hasLive ? "live" : "old";
+    const timeDisplay = rawTime
+      ? `<span class="metric-freshness"><span class="metric-dot ${dotCls}"></span><span style="color:rgba(154,166,199,.6);font-size:9px">${rawTime}</span></span>`
+      : `<span class="metric-freshness"><span class="metric-dot ${dotCls}"></span></span>`;
     return`<button class="metric ${active}" data-m="${esc(item.name)}">
       <div class="metric-top">
         <span class="metric-name">${esc(item.name)}</span>
-        <span class="metric-freshness"><span class="metric-dot ${dotCls}"></span><span style="color:rgba(154,166,199,.5);font-size:9px">${timeStr}</span></span>
+        ${timeDisplay}
       </div>
       <div class="metric-value ${klass}">${esc(item.value||"—")}</div>
       <div class="metric-change ${klass}">${esc(item.change||"—")} ${esc(item.percent||"")}</div>
@@ -439,9 +442,12 @@ function renderMetrics(){
       <div class="focus-label">選択中の主要指標</div>
       <div class="focus-main ${klass}">${esc(sel.name)} ${esc(sel.value)}</div>
       <div class="focus-change ${klass}">${esc(sel.change)} ${esc(sel.percent)}</div>
+      ${sel.time && sel.time!=="N/A" && sel.time!=="—"
+        ? `<div style="font-size:10px;color:rgba(154,166,199,.5);margin-top:2px">最終更新 ${esc(sel.time)}</div>`
+        : ""}
     </div>
     <div class="focus-right">
-      <span class="pill ${hasLive?'live':''}">${hasLive?"指標ライブON":"朝データ"}</span>
+      <span class="pill ${hasLive?'live':''}">${hasLive?"🟢 ライブON":"朝データ"}</span>
       <span class="session-badge ${sess.cls}">${sess.text}</span>
     </div>`;
 }

@@ -131,13 +131,32 @@ def yahoo_quote(symbol, label):
         pct = round((change / prev) * 100, 2) if prev != 0 else 0
         pct_sign = "+" if pct >= 0 else ""
         try:
-            last_time = getattr(fast, "regularMarketTime", None)
-            jst_time = (
-                datetime.fromtimestamp(int(last_time), JST).strftime("%H:%M")
-                if last_time else "N/A"
+            # fast_infoから時刻取得を試みる（複数の属性名を試す）
+            last_time = (
+                getattr(fast, "regularMarketTime", None) or
+                getattr(fast, "lastTradeTime", None)
             )
+            if last_time and isinstance(last_time, (int, float)) and last_time > 0:
+                jst_time = datetime.fromtimestamp(int(last_time), JST).strftime("%H:%M")
+            elif last_time and hasattr(last_time, "timestamp"):
+                # datetimeオブジェクトの場合
+                jst_time = last_time.astimezone(JST).strftime("%H:%M")
+            else:
+                # historyから最新の時刻を取得（フォールバック）
+                try:
+                    hist = ticker.history(period="1d", interval="1m")
+                    if not hist.empty:
+                        last_idx = hist.index[-1]
+                        if hasattr(last_idx, "to_pydatetime"):
+                            jst_time = last_idx.to_pydatetime().astimezone(JST).strftime("%H:%M")
+                        else:
+                            jst_time = "—"
+                    else:
+                        jst_time = "—"
+                except Exception:
+                    jst_time = "—"
         except Exception:
-            jst_time = "N/A"
+            jst_time = "—"
         return {
             "name": label,
             "value": f"{price:,.2f}",
@@ -678,7 +697,10 @@ Rules:
 - battlefield: 12文字以内の断定ラベル（例: 原油集中, 半導体選別, 個別材料相場）
 - theme name: 10文字以内（短く断定的に）
 - themes max 5 total (1 A-rank, max 2 B-rank, max 2 C-rank)
-- watchlist max 10 (先導株3件→連想1軍2件→連想2軍2件→危険株3件以内)
+- watchlist件数はmarket_regimeに応じて調整すること:
+    attack(攻めやすい)   → 先導株3+連想1軍3+連想2軍2+危険株2 = 最大10件
+    selective(選別相場)  → 先導株2+連想1軍2+連想2軍1+危険株2 = 最大7件
+    avoid(見送り寄り)    → 先導株1+連想1軍1+危険株2 = 最大4件（危険株を目立たせる）
 - avoid_themes max 3
 - market_regime: attack/selective/avoid
 - market_regime_label: 攻めやすい/選別相場/見送り寄り
