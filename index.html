@@ -2,740 +2,794 @@
 
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>株式AI分析</title>
-  <style>
-    :root {
-      --panel: #111a34;
-      --panel2: #182145;
-      --panel3: #0f1730;
-      --text: #eef2ff;
-      --muted: #9aa6c7;
-      --line: #2d3968;
-      --accent: #6ea8fe;
-      --accent2: #8b5cf6;
-      --chip: #23305e;
-      --good: #31d158;
-      --bad: #ff6b6b;
-      --warn: #f7b731;
-      --danger-bg: rgba(255,107,107,0.18);
-      --danger-line: rgba(255,107,107,0.45);
-      --danger-text: #ffd6d6;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
-      background: linear-gradient(180deg, #07101d 0%, #0c1530 100%);
-      color: var(--text);
-    }
-    .wrap { max-width: 1180px; margin: 0 auto; padding: 12px; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>株式AI分析</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#060d1a;--s1:#0b1628;--s2:#0f1e36;--s3:#162540;
+  --border:#1a2d4a;--dim:#243d5e;--muted:#4d6f96;--body:#8fa8c8;--hi:#c8dff5;--white:#e8f3ff;
+  --green:#00d68f;--red:#f03e4e;--amber:#f5a623;--blue:#3b8beb;--cyan:#00c4d4;--purple:#9b6dff;
+  --mono:'JetBrains Mono',monospace;--sans:'Noto Sans JP',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg);color:var(--body);font-family:var(--sans);font-size:13px;-webkit-text-size-adjust:100%}
+body{min-height:100dvh;padding-bottom:env(safe-area-inset-bottom)}
 
-```
-/* ヘッダー */
-.header {
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 10px; flex-wrap: wrap; margin-bottom: 8px;
+/* ── ヘッダー ── */
+.hdr{
+position:sticky;top:0;z-index:200;
+background:rgba(6,13,26,.97);backdrop-filter:blur(20px);
+border-bottom:1px solid var(–border);
+padding:8px 14px;
+display:flex;align-items:center;justify-content:space-between;gap:8px;
 }
-.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.logo {
-  width: 40px; height: 40px; border-radius: 11px;
-  display: grid; place-items: center; font-weight: 800;
-  background: linear-gradient(135deg, var(--accent), var(--accent2)); flex: 0 0 auto;
+.hdr-brand{display:flex;align-items:center;gap:8px}
+.hdr-logo{
+width:32px;height:32px;border-radius:8px;
+background:linear-gradient(135deg,#2563eb,#7c3aed);
+display:grid;place-items:center;font-family:var(–mono);font-size:11px;font-weight:800;color:#fff;
+flex-shrink:0;
 }
-.title { font-size: 22px; font-weight: 800; line-height: 1.05; }
-.subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.22; }
-.header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.header-meta {
-  font-size: 11px; color: var(--muted); padding: 7px 10px;
-  border: 1px solid var(--line); border-radius: 999px;
-  background: rgba(255,255,255,0.03);
+.hdr-title{font-size:13px;font-weight:700;color:var(–white);letter-spacing:-.01em}
+.hdr-sub{font-size:10px;color:var(–muted);margin-top:1px}
+.hdr-r{display:flex;align-items:center;gap:6px}
+.hdr-time{font-family:var(–mono);font-size:10px;color:var(–muted)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(–green);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,214,143,.5)}60%{box-shadow:0 0 0 5px rgba(0,214,143,0)}}
+.rbtn{
+background:none;border:1px solid var(–border);color:var(–muted);
+width:28px;height:28px;border-radius:7px;display:grid;place-items:center;
+cursor:pointer;font-size:14px;transition:all .15s;
 }
-.btn {
-  border: 1px solid var(--line); background: var(--panel); color: var(--text);
-  border-radius: 12px; padding: 10px 14px; cursor: pointer; font: inherit; flex: 0 0 auto;
-}
-.btn:hover { background: var(--panel2); }
+.rbtn:active{background:var(–s2);color:var(–white)}
 
-/* リアルタイムティッカー */
-.rt-ticker {
-  background: rgba(17,26,52,0.95);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 8px 10px;
-  margin-bottom: 8px;
-  overflow: hidden;
+/* ── ティッカー ── */
+.ticker{
+position:sticky;top:49px;z-index:190;
+background:var(–s1);border-bottom:1px solid var(–border);
+overflow:hidden;
 }
-.rt-ticker-label {
-  font-size: 9px; color: var(--muted); letter-spacing: .1em;
-  text-transform: uppercase; margin-bottom: 6px;
-  display: flex; align-items: center; gap: 6px;
+.ticker-inner{
+display:flex;overflow-x:auto;scrollbar-width:none;
+-webkit-overflow-scrolling:touch;
 }
-.live-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--good); animation: blink 2s infinite; flex-shrink: 0;
+.ticker-inner::-webkit-scrollbar{display:none}
+.ti{
+display:flex;flex-direction:column;align-items:center;
+padding:5px 10px;min-width:68px;flex-shrink:0;
+border-right:1px solid var(–border);gap:1px;
+transition:background .15s;
 }
-@keyframes blink {
-  0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(49,209,88,.5)}
-  60%{opacity:.6;box-shadow:0 0 0 5px rgba(49,209,88,0)}
-}
-.rt-scroll {
-  display: flex; gap: 0; overflow-x: auto;
-  scrollbar-width: none; -webkit-overflow-scrolling: touch;
-}
-.rt-scroll::-webkit-scrollbar { display: none; }
-.rt-item {
-  display: flex; flex-direction: column; align-items: center;
-  padding: 4px 12px; min-width: 72px; flex-shrink: 0;
-  border-right: 1px solid var(--line); gap: 2px;
-}
-.rt-item:last-child { border-right: none; }
-.rt-name { font-size: 9px; color: var(--muted); white-space: nowrap; }
-.rt-val { font-size: 13px; font-weight: 800; color: var(--text); line-height: 1; }
-.rt-val.good { color: var(--good); }
-.rt-val.bad { color: var(--bad); }
-.rt-chg { font-size: 9px; font-weight: 700; }
-.good { color: var(--good); }
-.bad { color: var(--bad); }
-.warn { color: var(--warn); }
+.ti:active{background:var(–s2)}
+.ti-n{font-family:var(–mono);font-size:8px;color:var(–muted);white-space:nowrap}
+.ti-v{font-family:var(–mono);font-size:12px;font-weight:800;line-height:1}
+.ti-c{font-family:var(–mono);font-size:8px;font-weight:600}
+.up{color:var(–green)}.dn{color:var(–red)}.fl{color:var(–muted)}
 
-/* マーケットバー */
-.market-bar {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px; margin-bottom: 8px;
+/* ── タブ ── */
+.tabs{
+position:sticky;top:88px;z-index:180;
+background:rgba(6,13,26,.97);backdrop-filter:blur(20px);
+border-bottom:1px solid var(–border);
+display:flex;overflow-x:auto;scrollbar-width:none;
 }
-.market-chip {
-  display: grid; gap: 2px; padding: 7px 9px;
-  border-radius: 11px; border: 1px solid rgba(255,255,255,0.06);
-  background: rgba(255,255,255,0.03); min-width: 0; position: relative;
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+flex-shrink:0;padding:9px 14px;
+font-size:11px;color:var(–muted);
+border:none;background:none;cursor:pointer;font-family:var(–sans);
+border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;
 }
-.market-chip.live { border-color: rgba(49,209,88,0.25); }
-.live-badge {
-  position: absolute; top: 5px; right: 6px;
-  font-size: 8px; padding: 1px 4px; border-radius: 4px;
-  background: rgba(49,209,88,0.15); color: var(--good);
-  border: 1px solid rgba(49,209,88,0.3);
-}
-.market-chip-top {
-  display: flex; align-items: baseline; justify-content: space-between; gap: 6px;
-}
-.market-chip-name, .market-chip-time { font-size: 10px; color: var(--muted); white-space: nowrap; }
-.market-chip-value {
-  font-size: 15px; font-weight: 900; line-height: 1.1; color: var(--text);
-}
-.market-chip-value.good { color: var(--good); }
-.market-chip-value.bad { color: var(--bad); }
-.market-chip-change { font-size: 11px; font-weight: 700; line-height: 1.1; }
+.tab.on{color:var(–cyan);border-bottom-color:var(–cyan);font-weight:700}
 
-/* タブ */
-.tabs {
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px; margin-bottom: 10px;
+/* ── ページ ── */
+.pg{display:none;padding:10px 12px 32px;animation:fadeUp .2s ease}
+.pg.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── マーケットグリッド ── */
+.mkt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px}
+.mkt-card{
+background:var(–s1);border:1px solid var(–border);border-radius:10px;
+padding:9px 10px;position:relative;overflow:hidden;
 }
-.tab {
-  width: 100%; border: 1px solid var(--line); background: var(--panel);
-  color: var(--text); border-radius: 999px; padding: 10px 14px;
-  cursor: pointer; font: inherit; text-align: center; min-width: 0;
+.mkt-card::after{
+content:’’;position:absolute;bottom:0;left:0;right:0;height:2px;
 }
-.tab.active {
-  border-color: transparent;
-  background: linear-gradient(135deg, #2457f5, #6f3ff5);
+.mkt-card.up::after{background:var(–green)}
+.mkt-card.dn::after{background:var(–red)}
+.mkt-lbl{font-family:var(–mono);font-size:8px;color:var(–muted);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+.mkt-val{font-family:var(–mono);font-size:15px;font-weight:800;line-height:1;color:var(–white)}
+.mkt-val.up{color:var(–green)}.mkt-val.dn{color:var(–red)}
+.mkt-chg{font-family:var(–mono);font-size:9px;font-weight:600;margin-top:2px}
+.live-tag{font-size:7px;padding:1px 3px;border-radius:3px;background:rgba(0,214,143,.12);color:var(–green);border:1px solid rgba(0,214,143,.25)}
+
+/* ── サマリーカード ── */
+.summary{
+background:var(–s1);border:1px solid var(–border);border-radius:12px;
+padding:12px;margin-bottom:8px;position:relative;overflow:hidden;
+}
+.summary::before{
+content:’’;position:absolute;top:0;left:0;right:0;height:2px;
+background:linear-gradient(90deg,var(–cyan),var(–blue));
+}
+.sum-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+.sum-label{font-family:var(–mono);font-size:9px;color:var(–muted);margin-bottom:4px;letter-spacing:.1em;text-transform:uppercase}
+.sum-title{font-size:20px;font-weight:800;color:var(–white);line-height:1.1}
+.sum-pills{display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0}
+.pill{
+font-size:10px;padding:3px 8px;border-radius:20px;
+border:1px solid var(–border);background:var(–s2);color:var(–body);
+white-space:nowrap;
+}
+.pill.danger-高{color:var(–red);background:rgba(240,62,78,.1);border-color:rgba(240,62,78,.3)}
+.pill.danger-中{color:var(–amber);background:rgba(245,166,35,.1);border-color:rgba(245,166,35,.3)}
+.pill.danger-低{color:var(–green);background:rgba(0,214,143,.1);border-color:rgba(0,214,143,.3)}
+.pill.style{color:var(–cyan);background:rgba(0,196,212,.1);border-color:rgba(0,196,212,.3)}
+.sum-text{font-size:12px;color:var(–body);line-height:1.7}
+
+/* ── セクション ── */
+.sec{margin-top:10px}
+.sec-hdr{
+font-family:var(–mono);font-size:9px;color:var(–muted);
+letter-spacing:.15em;text-transform:uppercase;
+margin-bottom:6px;display:flex;align-items:center;gap:6px;
+}
+.sec-hdr::after{content:’’;flex:1;height:1px;background:var(–border)}
+
+/* ── テーマカード ── */
+.theme-list{display:flex;flex-direction:column;gap:5px}
+.tc{
+background:var(–s1);border:1px solid var(–border);border-radius:10px;
+padding:10px 12px;display:flex;align-items:flex-start;gap:10px;
+}
+.tc.A{border-left:3px solid var(–amber)}
+.tc.B{border-left:3px solid var(–cyan)}
+.tc.C{border-left:3px solid var(–dim)}
+.tp{
+font-family:var(–mono);font-size:10px;font-weight:800;
+width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+flex-shrink:0;margin-top:1px;
+}
+.tp.A{background:rgba(245,166,35,.15);color:var(–amber);border:1px solid rgba(245,166,35,.3)}
+.tp.B{background:rgba(0,196,212,.15);color:var(–cyan);border:1px solid rgba(0,196,212,.3)}
+.tp.C{background:rgba(36,61,94,.4);color:var(–muted);border:1px solid var(–border)}
+.tc-name{font-size:13px;font-weight:700;color:var(–white);margin-bottom:2px}
+.tc-reason{font-size:11px;color:var(–muted);line-height:1.6}
+
+/* ── 避けるテーマ ── */
+.avoid-list{display:flex;flex-direction:column;gap:5px}
+.ac{
+background:rgba(240,62,78,.05);border:1px solid rgba(240,62,78,.2);
+border-radius:10px;padding:9px 12px;
+}
+.ac-name{font-size:12px;font-weight:700;color:var(–red);margin-bottom:2px}
+.ac-r{font-size:11px;color:var(–muted);line-height:1.6}
+
+/* ── 監視銘柄 ── */
+.watch-list{display:flex;flex-direction:column;gap:7px}
+.wc{background:var(–s1);border:1px solid var(–border);border-radius:11px;padding:11px}
+.wc-top{display:flex;align-items:center;gap:7px;margin-bottom:7px;flex-wrap:wrap}
+.bucket{
+font-family:var(–mono);font-size:8px;padding:2px 7px;border-radius:10px;
+background:var(–s2);color:var(–muted);border:1px solid var(–border);
+}
+.bucket.先導株{background:rgba(245,166,35,.1);color:var(–amber);border-color:rgba(245,166,35,.25)}
+.bucket.連想1軍{background:rgba(0,196,212,.1);color:var(–cyan);border-color:rgba(0,196,212,.25)}
+.bucket.連想2軍{background:rgba(59,139,235,.1);color:var(–blue);border-color:rgba(59,139,235,.25)}
+.bucket.危険株{background:rgba(240,62,78,.1);color:var(–red);border-color:rgba(240,62,78,.25)}
+.wc-name{font-size:14px;font-weight:800;color:var(–white)}
+.wc-code{font-family:var(–mono);font-size:10px;color:var(–muted);margin-left:2px}
+.wc-reason{font-size:11px;color:var(–muted);margin-bottom:8px;line-height:1.6}
+.wc-rows{display:grid;gap:4px}
+.wr{display:grid;grid-template-columns:52px 1fr;gap:6px;font-size:11px;line-height:1.5}
+.wk{color:var(–muted)}
+.wv.trig{color:var(–green)}
+.wv.stop{color:var(–red)}
+.wv.time{color:var(–cyan);font-family:var(–mono)}
+
+/* ── 条件リスト ── */
+.cond-list{display:flex;flex-direction:column;gap:4px}
+.ci{
+background:var(–s1);border:1px solid var(–border);
+border-radius:9px;padding:8px 11px;font-size:11px;line-height:1.65;color:var(–body);
+}
+.ci.skip{background:rgba(240,62,78,.05);border-color:rgba(240,62,78,.2);color:var(–red)}
+.ci.danger{background:rgba(245,166,35,.05);border-color:rgba(245,166,35,.2)}
+.ci::before{margin-right:4px}
+.ci.skip::before{content:‘⛔’}
+.ci.entry::before{content:‘✅’}
+.ci.danger::before{content:‘⚠️’}
+
+/* ── ニュース ── */
+.news-list{display:flex;flex-direction:column;gap:4px}
+.ni{
+background:var(–s1);border:1px solid var(–border);border-radius:8px;
+padding:7px 11px;font-size:11px;line-height:1.6;color:var(–body);
+border-left-width:2px;
+}
+.ni.macro{border-left-color:var(–amber)}
+.ni.stock{border-left-color:var(–cyan)}
+.ni.supply{border-left-color:var(–purple)}
+.ni.noise{border-left-color:var(–border);color:var(–muted)}
+
+/* ── スコアリング ── */
+.score-box{
+display:flex;align-items:center;gap:12px;
+background:var(–s1);border:1px solid var(–border);border-radius:12px;
+padding:12px;margin-bottom:8px;
+}
+.score-ring{position:relative;width:60px;height:60px;flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg)}
+.score-num{
+position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+font-family:var(–mono);font-size:17px;font-weight:800;color:var(–white);
+}
+.score-info .ttl{font-size:13px;font-weight:700;color:var(–white);margin-bottom:3px}
+.score-info .sub{font-size:11px;color:var(–muted);line-height:1.65}
+
+/* ── 差分カード ── */
+.gap-list{display:flex;flex-direction:column;gap:5px}
+.gc{
+background:var(–s1);border:1px solid var(–border);border-radius:10px;
+padding:9px 11px;display:flex;gap:8px;align-items:flex-start;
+}
+.gi{font-size:15px;flex-shrink:0}
+.gn{font-size:12px;font-weight:700;color:var(–white);margin-bottom:2px}
+.gd{font-size:11px;color:var(–muted);line-height:1.55}
+
+/* ── 精度履歴 ── */
+.bars{display:flex;align-items:flex-end;gap:4px;height:68px;margin-bottom:5px}
+.bc{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bv{font-family:var(–mono);font-size:8px;color:var(–muted)}
+.bb{width:100%;border-radius:3px 3px 0 0;min-height:3px}
+.bd{font-family:var(–mono);font-size:8px;color:var(–dim)}
+
+/* ── 共通 ── */
+.empty{
+background:var(–s1);border:1px dashed var(–border);border-radius:11px;
+padding:28px 16px;text-align:center;color:var(–muted);font-size:12px;
+}
+.loading{padding:40px 16px;text-align:center;color:var(–muted)}
+.spin{width:22px;height:22px;border:2px solid var(–border);border-top-color:var(–cyan);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.card{background:var(–s1);border:1px solid var(–border);border-radius:11px;padding:11px;margin-bottom:7px}
+.card h3{font-size:13px;font-weight:700;color:var(–white);margin-bottom:8px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.tag{font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(–border);color:var(–muted)}
+.tag.hi{color:var(–cyan);border-color:rgba(0,196,212,.3)}
+.fld{display:grid;gap:5px;margin-bottom:10px}
+.fld label{font-size:11px;color:var(–muted)}
+.fld input{
+padding:9px 11px;border-radius:8px;border:1px solid var(–border);
+background:var(–s1);color:var(–white);font:inherit;outline:none;
+}
+.fld input:focus{border-color:var(–blue)}
+.sbtn{
+background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;
+border:none;border-radius:9px;padding:10px 16px;font:inherit;font-weight:700;
+cursor:pointer;width:100%;
 }
 
-/* パネル */
-.panel {
-  display: none; background: rgba(17,26,52,.96);
-  border: 1px solid var(--line); border-radius: 18px;
-  padding: 12px; margin-bottom: 12px;
+/* ── 9:05固有 ── */
+.flow-list{display:flex;flex-direction:column;gap:5px}
+.fc{
+background:var(–s1);border:1px solid var(–border);border-radius:10px;
+padding:9px 11px;display:flex;align-items:center;gap:9px;
 }
-.panel.active { display: block; }
+.fdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.fh{font-size:12px;font-weight:700;color:var(–white);margin-bottom:2px}
+.fe{font-size:11px;color:var(–muted)}
 
-/* サマリーカード */
-.summary-card {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 14px; padding: 12px; margin-bottom: 10px;
+/* ── 設定 ── */
+.notice{
+background:rgba(59,139,235,.08);border:1px solid rgba(59,139,235,.25);
+border-radius:10px;padding:11px;font-size:12px;color:#b0ccf5;line-height:1.7;margin-bottom:12px;
 }
-.summary-top {
-  display: flex; justify-content: space-between; gap: 10px;
-  align-items: flex-start; flex-wrap: wrap; margin-bottom: 8px;
-}
-.summary-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; line-height: 1.2; }
-.summary-title { font-size: 24px; font-weight: 900; line-height: 1.08; word-break: break-word; }
-.summary-text { font-size: 13px; color: var(--muted); line-height: 1.42; word-break: break-word; }
+</style>
 
-.pills, .chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.pill, .chip {
-  background: var(--chip); border: 1px solid var(--line); border-radius: 999px;
-  padding: 5px 9px; font-size: 11px; line-height: 1.2; display: inline-flex; align-items: center;
-}
-
-.grid { display: grid; gap: 10px; }
-.grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-
-.card {
-  background: var(--panel3); border: 1px solid var(--line);
-  border-radius: 15px; padding: 12px; min-width: 0;
-}
-.card h3 { margin: 0 0 8px; font-size: 15px; }
-
-.list { display: grid; gap: 8px; }
-.item {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 12px; padding: 10px;
-}
-.item.tight { padding: 9px 10px; }
-.item.danger {
-  background: var(--danger-bg); border-color: var(--danger-line); color: var(--danger-text);
-}
-.item-title { font-weight: 700; margin-bottom: 4px; font-size: 14px; }
-.item-sub { color: var(--muted); line-height: 1.46; font-size: 13px; word-break: break-word; }
-.item.danger .item-sub { color: var(--danger-text); }
-
-.watch-card {
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 13px; padding: 10px; min-width: 0; display: grid; gap: 6px;
-}
-.watch-top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.watch-title { font-size: 14px; font-weight: 900; line-height: 1.2; word-break: break-word; }
-.watch-meta { font-size: 12px; color: var(--muted); line-height: 1.35; word-break: break-word; }
-.watch-row {
-  display: grid; grid-template-columns: 66px 1fr;
-  gap: 8px; font-size: 12px; line-height: 1.35;
-}
-.watch-key { color: var(--muted); }
-
-.empty {
-  border: 1px dashed var(--line); border-radius: 12px;
-  padding: 14px; text-align: center; color: var(--muted); font-size: 13px;
-}
-.table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 12px; }
-table { width: 100%; min-width: 640px; border-collapse: collapse; }
-th, td {
-  padding: 10px 9px; text-align: left;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  font-size: 13px; vertical-align: top;
-}
-th { color: var(--muted); background: rgba(255,255,255,0.03); }
-
-.notice {
-  background: rgba(110,168,254,.10); border: 1px solid rgba(110,168,254,.30);
-  color: #dce7ff; border-radius: 12px; padding: 12px; line-height: 1.6; font-size: 13px;
-}
-.field { display: grid; gap: 6px; margin-bottom: 12px; }
-.field label { font-size: 12px; color: var(--muted); }
-.field input {
-  width: 100%; padding: 11px 12px; border-radius: 12px;
-  border: 1px solid var(--line); background: var(--panel); color: var(--text); font: inherit;
-}
-
-@media (max-width: 900px) {
-  .grid.two, .grid.three { grid-template-columns: 1fr; }
-  .market-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .summary-title { font-size: 22px; }
-}
-```
-
-  </style>
 </head>
 <body>
-<div class="wrap">
 
-  <!-- ヘッダー -->
+<!-- ヘッダー -->
 
-  <div class="header">
-    <div class="brand">
-      <div class="logo">株</div>
-      <div>
-        <div class="title">株式AI分析</div>
-        <div class="subtitle">日本株短期トレード用・個人向け売買判断補助</div>
-      </div>
-    </div>
-    <div class="header-actions">
-      <div class="header-meta" id="globalMeta">更新 -</div>
-      <button class="btn" id="refreshBtn">↻ 再読込</button>
+<div class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">株</div>
+    <div>
+      <div class="hdr-title">株式AI分析</div>
+      <div class="hdr-sub">日本株短期トレード用</div>
     </div>
   </div>
-
-  <!-- リアルタイムティッカー -->
-
-  <div class="rt-ticker">
-    <div class="rt-ticker-label"><div class="live-dot"></div>リアルタイム市場（5分更新）</div>
-    <div class="rt-scroll" id="rtScroll">
-      <div class="rt-item"><div class="rt-name">読込中</div><div class="rt-val">—</div><div class="rt-chg warn">—</div></div>
-    </div>
+  <div class="hdr-r">
+    <div class="live-dot"></div>
+    <span class="hdr-time" id="upd">—</span>
+    <button class="rbtn" onclick="loadAll()">↻</button>
   </div>
-
-  <!-- マーケットバー -->
-
-  <section class="market-bar" id="marketBar"></section>
-
-  <!-- タブ -->
-
-  <div class="tabs">
-    <button class="tab active" data-tab="tab600">6:00 戦略会議</button>
-    <button class="tab" data-tab="tab905">9:10 行動修正</button>
-    <button class="tab" data-tab="tab1200">12:00 後場戦略</button>
-    <button class="tab" data-tab="tab1535">15:35 実戦学習</button>
-    <button class="tab" data-tab="tabLog">振り返りログ</button>
-    <button class="tab" data-tab="tabSettings">設定</button>
-  </div>
-
-  <section class="panel active" id="tab600"></section>
-  <section class="panel" id="tab905"></section>
-  <section class="panel" id="tab1200"></section>
-  <section class="panel" id="tab1535"></section>
-  <section class="panel" id="tabLog"></section>
-  <section class="panel" id="tabSettings"></section>
-
 </div>
 
+<!-- リアルタイムティッカー -->
+
+<div class="ticker">
+  <div class="ticker-inner" id="ticker">
+    <div class="ti"><div class="ti-n">読込中</div><div class="ti-v fl">—</div><div class="ti-c fl">—</div></div>
+  </div>
+</div>
+
+<!-- タブ -->
+
+<div class="tabs">
+  <button class="tab on" onclick="sw('p600',this)">6:00 戦略</button>
+  <button class="tab" onclick="sw('p905',this)">9:10 修正</button>
+  <button class="tab" onclick="sw('p1200',this)">12:00 後場</button>
+  <button class="tab" onclick="sw('p1535',this)">15:35 学習</button>
+  <button class="tab" onclick="sw('plog',this)">ログ</button>
+  <button class="tab" onclick="sw('pset',this)">設定</button>
+</div>
+
+<div id="p600" class="pg on"><div class="loading"><div class="spin"></div>読み込み中...</div></div>
+<div id="p905" class="pg"><div class="loading"><div class="spin"></div>読み込み中...</div></div>
+<div id="p1200" class="pg"><div class="loading"><div class="spin"></div>読み込み中...</div></div>
+<div id="p1535" class="pg"><div class="loading"><div class="spin"></div>読み込み中...</div></div>
+<div id="plog" class="pg"><div class="loading"><div class="spin"></div>読み込み中...</div></div>
+<div id="pset" class="pg"></div>
+
 <script>
-const STORAGE_USER = "stock-ai-user";
-const STORAGE_REPO = "stock-ai-repo";
-
-const els = {
-  globalMeta: document.getElementById("globalMeta"),
-  marketBar: document.getElementById("marketBar"),
-  rtScroll: document.getElementById("rtScroll"),
-  tab600: document.getElementById("tab600"),
-  tab905: document.getElementById("tab905"),
-  tab1200: document.getElementById("tab1200"),
-  tab1535: document.getElementById("tab1535"),
-  tabLog: document.getElementById("tabLog"),
-  tabSettings: document.getElementById("tabSettings"),
-  refreshBtn: document.getElementById("refreshBtn"),
-};
-
 // ===== ユーティリティ =====
-function esc(v){return String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
-function nl2br(v){return esc(v??"").replace(/\n/g,"<br>");}
+function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function arr(v){return Array.isArray(v)?v:[];}
-function compactJoin(list,emptyText="なし"){const f=arr(list).filter(Boolean);return f.length?f.join(" / "):emptyText;}
+function nl2br(v){return esc(v??'').replace(/\n/g,'<br>');}
+function join(list,empty='なし'){const f=arr(list).filter(Boolean);return f.length?f.join(' / '):empty;}
+function cc(v){const s=String(v||'');return s.startsWith('+')?'up':s.startsWith('-')?'dn':'fl';}
+function scC(s){return s>=70?'#00d68f':s>=50?'#f5a623':'#f03e4e';}
 
-function baseUrl(){
-  const user=localStorage.getItem(STORAGE_USER)||"sszzkkzzkk";
-  const repo=localStorage.getItem(STORAGE_REPO)||"stock-analyzer";
-  return`https://${user}.github.io/${repo}`;
+// ===== 設定 =====
+const GHU='stk-u',GHR='stk-r';
+let d600=null,d905=null,d1200=null,d1535=null,dlog=null,rtd={};
+
+function base(){
+  return'https://sszzkkzzkk.github.io/stock-analyzer';
 }
 
-async function fetchJson(path){
-  const url=`${baseUrl()}/data/${path}?t=${Date.now()}`;
-  const res=await fetch(url,{cache:"no-store"});
-  if(!res.ok)throw new Error(`${path}: ${res.status}`);
-  return await res.json();
+// ===== タブ =====
+function sw(id,btn){
+  document.querySelectorAll('.pg').forEach(p=>{p.classList.remove('on');p.style.display='none';});
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  const el=document.getElementById(id);
+  el.classList.add('on');el.style.display='block';
+  if(btn)btn.classList.add('on');
+}
+document.querySelectorAll('.pg').forEach((p,i)=>{if(i>0)p.style.display='none';});
+
+// ===== データ取得 =====
+async function fj(path){
+  try{const r=await fetch(`${base()}/data/${path}?_=${Date.now()}`,{cache:'no-store'});if(!r.ok)return null;return await r.json();}
+  catch{return null;}
 }
 
-function quoteClass(change){
-  const s=String(change||"");
-  if(s.startsWith("+"))return"good";
-  if(s.startsWith("-"))return"bad";
-  return"warn";
+async function loadAll(){
+  document.getElementById('upd').textContent='更新中...';
+  const[a,b,c,d,e]=await Promise.all([
+    fj('latest_600.json'),fj('latest_905.json'),
+    fj('latest_1200.json'),fj('latest_1535.json'),
+    fj('review_log.json'),
+  ]);
+  d600=a;d905=b;d1200=c;d1535=d;dlog=e;
+  render600();render905();render1200();render1535();renderLog();renderSet();
+  document.getElementById('upd').textContent=new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+  fetchRT();
 }
 
-// ===== リアルタイム株価 =====
-const RT_SYMS=[
-  {id:"^N225",n:"日経225"},
-  {id:"NIY=F",n:"日経先物"},
-  {id:"^DJI",n:"NYダウ"},
-  {id:"^IXIC",n:"NASDAQ"},
-  {id:"^GSPC",n:"S&P500"},
-  {id:"^SOX",n:"SOX"},
-  {id:"USDJPY=X",n:"ドル円"},
-  {id:"CL=F",n:"原油WTI"},
-  {id:"GC=F",n:"金"},
-  {id:"^VIX",n:"VIX"},
+// ===== リアルタイム =====
+const RT=[
+  {id:'^N225',n:'日経'},
+  {id:'NIY=F',n:'先物'},
+  {id:'^DJI',n:'DOW'},
+  {id:'^IXIC',n:'NAS'},
+  {id:'^GSPC',n:'S&P'},
+  {id:'^SOX',n:'SOX'},
+  {id:'USDJPY=X',n:'¥/$'},
+  {id:'CL=F',n:'原油'},
+  {id:'GC=F',n:'金'},
+  {id:'^VIX',n:'VIX'},
 ];
 
-let rtCache={};
-
-function fpNum(sym,p){
-  if(p==null)return"—";
-  if(["USDJPY=X","^VIX"].includes(sym))return p.toFixed(2);
-  if(p>1000)return p.toLocaleString("ja-JP",{maximumFractionDigits:0});
+function fp(sym,p){
+  if(p==null)return'—';
+  if(['USDJPY=X','^VIX'].includes(sym))return p.toFixed(2);
+  if(p>1000)return p.toLocaleString('ja-JP',{maximumFractionDigits:0});
   return p.toFixed(2);
 }
-function fpPct(pct){
-  if(pct==null)return"—";
-  return(pct>=0?"+":"")+pct.toFixed(2)+"%";
-}
-function rtCls(pct){return pct==null?"warn":pct>0?"good":pct<0?"bad":"warn";}
+function fpct(pct){return pct==null?'—':(pct>=0?'+':'')+pct.toFixed(2)+'%';}
+function rtCls(pct){return pct==null?'fl':pct>0?'up':pct<0?'dn':'fl';}
 
-async function fetchRealtime(){
-  const ids=RT_SYMS.map(s=>s.id).join(",");
+async function fetchRT(){
+  const ids=RT.map(s=>s.id).join(',');
   const api=`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(ids)}&fields=regularMarketPrice,regularMarketChange,regularMarketChangePercent`;
-  const proxies=[
-    u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,
-    u=>`https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
-  ];
-  for(const px of proxies){
+  for(const px of[u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,u=>`https://api.allorigins.win/get?url=${encodeURIComponent(u)}`]){
     try{
-      const res=await fetch(px(api),{signal:AbortSignal.timeout(8000)});
-      if(!res.ok)continue;
-      let json=await res.json();
-      if(json.contents)json=JSON.parse(json.contents);
-      const quotes=json?.quoteResponse?.result||[];
-      if(!quotes.length)continue;
-      quotes.forEach(q=>{rtCache[q.symbol]={p:q.regularMarketPrice,pct:q.regularMarketChangePercent};});
-      renderTicker();
-      updateMarketBarLive();
-      return;
-    }catch(e){continue;}
+      const r=await fetch(px(api),{signal:AbortSignal.timeout(8000)});
+      if(!r.ok)continue;
+      let j=await r.json();
+      if(j.contents)j=JSON.parse(j.contents);
+      const qs=j?.quoteResponse?.result||[];
+      if(!qs.length)continue;
+      qs.forEach(q=>{rtd[q.symbol]={p:q.regularMarketPrice,pct:q.regularMarketChangePercent};});
+      renderTicker();updateMktCards();return;
+    }catch{continue;}
   }
 }
+setInterval(fetchRT,5*60*1000);
 
 function renderTicker(){
-  const el=els.rtScroll;
-  let h="";
-  RT_SYMS.forEach(s=>{
-    const d=rtCache[s.id];
+  const el=document.getElementById('ticker');
+  let h='';
+  RT.forEach(s=>{
+    const d=rtd[s.id];
     if(!d)return;
     const cls=rtCls(d.pct);
-    h+=`<div class="rt-item">
-      <div class="rt-name">${s.n}</div>
-      <div class="rt-val ${cls}">${fpNum(s.id,d.p)}</div>
-      <div class="rt-chg ${cls}">${fpPct(d.pct)}</div>
-    </div>`;
+    h+=`<div class="ti"><div class="ti-n">${s.n}</div><div class="ti-v ${cls}">${fp(s.id,d.p)}</div><div class="ti-c ${cls}">${fpct(d.pct)}</div></div>`;
   });
   if(h)el.innerHTML=h;
 }
 
-function updateMarketBarLive(){
-  // マーケットバーのカードをリアルタイムで更新
-  const map={"rt-nikkei":"^N225","rt-futures":"NIY=F","rt-dow":"^DJI","rt-usdjpy":"USDJPY=X"};
+function updateMktCards(){
+  const map={'rt-nikkei':'^N225','rt-futures':'NIY=F','rt-dow':'^DJI','rt-usdjpy':'USDJPY=X','rt-sox':'^SOX','rt-oil':'CL=F'};
+  const lbl={'rt-nikkei':'日経平均','rt-futures':'日経先物','rt-dow':'NYダウ','rt-usdjpy':'ドル円','rt-sox':'SOX','rt-oil':'原油WTI'};
   Object.entries(map).forEach(([eid,sym])=>{
     const el=document.getElementById(eid);
     if(!el)return;
-    const d=rtCache[sym];
+    const d=rtd[sym];
     if(!d)return;
     const cls=rtCls(d.pct);
-    const labels={"rt-nikkei":"日経平均","rt-futures":"日経先物","rt-dow":"NYダウ","rt-usdjpy":"ドル円"};
+    el.className=`mkt-card ${cls}`;
     el.innerHTML=`
-      <div class="market-chip-top"><div class="market-chip-name">${labels[eid]}</div><div class="market-chip-time">LIVE</div></div>
-      <div class="market-chip-value ${cls}">${fpNum(sym,d.p)}</div>
-      <div class="market-chip-change ${cls}">${fpPct(d.pct)}</div>
-    `;
+      <div class="mkt-lbl">${lbl[eid]}<span class="live-tag">LIVE</span></div>
+      <div class="mkt-val ${cls}">${fp(sym,d.p)}</div>
+      <div class="mkt-chg ${cls}">${fpct(d.pct)}</div>`;
   });
 }
 
-setInterval(fetchRealtime,5*60*1000);
-
-// ===== マーケットバー =====
-function firstMatch(data,names,buckets){
-  const md=data?.market_data||{};
-  const merged=[];
-  (buckets||["indices","futures","forex","world_indices","sox","oil"]).forEach(b=>merged.push(...arr(md[b])));
-  return merged.find(x=>names.includes(x.name))||null;
+// ===== マーケットカード（静的）=====
+function mktCard(id,lbl,val,chg,pct,time){
+  const cls=cc(chg||pct);
+  return`<div class="mkt-card ${cls}" id="${id}">
+    <div class="mkt-lbl">${lbl}<span style="font-family:var(--mono);font-size:8px;color:var(--muted)">${esc(time||'')}</span></div>
+    <div class="mkt-val ${cls}">${esc(val||'—')}</div>
+    <div class="mkt-chg ${cls}">${esc(pct||chg||'—')}</div>
+  </div>`;
 }
 
-function renderMarketBar(d600){
-  if(!d600){els.marketBar.innerHTML=`<div class="empty" style="grid-column:1/-1">市況データなし</div>`;return;}
-  const picks=[
-    firstMatch(d600,["日経平均"],["indices"]),
-    firstMatch(d600,["日経先物","日経225先物"],["futures"]),
-    firstMatch(d600,["ドル円","米ドル円"],["forex"]),
-    firstMatch(d600,["NYダウ","ＮＹダウ"],["world_indices"]),
-  ].filter(Boolean);
-  els.marketBar.innerHTML=picks.length?picks.map((item,i)=>{
-    const klass=quoteClass(item.change);
-    const ids=["rt-nikkei","rt-futures","rt-usdjpy","rt-dow"];
-    return`<div class="market-chip live" id="${ids[i]||''}">
-      <span class="live-badge">LIVE</span>
-      <div class="market-chip-top"><div class="market-chip-name">${esc(item.name||"-")}</div><div class="market-chip-time">${esc(item.time||"")}</div></div>
-      <div class="market-chip-value ${klass}">${esc(item.value||"—")}</div>
-      <div class="market-chip-change ${klass}">${esc(item.change||"—")} ${esc(item.percent||"")}</div>
-    </div>`;
-  }).join(""):`<div class="empty" style="grid-column:1/-1">市況データなし</div>`;
-}
+// ===== 6:00 =====
+function render600(){
+  const el=document.getElementById('p600');
+  const d=d600;
+  if(!d||!d.strategy){el.innerHTML=`<div class="empty">6:00分析がありません</div>`;return;}
+  const st=d.strategy||{};
+  const md=d.market_data||{};
+  const idx=md.indices?.[0]||{};
+  const fut=md.futures?.[0]||{};
+  const dow=md.world_indices?.[0]||{};
+  const fx=md.forex?.[0]||{};
+  const sox=md.sox?.[0]||{};
+  const oil=md.oil?.[0]||{};
 
-// ===== 各タブレンダリング =====
-function renderThemeList(items,emptyText="データなし"){
-  const list=arr(items).filter(Boolean);
-  if(!list.length)return`<div class="empty">${esc(emptyText)}</div>`;
-  return`<div class="list">${list.map(x=>`
-    <div class="item tight">
-      <div class="item-title">${esc(x.name||"-")} ${x.priority?`<span class="chip">${esc(x.priority)}</span>`:""}</div>
-      <div class="item-sub">${esc(x.reason||"-")}</div>
-    </div>`).join("")}</div>`;
-}
+  // ニュース（分類別）
+  const cl=md.classified_news||{};
+  const newsHtml=[
+    ...arr(cl.macro).map(n=>`<div class="ni macro">${esc(n)}</div>`),
+    ...arr(cl.stock_specific).map(n=>`<div class="ni stock">${esc(n)}</div>`),
+    ...arr(cl.supply_demand).map(n=>`<div class="ni supply">${esc(n)}</div>`),
+  ].join('') || arr(md.key_news).slice(0,6).map(n=>`<div class="ni stock">${esc(n)}</div>`).join('');
 
-function renderThemeStatus(items,emptyText="データなし"){
-  const list=arr(items).filter(Boolean);
-  if(!list.length)return`<div class="empty">${esc(emptyText)}</div>`;
-  return`<div class="list">${list.map(x=>`
-    <div class="item tight">
-      <div class="item-title">${esc(x.name||"-")} / ${esc(x.type||"-")}</div>
-      <div class="item-sub">${esc(x.comment||"-")}</div>
-    </div>`).join("")}</div>`;
-}
+  // テーマ
+  const themes=arr(d.priority_themes).map(t=>`
+    <div class="tc ${esc(t.priority||'C')}">
+      <div class="tp ${esc(t.priority||'C')}">${esc(t.priority||'?')}</div>
+      <div><div class="tc-name">${esc(t.name||'')}</div><div class="tc-reason">${esc(t.reason||'')}</div></div>
+    </div>`).join('');
 
-function renderWatchCards(items){
-  const list=arr(items).filter(Boolean);
-  if(!list.length)return`<div class="empty">監視銘柄なし</div>`;
-  return`<div class="grid two">${list.map((x,i)=>`
-    <div class="watch-card">
-      <div class="watch-top"><span class="pill">優先 ${i+1}</span><div class="watch-title">${esc(x.name||"-")} ${x.code?`(${esc(x.code)})`:""}</div></div>
-      <div class="watch-meta">${esc(x.bucket||"-")} / ${esc(x.reason||"-")}</div>
-      <div class="watch-row"><div class="watch-key">仕掛け</div><div>${esc(x.trigger||"-")}</div></div>
-      <div class="watch-row"><div class="watch-key">失効</div><div>${esc(x.invalidation||"-")}</div></div>
-      <div class="watch-row"><div class="watch-key">時間帯</div><div>${esc(x.time_window||"-")}</div></div>
-    </div>`).join("")}</div>`;
-}
+  // 避けるテーマ
+  const avoids=arr(d.avoid_themes).map(t=>`
+    <div class="ac"><div class="ac-name">🚫 ${esc(t.name||'')}</div><div class="ac-r">${esc(t.reason||'')}</div></div>`).join('');
 
-function renderReviewLogs(logs){
-  const list=arr(logs).slice().reverse();
-  if(!list.length)return`<div class="empty">ログがまだありません</div>`;
-  return`<div class="table-wrap"><table>
-    <thead><tr><th>日付</th><th>使えた判断</th><th>良かった点</th><th>禁止事項</th><th>次の注目</th><th>テーマ</th><th>執行</th><th>見送り</th></tr></thead>
-    <tbody>${list.map(x=>`<tr>
-      <td>${esc(x.date||"-")}</td><td>${esc(x.usefulness||"-")}</td><td>${esc(x.easy_pattern||"-")}</td>
-      <td>${esc(x.danger_pattern||"-")}</td><td>${esc(x.next_note||"-")}</td>
-      <td>${esc(x.theme_score??"-")}</td><td>${esc(x.execution_score??"-")}</td><td>${esc(x.skip_score??"-")}</td>
-    </tr>`).join("")}</tbody>
-  </table></div>`;
-}
+  // 監視銘柄
+  const watches=arr(d.watchlist).map(w=>`
+    <div class="wc">
+      <div class="wc-top">
+        <span class="bucket ${esc(w.bucket||'')}">${esc(w.bucket||'')}</span>
+        <span class="wc-name">${esc(w.name||'')}</span>
+        <span class="wc-code">${esc(w.code||'')}</span>
+      </div>
+      <div class="wc-reason">${esc(w.reason||'')}</div>
+      <div class="wc-rows">
+        <div class="wr"><div class="wk">仕掛け</div><div class="wv trig">${esc(w.trigger||'—')}</div></div>
+        <div class="wr"><div class="wk">失効</div><div class="wv stop">${esc(w.invalidation||'—')}</div></div>
+        <div class="wr"><div class="wk">時間帯</div><div class="wv time">${esc(w.time_window||'—')}</div></div>
+      </div>
+    </div>`).join('');
 
-function setGlobalMeta(...datasets){
-  const times=datasets.map(x=>x?.generated_at).filter(Boolean);
-  els.globalMeta.textContent=`更新 ${times.length?times.join(" / "):"-"}`;
-}
+  const entries=arr(d.entry_conditions).map(c=>`<div class="ci entry">${esc(c)}</div>`).join('');
+  const skips=arr(d.skip_conditions).map(c=>`<div class="ci skip">${esc(c)}</div>`).join('');
+  const dangers=arr(d.danger_patterns).map(c=>`<div class="ci danger">${esc(c)}</div>`).join('');
 
-function render600(data){
-  if(!data){els.tab600.innerHTML=`<div class="empty">6:00データがありません</div>`;return;}
-  const st=data.strategy||{};
-  els.tab600.innerHTML=`
-    <div class="summary-card">
-      <div class="summary-top">
+  el.innerHTML=`
+    <div class="summary">
+      <div class="sum-top">
         <div>
-          <div class="summary-label">6:00 サマリー</div>
-          <div class="summary-title">${esc(st.market_regime_label||"未判定")}</div>
+          <div class="sum-label">${esc(d.date||'')} ${esc(d.generated_at||'')} サマリー</div>
+          <div class="sum-title">${esc(st.market_regime_label||'—')}</div>
         </div>
-        <div class="pills">
-          ${st.entry_style_label?`<span class="pill">${esc(st.entry_style_label)}</span>`:""}
-          ${st.danger_level?`<span class="pill">危険度 ${esc(st.danger_level)}</span>`:""}
+        <div class="sum-pills">
+          <span class="pill style">${esc(st.entry_style_label||'—')}</span>
+          <span class="pill danger-${esc(st.danger_level||'中')}">危険度 ${esc(st.danger_level||'—')}</span>
         </div>
       </div>
-      <div class="summary-text">${esc(st.conclusion||data.summary||"サマリーなし")}</div>
+      <div class="sum-text">${esc(st.conclusion||d.summary||'—')}</div>
+    </div>
+
+    <div class="mkt-grid">
+      ${mktCard('rt-nikkei','日経平均',idx.value,idx.change,idx.percent,idx.time)}
+      ${mktCard('rt-futures','日経先物',fut.value,fut.change,fut.percent,fut.time)}
+      ${mktCard('rt-dow','NYダウ',dow.value,dow.change,dow.percent,dow.time)}
+      ${mktCard('rt-usdjpy','ドル円',fx.value,fx.change,fx.percent,fx.time)}
+      ${mktCard('rt-sox','SOX',sox.value,sox.change,sox.percent,sox.time)}
+      ${mktCard('rt-oil','原油WTI',oil.value,oil.change,oil.percent,oil.time)}
+    </div>
+
+    ${newsHtml?`<div class="sec"><div class="sec-hdr">本日ニュース</div><div class="news-list">${newsHtml}</div></div>`:''}
+
+    <div class="sec">
+      <div class="sec-hdr">本命テーマ</div>
+      <div class="theme-list">${themes||'<div class="empty">なし</div>'}</div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr">見ないテーマ</div>
+      <div class="avoid-list">${avoids||'<div class="empty">なし</div>'}</div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hdr">監視銘柄</div>
+      <div class="watch-list">${watches||'<div class="empty">なし</div>'}</div>
+    </div>
+
+    ${entries?`<div class="sec"><div class="sec-hdr">仕掛け条件</div><div class="cond-list">${entries}</div></div>`:''}
+    ${skips?`<div class="sec"><div class="sec-hdr">やらないこと</div><div class="cond-list">${skips}</div></div>`:''}
+    ${dangers?`<div class="sec"><div class="sec-hdr">危険パターン</div><div class="cond-list">${dangers}</div></div>`:''}
+  `;
+  updateMktCards();
+}
+
+// ===== 9:05 =====
+function render905(){
+  const el=document.getElementById('p905');
+  const d=d905;
+  if(!d||Object.keys(d).length===0){el.innerHTML=`<div class="empty">9:10分析がありません</div>`;return;}
+  const j=d.action_judgement||{};
+  const sc=d.morning_accuracy_score||0;
+  const circ=2*Math.PI*22;
+  const col=scC(sc);
+
+  const flow=arr(d.actual_flow).map(a=>`
+    <div class="fc">
+      <div class="fdot" style="background:${a.strength==='high'?'var(--red)':a.strength==='medium'?'var(--amber)':'var(--muted)'}"></div>
+      <div><div class="fh">${esc(a.theme||'')}</div><div class="fe">${esc(a.evidence||'')}</div></div>
+    </div>`).join('');
+
+  const gaps=arr(d.prediction_gap).map(g=>{
+    const icon=g.actual_result==='的中'?'✅':g.actual_result==='外れ'?'❌':'🔶';
+    return`<div class="gc"><div class="gi">${icon}</div>
+      <div><div class="gn">${esc(g.predicted_theme||'')} <span style="font-size:10px;color:var(--muted)">${esc(g.actual_result||'')}</span></div>
+      <div class="gd">${esc(g.gap_reason||'')}${g.missed_factor?` ／ 見落とし: ${esc(g.missed_factor)}`:''}</div></div></div>`;
+  }).join('');
+
+  const cor=d.intraday_correction||{};
+  const hints=arr(cor.correction_hints).map(h=>`<div class="ci entry">${esc(h)}</div>`).join('');
+  const watch=arr(cor.themes_to_watch).map(t=>`<span class="tag hi">${esc(t)}</span>`).join('');
+  const faded=arr(cor.themes_faded).map(t=>`<span class="tag">${esc(t)}</span>`).join('');
+
+  // 9:10固有：action_judgement
+  const actionBlock=j.action_now?`
+    <div class="card">
+      <h3>今から何をするか</h3>
+      <div style="display:grid;gap:6px">
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 10px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:2px">行動判断</div>
+          <div style="font-size:12px;color:var(--hi);line-height:1.6">${esc(j.action_now||'—')}</div>
+        </div>
+        ${j.do_not_chase?`<div style="background:rgba(240,62,78,.06);border:1px solid rgba(240,62,78,.2);border-radius:8px;padding:8px 10px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:2px">追わないもの</div>
+          <div style="font-size:12px;color:var(--red);line-height:1.6">${esc(j.do_not_chase)}</div>
+        </div>`:''}
+        ${j.best_current_theme||j.best_current_stock?`<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 10px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:2px">主役テーマ / 銘柄</div>
+          <div style="font-size:12px;color:var(--cyan)">${esc(j.best_current_theme||'—')} / ${esc(j.best_current_stock||'—')}</div>
+        </div>`:''}
+      </div>
+    </div>`:''
+
+  const op=d.opening||{};
+  el.innerHTML=`
+    <div class="score-box">
+      <div class="score-ring">
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="22" fill="none" stroke="#162540" stroke-width="5"/>
+          <circle cx="30" cy="30" r="22" fill="none" stroke-width="5" stroke="${col}"
+            stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${circ.toFixed(1)}"
+            stroke-linecap="round" id="r905"/>
+        </svg>
+        <div class="score-num">${sc}</div>
+      </div>
+      <div class="score-info">
+        <div class="ttl">寄り付き精度 — ${esc(d.date||'')} ${esc(d.generated_at||'')}</div>
+        <div class="sub">
+          日経: ${esc(op.nikkei_open||'—')} (${esc(op.nikkei_change||'—')})<br>
+          市場: ${esc(op.market_tone||'—')} ／ 主役: ${esc(op.dominant_theme||'—')}
+        </div>
+      </div>
+    </div>
+
+    ${actionBlock}
+
+    ${flow?`<div class="sec"><div class="sec-hdr">実際の資金の流れ</div><div class="flow-list">${flow}</div></div>`:''}
+    ${gaps?`<div class="sec"><div class="sec-hdr">予測との差分</div><div class="gap-list">${gaps}</div></div>`:''}
+    ${watch?`<div class="sec"><div class="sec-hdr">午後も注目</div><div class="tags">${watch}</div></div>`:''}
+    ${faded?`<div class="sec"><div class="sec-hdr">朝だけのテーマ</div><div class="tags">${faded}</div></div>`:''}
+    ${hints?`<div class="sec"><div class="sec-hdr">15:35への修正ヒント</div><div class="cond-list">${hints}</div></div>`:''}
+    <div class="sec"><div class="sec-hdr">総評</div>
+      <div class="summary"><div class="sum-text">${nl2br(d.summary||'—')}</div></div>
+    </div>
+  `;
+  requestAnimationFrame(()=>{
+    const r=document.getElementById('r905');
+    if(r)setTimeout(()=>{r.style.transition='stroke-dashoffset .9s ease';r.setAttribute('stroke-dashoffset',(circ*(1-sc/100)).toFixed(1));},150);
+  });
+}
+
+// ===== 12:00 =====
+function render1200(){
+  const el=document.getElementById('p1200');
+  const d=d1200;
+  if(!d||Object.keys(d).length===0){el.innerHTML=`<div class="empty">12:00分析がありません</div>`;return;}
+  const plan=d.afternoon_plan||{};
+  el.innerHTML=`
+    <div class="summary">
+      <div class="sum-top">
+        <div>
+          <div class="sum-label">12:00 後場戦略</div>
+          <div class="sum-title">${esc(plan.status_label||'後場戦略')}</div>
+        </div>
+        <div class="sum-pills">
+          ${plan.pm_regime_label?`<span class="pill style">${esc(plan.pm_regime_label)}</span>`:''}
+        </div>
+      </div>
+      <div class="sum-text">${esc(plan.summary||d.summary||'—')}</div>
     </div>
 
     <div class="card">
-      <h3>本命テーマ・本命監視銘柄</h3>
-      <div class="grid two">
-        <div class="item tight">
-          <div class="item-title">本命テーマ</div>
-          <div class="item-sub">${esc(compactJoin(arr(data.priority_themes).map(x=>x.name)))}</div>
+      <h3>後場の方針</h3>
+      <div style="display:grid;gap:5px">
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 10px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">前場で強かったテーマ</div>
+          <div style="font-size:12px;color:var(--hi)">${esc(join(d.strong_themes_am))}</div>
         </div>
-        <div class="item tight">
-          <div class="item-title">本命監視銘柄</div>
-          <div class="item-sub">${esc(compactJoin(arr(data.watchlist).filter(x=>["先導株","連想1軍"].includes(x.bucket)).slice(0,3).map(x=>x.name)))}</div>
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 10px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">後場の本命テーマ</div>
+          <div style="font-size:12px;color:var(--cyan)">${esc(join(d.pm_core_themes))}</div>
+        </div>
+        <div style="background:rgba(240,62,78,.06);border:1px solid rgba(240,62,78,.2);border-radius:8px;padding:8px 10px">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:2px">捨てるテーマ</div>
+          <div style="font-size:12px;color:var(--red)">${esc(join(d.drop_themes))}</div>
         </div>
       </div>
     </div>
 
-    <div class="grid two" style="margin-top:10px;">
-      <div class="card">
-        <h3>やらないこと</h3>
-        <div class="item danger"><div class="item-sub">${arr(data.skip_conditions).map(esc).join("<br>")||"なし"}</div></div>
-      </div>
-      <div class="card">
-        <h3>仕掛け条件</h3>
-        <div class="item tight"><div class="item-sub">${arr(data.entry_conditions).map(esc).join("<br>")||"なし"}</div></div>
-      </div>
-    </div>
+    ${arr(d.entry_conditions_pm).length?`<div class="sec"><div class="sec-hdr">仕掛け条件（後場）</div><div class="cond-list">${arr(d.entry_conditions_pm).map(c=>`<div class="ci entry">${esc(c)}</div>`).join('')}</div></div>`:''}
+    ${arr(d.do_not_do_pm).length?`<div class="sec"><div class="sec-hdr">やらないこと（後場）</div><div class="cond-list">${arr(d.do_not_do_pm).map(c=>`<div class="ci skip">${esc(c)}</div>`).join('')}</div></div>`:''}
 
-    <div class="card" style="margin-top:10px;">
-      <h3>監視銘柄一覧</h3>
-      ${renderWatchCards(data.watchlist)}
-    </div>
-
-    <div class="grid three" style="margin-top:10px;">
-      <div class="card"><h3>強いテーマ</h3>${renderThemeList(data.priority_themes,"強いテーマなし")}</div>
-      <div class="card"><h3>見ないテーマ</h3>${renderThemeList(data.avoid_themes,"見ないテーマなし")}</div>
-      <div class="card"><h3>危険パターン</h3>
-        <div class="list">${arr(data.danger_patterns).length?arr(data.danger_patterns).map(x=>`<div class="item tight"><div class="item-sub">${esc(x)}</div></div>`).join(""):`<div class="empty">危険パターンなし</div>`}</div>
-      </div>
-    </div>
+    ${arr(d.new_watchlist).length?`<div class="sec"><div class="sec-hdr">新規監視銘柄</div><div class="watch-list">${arr(d.new_watchlist).map(w=>`
+      <div class="wc">
+        <div class="wc-top">
+          <span class="bucket ${esc(w.bucket||'')}">${esc(w.bucket||'')}</span>
+          <span class="wc-name">${esc(w.name||'')}</span>
+          <span class="wc-code">${esc(w.code||'')}</span>
+        </div>
+        <div class="wc-reason">${esc(w.reason||'')}</div>
+        <div class="wc-rows">
+          <div class="wr"><div class="wk">仕掛け</div><div class="wv trig">${esc(w.trigger||'—')}</div></div>
+          <div class="wr"><div class="wk">失効</div><div class="wv stop">${esc(w.invalidation||'—')}</div></div>
+          <div class="wr"><div class="wk">時間帯</div><div class="wv time">${esc(w.time_window||'—')}</div></div>
+        </div>
+      </div>`).join('')}</div></div>`:''}
   `;
 }
 
-function render905(data){
-  if(!data){els.tab905.innerHTML=`<div class="empty">9:10データがありません</div>`;return;}
-  const j=data.action_judgement||{};
-  els.tab905.innerHTML=`
-    <div class="summary-card">
-      <div class="summary-top">
+// ===== 15:35 =====
+function render1535(){
+  const el=document.getElementById('p1535');
+  const d=d1535;
+  if(!d||Object.keys(d).length===0){el.innerHTML=`<div class="empty">15:35分析がありません</div>`;return;}
+  const r=d.review||{};
+  const sc_t=r.theme_score??'—';const sc_e=r.execution_score??'—';const sc_s=r.skip_score??'—';
+  el.innerHTML=`
+    <div class="summary">
+      <div class="sum-top">
         <div>
-          <div class="summary-label">9:10 サマリー</div>
-          <div class="summary-title">${esc(j.opening_state||"未判定")}</div>
+          <div class="sum-label">15:35 実戦学習</div>
+          <div class="sum-title">${esc(r.next_ban_rule||'実戦学習')}</div>
         </div>
-        <div class="pills">
-          ${j.best_current_theme?`<span class="pill">${esc(j.best_current_theme)}</span>`:""}
-          ${j.best_current_stock?`<span class="pill">${esc(j.best_current_stock)}</span>`:""}
-        </div>
-      </div>
-      <div class="summary-text">${esc(j.action_now||data.summary||"サマリーなし")}</div>
-    </div>
-    <div class="grid two">
-      <div class="card">
-        <h3>今から何をするか</h3>
-        <div class="list">
-          <div class="item tight"><div class="item-title">行動判断</div><div class="item-sub">${esc(j.action_now||"-")}</div></div>
-          <div class="item tight"><div class="item-title">追わないもの</div><div class="item-sub">${esc(j.do_not_chase||"-")}</div></div>
-          <div class="item tight"><div class="item-title">主役テーマ / 銘柄</div><div class="item-sub">${esc(j.best_current_theme||"-")} / ${esc(j.best_current_stock||"-")}</div></div>
+        <div class="sum-pills">
+          <span class="pill">テーマ ${esc(sc_t)}</span>
+          <span class="pill">執行 ${esc(sc_e)}</span>
+          <span class="pill">見送り ${esc(sc_s)}</span>
         </div>
       </div>
-      <div class="card">
-        <h3>テーマ状態</h3>
-        ${renderThemeStatus(data.theme_status,"テーマ状態なし")}
-      </div>
+      <div class="sum-text">${esc(d.summary||'—')}</div>
     </div>
-    <div class="card" style="margin-top:10px;">
-      <h3>寄り後メモ</h3>
-      <div class="item tight"><div class="item-sub">${nl2br(data.summary||"-")}</div></div>
-    </div>
-  `;
-}
 
-function render1200(data){
-  if(!data){els.tab1200.innerHTML=`<div class="empty">12:00データがありません</div>`;return;}
-  const plan=data.afternoon_plan||{};
-  els.tab1200.innerHTML=`
-    <div class="summary-card">
-      <div class="summary-top">
-        <div>
-          <div class="summary-label">12:00 サマリー</div>
-          <div class="summary-title">${esc(plan.status_label||"後場戦略")}</div>
-        </div>
-        <div class="pills">
-          ${plan.pm_regime_label?`<span class="pill">${esc(plan.pm_regime_label)}</span>`:""}
-          ${plan.status?`<span class="pill">${esc(plan.status)}</span>`:""}
-        </div>
-      </div>
-      <div class="summary-text">${esc(plan.summary||data.summary||"サマリーなし")}</div>
-    </div>
-    <div class="grid two">
-      <div class="card">
-        <h3>後場の方針</h3>
-        <div class="list">
-          <div class="item tight"><div class="item-title">前場で強かったテーマ</div><div class="item-sub">${esc(compactJoin(data.strong_themes_am))}</div></div>
-          <div class="item tight"><div class="item-title">後場の本命テーマ</div><div class="item-sub">${esc(compactJoin(data.pm_core_themes))}</div></div>
-          <div class="item tight"><div class="item-title">捨てるテーマ</div><div class="item-sub">${esc(compactJoin(data.drop_themes))}</div></div>
-        </div>
-      </div>
-      <div class="card">
-        <h3>後場でやること / やらないこと</h3>
-        <div class="item tight"><div class="item-title">仕掛け条件</div><div class="item-sub">${arr(data.entry_conditions_pm).map(esc).join("<br>")||"なし"}</div></div>
-        <div class="item danger" style="margin-top:8px;"><div class="item-title">やらないこと</div><div class="item-sub">${arr(data.do_not_do_pm).map(esc).join("<br>")||"なし"}</div></div>
-        <div class="item tight" style="margin-top:8px;"><div class="item-title">見送り条件</div><div class="item-sub">${arr(data.skip_conditions_pm).map(esc).join("<br>")||"なし"}</div></div>
+    <div class="card">
+      <h3>今日の学び</h3>
+      <div style="display:grid;gap:5px">
+        ${r.actually_best_theme?`<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:var(--muted);margin-bottom:2px">取るべきだったテーマ</div><div style="font-size:12px;color:var(--green)">${esc(r.actually_best_theme)}</div></div>`:''}
+        ${r.danger_theme_in_morning?`<div style="background:rgba(240,62,78,.06);border:1px solid rgba(240,62,78,.2);border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:var(--muted);margin-bottom:2px">危険だったテーマ</div><div style="font-size:12px;color:var(--red)">${esc(r.danger_theme_in_morning)}</div></div>`:''}
+        ${r.next_ban_rule?`<div style="background:rgba(240,62,78,.06);border:1px solid rgba(240,62,78,.2);border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:var(--muted);margin-bottom:2px">次回の禁止事項</div><div style="font-size:12px;color:var(--red)">${esc(r.next_ban_rule)}</div></div>`:''}
+        ${r.next_focus?`<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:var(--muted);margin-bottom:2px">次の注目</div><div style="font-size:12px;color:var(--cyan)">${esc(r.next_focus)}</div></div>`:''}
       </div>
     </div>
-    <div class="card" style="margin-top:10px;">
-      <h3>新規監視銘柄</h3>
-      ${renderWatchCards(data.new_watchlist)}
-    </div>
-  `;
-}
 
-function render1535(data){
-  if(!data){els.tab1535.innerHTML=`<div class="empty">15:35データがありません</div>`;return;}
-  const r=data.review||{};
-  els.tab1535.innerHTML=`
-    <div class="summary-card">
-      <div class="summary-top">
-        <div>
-          <div class="summary-label">15:35 サマリー</div>
-          <div class="summary-title">${esc(r.next_ban_rule||"実戦学習")}</div>
-        </div>
-        <div class="pills">
-          <span class="pill">テーマ ${esc(r.theme_score??"-")}</span>
-          <span class="pill">執行 ${esc(r.execution_score??"-")}</span>
-          <span class="pill">見送り ${esc(r.skip_score??"-")}</span>
-        </div>
-      </div>
-      <div class="summary-text">${esc(data.summary||"サマリーなし")}</div>
-    </div>
-    <div class="grid two">
-      <div class="card">
-        <h3>今日の学び</h3>
-        <div class="list">
-          <div class="item tight"><div class="item-title">取るべきだったテーマ</div><div class="item-sub">${esc(r.actually_best_theme||"-")}</div></div>
-          <div class="item tight"><div class="item-title">危険だったテーマ</div><div class="item-sub">${esc(r.danger_theme_in_morning||"-")}</div></div>
-          <div class="item tight"><div class="item-title">次回の禁止事項</div><div class="item-sub">${esc(r.next_ban_rule||"-")}</div></div>
-          <div class="item tight"><div class="item-title">次の注目</div><div class="item-sub">${esc(r.next_focus||"-")}</div></div>
-        </div>
-      </div>
-      <div class="card">
-        <h3>銘柄と仮説</h3>
-        <div class="list">
-          <div class="item tight"><div class="item-title">伸びた先導株</div><div class="item-sub">${esc(r.best_leader_stock||"-")}</div></div>
-          <div class="item tight"><div class="item-title">伸びなかった連想株</div><div class="item-sub">${esc(r.weak_secondary_stock||"-")}</div></div>
-          <div class="item tight"><div class="item-title">外れた仮説</div><div class="item-sub">${esc(r.wrong_hypothesis||"-")}</div></div>
-        </div>
+    <div class="card">
+      <h3>銘柄と仮説</h3>
+      <div style="display:grid;gap:5px">
+        ${r.best_leader_stock?`<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:var(--muted);margin-bottom:2px">伸びた先導株</div><div style="font-size:12px;color:var(--green)">${esc(r.best_leader_stock)}</div></div>`:''}
+        ${r.weak_secondary_stock?`<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:var(--muted);margin-bottom:2px">伸びなかった連想株</div><div style="font-size:12px;color:var(--muted)">${esc(r.weak_secondary_stock)}</div></div>`:''}
+        ${r.wrong_hypothesis?`<div style="background:rgba(240,62,78,.06);border:1px solid rgba(240,62,78,.2);border-radius:8px;padding:8px 10px"><div style="font-size:10px;color:var(--muted);margin-bottom:2px">外れた仮説</div><div style="font-size:12px;color:var(--red)">${esc(r.wrong_hypothesis)}</div></div>`:''}
       </div>
     </div>
   `;
 }
 
-function renderLog(logs){
-  els.tabLog.innerHTML=`<div class="card"><h3>振り返りログ</h3>${renderReviewLogs(logs)}</div>`;
-}
-
-function renderSettings(){
-  const user=localStorage.getItem(STORAGE_USER)||"sszzkkzzkk";
-  const repo=localStorage.getItem(STORAGE_REPO)||"stock-analyzer";
-  els.tabSettings.innerHTML=`
-    <div class="notice">接続先や設定はここで管理します。</div>
-    <div style="height:12px;"></div>
-    <div class="field"><label>GitHub ユーザー名</label><input id="ghUser" value="${esc(user)}" placeholder="例: sszzkkzzkk"></div>
-    <div class="field"><label>リポジトリ名</label><input id="ghRepo" value="${esc(repo)}" placeholder="例: stock-analyzer"></div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button class="btn" id="saveBtn">保存して接続</button>
-      <button class="btn" id="clearBtn">設定クリア</button>
+// ===== ログ =====
+function renderLog(){
+  const el=document.getElementById('plog');
+  const logs=dlog;
+  if(!logs||!arr(logs).length){el.innerHTML=`<div class="empty">ログがまだありません</div>`;return;}
+  const list=arr(logs).slice().reverse();
+  el.innerHTML=`
+    <div style="overflow:auto;border:1px solid var(--border);border-radius:10px">
+      <table style="width:100%;min-width:640px;border-collapse:collapse">
+        <thead><tr>${['日付','使えた判断','良かった点','禁止事項','次の注目','テーマ','執行','見送り'].map(h=>`<th style="padding:8px 9px;text-align:left;font-size:11px;color:var(--muted);background:var(--s1);border-bottom:1px solid var(--border)">${h}</th>`).join('')}</tr></thead>
+        <tbody>${list.map(x=>`<tr style="border-bottom:1px solid var(--border)">
+          ${[x.date,x.usefulness,x.easy_pattern,x.danger_pattern,x.next_note,x.theme_score,x.execution_score,x.skip_score]
+            .map(v=>`<td style="padding:8px 9px;font-size:11px;vertical-align:top;color:var(--body)">${esc(v??'-')}</td>`).join('')}
+        </tr>`).join('')}</tbody>
+      </table>
     </div>
   `;
-  document.getElementById("saveBtn").addEventListener("click",async()=>{
-    localStorage.setItem(STORAGE_USER,document.getElementById("ghUser").value.trim());
-    localStorage.setItem(STORAGE_REPO,document.getElementById("ghRepo").value.trim());
-    await loadAll();
-  });
-  document.getElementById("clearBtn").addEventListener("click",()=>{
-    localStorage.removeItem(STORAGE_USER);localStorage.removeItem(STORAGE_REPO);
-    renderSettings();
-  });
 }
 
-async function safeLoad(path){try{return await fetchJson(path);}catch{return null;}}
-
-async function loadAll(){
-  ["tab600","tab905","tab1200","tab1535","tabLog"].forEach(id=>{
-    document.getElementById(id).innerHTML=`<div class="empty">読み込み中...</div>`;
-  });
-  const[d600,d905,d1200,d1535,logs]=await Promise.all([
-    safeLoad("latest_600.json"),safeLoad("latest_905.json"),
-    safeLoad("latest_1200.json"),safeLoad("latest_1535.json"),
-    safeLoad("review_log.json"),
-  ]);
-  setGlobalMeta(d600,d905,d1200,d1535);
-  renderMarketBar(d600);
-  render600(d600);render905(d905);render1200(d1200);render1535(d1535);
-  renderLog(logs);renderSettings();
-  fetchRealtime();
+// ===== 設定 =====
+function renderSet(){
+  const el=document.getElementById('pset');
+  const u=localStorage.getItem(GHU)||'sszzkkzzkk';
+  const r=localStorage.getItem(GHR)||'stock-analyzer';
+  el.innerHTML=`
+    <div class="notice">接続先のGitHub Pagesを設定します。</div>
+    <div class="fld"><label>GitHubユーザー名</label><input id="su" value="${esc(u)}" placeholder="sszzkkzzkk"></div>
+    <div class="fld"><label>リポジトリ名</label><input id="sr" value="${esc(r)}" placeholder="stock-analyzer"></div>
+    <button class="sbtn" onclick="saveSet()">保存して接続</button>
+  `;
+}
+function saveSet(){
+  localStorage.setItem(GHU,document.getElementById('su').value.trim());
+  localStorage.setItem(GHR,document.getElementById('sr').value.trim());
+  sw('p600',document.querySelector('.tab'));loadAll();
 }
 
-// タブ切替
-document.querySelectorAll(".tab").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-    document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById(btn.dataset.tab).classList.add("active");
-  });
-});
-
-document.getElementById("refreshBtn").addEventListener("click",loadAll);
+// ===== 起動 =====
 loadAll();
 </script>
 
