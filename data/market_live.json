@@ -1,10 +1,53 @@
 {
-  "generated_at": "2026-03-19 18:57:15",
-  "items": [],
-  "errors": [
-    "日経平均: HTTP Error 401: Unauthorized",
-    "日経先物: HTTP Error 401: Unauthorized",
-    "ドル円: HTTP Error 401: Unauthorized",
-    "NYダウ: HTTP Error 401: Unauthorized"
+  "generated_at": "2026-03-19 19:09:06",
+  "items": [
+    {
+      "name": "日経平均",
+      "value": "53,372.53",
+      "change": "-1,816.13",
+      "percent": "-3.29%",
+      "time": "N/A",
+      "source": "yfinance:^N225"
+    },
+    {
+      "name": "日経先物",
+      "value": "52,760.00",
+      "change": "-685.00",
+      "percent": "-1.28%",
+      "time": "N/A",
+      "source": "yfinance:NIY=F"
+    },
+    {
+      "name": "ドル円",
+      "value": "159.11",
+      "change": "-0.68",
+      "percent": "-0.43%",
+      "time": "N/A",
+      "source": "yfinance:JPY=X"
+    },
+    {
+      "name": "NYダウ",
+      "value": "46,225.15",
+      "change": "-768.11",
+      "percent": "-1.63%",
+      "time": "N/A",
+      "source": "yfinance:^DJI"
+    },
+    {
+      "name": "SOX",
+      "value": "7,795.13",
+      "change": "-41.70",
+      "percent": "-0.53%",
+      "time": "N/A",
+      "source": "yfinance:^SOX"
+    },
+    {
+      "name": "WTI原油",
+      "value": "95.04",
+      "change": "-1.33",
+      "percent": "-1.38%",
+      "time": "N/A",
+      "source": "yfinance:CL=F"
+    }
   ]
 }
