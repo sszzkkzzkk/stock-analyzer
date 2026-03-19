@@ -38,5 +38,15 @@
     "theme_score": 45,
     "execution_score": 70,
     "skip_score": 85
+  },
+  {
+    "date": "2026-03-19",
+    "usefulness": "テーマ選定(資源エネルギー)は的中も執行は失敗。原油ブル等ETFが上位独占する中、個別株の押し目待ちに固執。商品急騰時はETF優先ルールが必要。寄り天回避の判断は正解で無駄な損失を回避できた点は評価",
+    "easy_pattern": "原油先Wブル",
+    "danger_pattern": "NYダウ大幅安後の原油急騰時は個別株押し目待ちより商品ETF寄り付き勢い確認を優先",
+    "next_note": "原油価格急騰局面では商品ETFの初動5分間の出来高と値幅を計測。個別株は二番手扱い",
+    "theme_score": 85,
+    "execution_score": 45,
+    "skip_score": 75
   }
 ]
