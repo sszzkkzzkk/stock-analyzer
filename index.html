@@ -12,7 +12,8 @@
       --danger-bg:rgba(255,107,107,.16); --danger-line:rgba(255,107,107,.42); --danger-text:#ffd6d6;
       --gold:#ffcc66; --gold-bg:rgba(255,204,102,.12); --gold-line:rgba(255,204,102,.35);
       --silver:#9fd6ff; --silver-bg:rgba(159,214,255,.10); --silver-line:rgba(159,214,255,.28);
-      --hdr-h:0px; --top-h:0px; --tabs-h:0px;
+      --bronze:#c6925b; --bronze-bg:rgba(198,146,91,.10); --bronze-line:rgba(198,146,91,.26);
+      --hdr-h:0px; --tabs-h:0px;
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0}
@@ -25,7 +26,6 @@
     }
     .good{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
     .wrap{max-width:1180px;margin:0 auto;padding:12px}
-
     .hdr{
       position:relative;
       background:rgba(6,13,26,.96);
@@ -54,7 +54,6 @@
       border-radius:14px; padding:10px 14px; font:inherit; cursor:pointer;
     }
 
-    /* 上部は「指標だけ」固定。大きいヒーローは固定しない */
     .top-wrap{
       position:relative;
       background:rgba(6,13,26,.96);
@@ -77,7 +76,6 @@
     .metric-name,.metric-time{font-size:10px; color:var(--muted)}
     .metric-value{font-size:16px; font-weight:900; margin-top:4px}
     .metric-change{font-size:11px; font-weight:700; margin-top:4px}
-
     .focus-mini{
       margin-top:8px;
       border:1px solid var(--line);
@@ -135,6 +133,7 @@
 
     .grid{display:grid; gap:12px}
     .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
     .card{
       background:var(--panel3);
       border:1px solid var(--line);
@@ -170,6 +169,15 @@
     .theme-title{font-size:18px; font-weight:900}
     .theme-text{font-size:13px; color:var(--muted); line-height:1.45}
 
+    .watch-tier{
+      border-radius:14px; padding:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+    }
+    .watch-tier.primary{background:var(--gold-bg); border-color:var(--gold-line)}
+    .watch-tier.secondary{background:var(--silver-bg); border-color:var(--silver-line)}
+    .watch-tier.reserve{background:var(--bronze-bg); border-color:var(--bronze-line)}
+    .watch-tier h4{margin:0 0 10px; font-size:14px}
     .watch{
       background:rgba(255,255,255,.03);
       border:1px solid rgba(255,255,255,.06);
@@ -208,7 +216,7 @@
     @media (max-width:980px){
       .metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
       .tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .grid.two{grid-template-columns:1fr}
+      .grid.two,.grid.three{grid-template-columns:1fr}
       .hero-title{font-size:22px}
     }
   </style>
@@ -257,7 +265,7 @@
 const STORAGE_USER="stock-ai-user";
 const STORAGE_REPO="stock-ai-repo";
 let selectedMarketName="日経平均";
-let state={d600:null,d905:null,d1200:null,d1535:null};
+let state={d600:null,d905:null,d1200:null,d1535:null,marketLive:null};
 
 const els={
   globalMeta:document.getElementById("globalMeta"),
@@ -298,22 +306,41 @@ function firstMatchItem(data,names,buckets=[]){
   (buckets.length?buckets:["indices","futures","forex","world_indices","sox","oil"]).forEach(b=>merged.push(...arr(market[b])));
   return merged.find(x=>names.includes(x.name))||null;
 }
-function getMarketPicks(d600){
+function normalizeLiveItems(raw){
+  if(!raw) return [];
+  if(Array.isArray(raw)) return raw;
+  if(Array.isArray(raw.items)) return raw.items;
+  if(raw.market_data){
+    return [
+      firstMatchItem(raw,["日経平均"],["indices"]),
+      firstMatchItem(raw,["日経先物","日経225先物"],["futures"]),
+      firstMatchItem(raw,["ドル円","米ドル円"],["forex"]),
+      firstMatchItem(raw,["NYダウ","ＮＹダウ"],["world_indices"])
+    ].filter(Boolean);
+  }
+  return [];
+}
+function getMarketPicks(){
+  const live = normalizeLiveItems(state.marketLive);
+  if(live.length) return live;
   return [
-    firstMatchItem(d600,["日経平均"],["indices"]),
-    firstMatchItem(d600,["日経先物","日経225先物"],["futures"]),
-    firstMatchItem(d600,["ドル円","米ドル円"],["forex"]),
-    firstMatchItem(d600,["NYダウ","ＮＹダウ"],["world_indices"])
+    firstMatchItem(state.d600,["日経平均"],["indices"]),
+    firstMatchItem(state.d600,["日経先物","日経225先物"],["futures"]),
+    firstMatchItem(state.d600,["ドル円","米ドル円"],["forex"]),
+    firstMatchItem(state.d600,["NYダウ","ＮＹダウ"],["world_indices"])
   ].filter(Boolean);
 }
 function setGlobalMeta(...datasets){
   const times=datasets.map(x=>x?.generated_at).filter(Boolean);
-  els.globalMeta.textContent=`更新 ${times.length?times.join(" / "):"-"}`;
+  const liveTime=state.marketLive?.generated_at || state.marketLive?.updated_at || "";
+  const suffix=liveTime ? ` / 指標 ${liveTime}` : "";
+  els.globalMeta.textContent=`更新 ${times.length?times.join(" / "):"-"}${suffix}`;
 }
-function renderMetrics(d600){
-  const picks=getMarketPicks(d600);
+function renderMetrics(){
+  const picks=getMarketPicks();
+  const hasLive=normalizeLiveItems(state.marketLive).length>0;
   if(!picks.length){
-    els.metricsGrid.innerHTML=`<div class="notice" style="grid-column:1/-1">主要指標データが取得できません。これは市場リアルタイム直結ではなく、JSONの定期再取得です。</div>`;
+    els.metricsGrid.innerHTML=`<div class="notice" style="grid-column:1/-1">主要指標データが取得できません。いまは market_live.json があればそちらを優先し、なければ朝の分析JSONの値を表示します。</div>`;
     els.focusMini.innerHTML="";
     return;
   }
@@ -330,7 +357,7 @@ function renderMetrics(d600){
   els.metricsGrid.querySelectorAll("[data-market]").forEach(btn=>{
     btn.addEventListener("click",()=>{
       selectedMarketName=btn.getAttribute("data-market");
-      renderMetrics(d600);
+      renderMetrics();
       syncStickyHeights();
     });
   });
@@ -340,11 +367,11 @@ function renderMetrics(d600){
     <div>
       <div class="focus-kicker">選択中の主要指標</div>
       <div class="focus-main ${klass}">${esc(selected.name)} ${esc(selected.value)}</div>
-      <div class="focus-sub">${esc(selected.change)} ${esc(selected.percent)} / 最終更新 ${esc(selected.time)} / 60秒再取得</div>
+      <div class="focus-sub">${esc(selected.change)} ${esc(selected.percent)} / 最終更新 ${esc(selected.time)} / ${hasLive ? "market_live 優先" : "朝データを表示中"}</div>
     </div>
     <div class="pills">
-      <span class="pill">軽量表示</span>
-      <span class="pill">JSON再取得</span>
+      <span class="pill">${hasLive ? "指標ライブON" : "指標ライブ未取得"}</span>
+      <span class="pill">60秒再取得</span>
     </div>`;
 }
 function renderThemeCards(items){
@@ -356,17 +383,37 @@ function renderThemeCards(items){
       <div class="theme-text">${esc(x.reason||"-")}</div>
     </div>`).join("")}</div>`;
 }
-function renderWatchCards(items){
-  const list=arr(items).filter(Boolean);
-  if(!list.length) return `<div class="notice">監視銘柄なし</div>`;
-  return `<div class="grid two">${list.map((x,idx)=>`
-    <div class="watch">
-      <div class="watch-head"><span class="pill">優先 ${idx+1}</span><div class="watch-name">${esc(x.name||"-")} ${x.code?`(${esc(x.code)})`:""}</div></div>
-      <div class="watch-role">${esc(x.bucket||"-")} / ${esc(x.reason||"-")}</div>
-      <div class="watch-row"><div class="watch-key">仕掛け</div><div>${esc(x.trigger||"-")}</div></div>
-      <div class="watch-row"><div class="watch-key">失効</div><div>${esc(x.invalidation||"-")}</div></div>
-      <div class="watch-row"><div class="watch-key">時間帯</div><div>${esc(x.time_window||"-")}</div></div>
-    </div>`).join("")}</div>`;
+function classifyWatchlist(items){
+  const list=arr(items).filter(Boolean).slice(0,10);
+  return {
+    primary:list.slice(0,3),
+    secondary:list.slice(3,5),
+    reserve:list.slice(5,10)
+  };
+}
+function renderWatchTier(title, cls, items, emptyText){
+  if(!items.length) return `<div class="watch-tier ${cls}"><h4>${title}</h4><div class="notice">${emptyText}</div></div>`;
+  return `<div class="watch-tier ${cls}">
+    <h4>${title}</h4>
+    <div class="grid">${items.map((x,idx)=>`
+      <div class="watch">
+        <div class="watch-head"><span class="pill">${idx+1}位</span><div class="watch-name">${esc(x.name||"-")} ${x.code?`(${esc(x.code)})`:""}</div></div>
+        <div class="watch-role">${esc(x.bucket||"-")} / ${esc(x.reason||"-")}</div>
+        <div class="watch-row"><div class="watch-key">仕掛け</div><div>${esc(x.trigger||"-")}</div></div>
+        <div class="watch-row"><div class="watch-key">失効</div><div>${esc(x.invalidation||"-")}</div></div>
+        <div class="watch-row"><div class="watch-key">時間帯</div><div>${esc(x.time_window||"-")}</div></div>
+      </div>`).join("")}
+    </div>
+  </div>`;
+}
+function renderWatchBlock(items, emptyText="監視銘柄なし"){
+  const tiers=classifyWatchlist(items);
+  if(!tiers.primary.length && !tiers.secondary.length && !tiers.reserve.length) return `<div class="notice">${emptyText}</div>`;
+  return `<div class="grid three">
+    ${renderWatchTier("最優先 3件", "primary", tiers.primary, "最優先なし")}
+    ${renderWatchTier("準主役 2件", "secondary", tiers.secondary, "準主役なし")}
+    ${renderWatchTier("予備 5件まで", "reserve", tiers.reserve, "予備なし")}
+  </div>`;
 }
 function renderThemeList(items, emptyText="データなし"){
   const list=arr(items).filter(Boolean);
@@ -409,7 +456,7 @@ function render600(data){
     </div>
     <div class="grid two">
       <div class="card"><h3>本命テーマ</h3>${renderThemeCards(data.priority_themes)}</div>
-      <div class="card"><h3>本命監視銘柄</h3>${renderWatchCards(arr(data.watchlist).filter(x=>["先導株","連想1軍"].includes(x.bucket)).slice(0,4))}</div>
+      <div class="card"><h3>監視銘柄</h3>${renderWatchBlock(data.watchlist, "監視銘柄なし")}</div>
     </div>
     <div class="grid two">
       <div class="card"><h3>やること</h3><div class="list">${arr(data.entry_conditions).length?arr(data.entry_conditions).map(x=>`<div class="item"><div class="item-sub">${esc(x)}</div></div>`).join(""):`<div class="notice">仕掛け条件なし</div>`}</div></div>
@@ -420,11 +467,11 @@ function render600(data){
       <div class="card"><h3>見ないテーマ / 危険パターン</h3>${renderThemeList(data.avoid_themes,"見ないテーマなし")}<div style="height:10px"></div><div class="list">${arr(data.danger_patterns).length?arr(data.danger_patterns).map(x=>`<div class="item"><div class="item-sub">${esc(x)}</div></div>`).join(""):`<div class="notice">危険パターンなし</div>`}</div></div>
     </div>
   </div>`;
-  bindNewsToggles();
 }
 function render905(data){
   if(!data){els.tab905.innerHTML=`<div class="notice">9:10データがありません</div>`; return;}
   const j=data.action_judgement||{};
+  const watch = arr(data.watchlist || data.monitor_list || []);
   els.tab905.innerHTML=`<div class="stack">
     <div class="hero">
       <div class="hero-top">
@@ -441,12 +488,16 @@ function render905(data){
       </div></div>
       <div class="card"><h3>テーマ状態</h3>${renderThemeStatus(data.theme_status)}</div>
     </div>
+    <div class="card"><h3>監視銘柄</h3>${renderWatchBlock(watch.length ? watch : arr(state.d600?.watchlist||[]), "監視銘柄なし")}</div>
     <div class="card"><h3>寄り後メモ</h3><div class="item"><div class="item-sub">${nl2br(data.summary||"-")}</div></div></div>
   </div>`;
 }
 function render1200(data){
   if(!data){els.tab1200.innerHTML=`<div class="notice">12:00データがありません</div>`; return;}
   const p=data.afternoon_plan||{};
+  const fallback = arr(state.d600?.watchlist||[]).slice(0,5);
+  const newWatch = arr(data.new_watchlist||[]);
+  const displayWatch = newWatch.length >= 5 ? newWatch : [...newWatch, ...fallback].slice(0,10);
   els.tab1200.innerHTML=`<div class="stack">
     <div class="hero">
       <div class="hero-top">
@@ -467,7 +518,7 @@ function render1200(data){
         <div class="item"><div class="item-title">見送り条件</div><div class="item-sub">${arr(data.skip_conditions_pm).map(esc).join("<br>")||"なし"}</div></div>
       </div></div>
     </div>
-    <div class="card"><h3>新規監視銘柄</h3>${renderWatchCards(data.new_watchlist)}</div>
+    <div class="card"><h3>後場の監視銘柄</h3>${renderWatchBlock(displayWatch, "後場監視銘柄なし")}</div>
   </div>`;
 }
 function render1535(data,d600,d905,d1200){
@@ -497,8 +548,6 @@ function render1535(data,d600,d905,d1200){
 }
 function syncStickyHeights(){
   const tabs=document.querySelector(".tabs-wrap");
-  document.documentElement.style.setProperty("--hdr-h","0px");
-  document.documentElement.style.setProperty("--top-h","0px");
   document.documentElement.style.setProperty("--tabs-h",`${tabs?Math.ceil(tabs.getBoundingClientRect().height):0}px`);
 }
 async function loadAll(){
@@ -506,15 +555,18 @@ async function loadAll(){
   els.tab905.innerHTML='<div class="notice">読み込み中...</div>';
   els.tab1200.innerHTML='<div class="notice">読み込み中...</div>';
   els.tab1535.innerHTML='<div class="notice">読み込み中...</div>';
-  const [d600,d905,d1200,d1535]=await Promise.all([
+
+  const [marketLive,d600,d905,d1200,d1535]=await Promise.all([
+    safeLoad("market_live.json"),
     safeLoad("latest_600.json"),
     safeLoad("latest_905.json"),
     safeLoad("latest_1200.json"),
     safeLoad("latest_1535.json")
   ]);
-  state={d600,d905,d1200,d1535};
+
+  state={marketLive,d600,d905,d1200,d1535};
   setGlobalMeta(d600,d905,d1200,d1535);
-  renderMetrics(d600);
+  renderMetrics();
   render600(d600);
   render905(d905);
   render1200(d1200);
