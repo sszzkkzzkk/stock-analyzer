@@ -1,3 +1,129 @@
 ```json
-{"strategy": {"market_regime": "selective", "market_regime_label": "選別相場", "entry_style": "pullback", "entry_style_label": "寄り後押し目待ち", "danger_level": "高", "battlefield": "エネルギーETF（原油WTI関連）", "one_line": "NYダウ大幅安も原油95ドル台維持、WTI関連ETFに資金逃避"}, "themes": [{"rank": "A", "rank_label": "本命", "name": "原油・エネルギーETF", "score": 88, "reason": "WTI95ドル台堅調＋中東不透明感継続＋欧州エネルギー高＋前日ETF主役パターン再現", "continuity": "継続", "leader_strength": "強", "ripple": "狭", "leader_stock": "原油先Ｗブル", "entry_hint": "9:00寄り付き確認後、ETF先行なら押し目"}, {"rank": "B", "rank_label": "対抗", "name": "ディフェンシブ（内需・SaaS）", "score": 65, "reason": "NYダウ大幅安でリスクオフ、円高進行で内需系＋SaaS特集記事の追い風", "continuity": "新規", "leader_strength": "中", "ripple": "中", "leader_stock": "未特定", "entry_hint": "下落耐性確認後、個別材料株から選別"}, {"rank": "C", "rank_label": "監視", "name": "蓄電池", "score": 52, "reason": "対米投融資第2弾候補とニュースあるも、リスクオフ環境で資金集中力弱い", "continuity": "新規", "leader_strength": "弱", "ripple": "中", "leader_stock": "未特定", "entry_hint": "前場様子見、独自材料持ち銘柄のみ"}], "watchlist": [{"bucket": "先導株", "name": "原油先Ｗブル", "code": "2038", "theme": "原油・エネルギーETF", "reason": "前日上位ランクイン、WTI95ドル台で寄り高確実", "trigger": "寄り後9:10までに+3%超維持なら押し目", "invalidation": "9:30までに前日比マイ転", "time_window": "9:00-9:30"}, {"bucket": "先導株", "name": "ＷＴエナジー", "code": "1685", "theme": "原油・エネルギーETF", "reason": "WTI原油連動ETF、前日上位で継続性確認", "trigger": "原油先Ｗブルと連動上昇、出来高急増", "invalidation": "9:20時点で出来高低迷", "time_window": "9:00-9:30"}, {"bucket": "連想1軍", "name": "ＷＴ天然ガス", "code": "1689", "theme": "原油・エネルギーETF", "reason": "エネルギー系ETF全体への波及確認用", "trigger": "天然ガスも連動高なら資源全体テーマ", "invalidation": "単独下落ならWTI限定", "time_window": "9:00-9:30"}, {"bucket": "連想2軍", "name": "アスタリスク", "code": "6522", "theme": "個別材料株", "reason": "上昇率上位、個別株への資金分散度チェック", "trigger": "寄り後も上昇継続なら個別分散相場", "invalidation": "寄り天井で失速", "time_window": "9:00-9:20"}, {"bucket": "連想2軍", "name": "エデュラボ", "code": "4427", "theme": "個別材料株", "reason": "上昇率上位、ETF一極集中か分散か判定", "trigger": "独自材料で続伸なら個別物色活発化", "invalidation": "材料不明で寄り天", "time_window": "9:00-9:20"}], "avoid_themes": [{"name": "半導体・SOX関連", "reason": "SOX軟調＋日経先物-2.5%で逆風、円高も逆風"}, {"name": "輸出株全般", "reason": "円高進行＋NYダウ大幅安でダブルパンチ、主力株全面安リスク"}], "skip_rule": "個別株テーマへの飛びつき厳禁。ETF先行確認まで待機、主力株の寄り底確認前の逆張り禁止", "summary": "NYダウ大幅安も原油95ドル維持で前日同様ETF主役濃厚。原油先Ｗブル・WTエナジー等ETF集中監視。個別株分散なら手出し無用、ETF一極なら押し目狙い。日経-2.5%予想で主力株全面安、SaaS等ディフェンシブも選別限定。商品ETF動向を9:30まで最優先確認"}
+{
+  "strategy": {
+    "market_regime": "avoid",
+    "market_regime_label": "見送り寄り",
+    "entry_style": "skip",
+    "entry_style_label": "見送り",
+    "danger_level": "高",
+    "battlefield": "ETF集中相場",
+    "one_line": "日経-2.79%の全面安。原油ETFに逃避も個別株は総崩れ、期末要因で手出し無用"
+  },
+  "themes": [
+    {
+      "rank": "A",
+      "rank_label": "本命",
+      "name": "原油ETF",
+      "score": 78,
+      "reason": "WTI95ドル台高止まり。前日教訓通り個別株より商品ETFに資金集中",
+      "continuity": "継続",
+      "leader_strength": "強",
+      "ripple": "狭",
+      "leader_stock": "原油先Ｗブル",
+      "entry_hint": "ETF専門。個別株は分散で集中度不足、手出し不要"
+    },
+    {
+      "rank": "B",
+      "rank_label": "対抗",
+      "name": "天然ガスETF",
+      "score": 62,
+      "reason": "エネルギー全般高。ガスETFもランクイン、原油の派生受け皿",
+      "continuity": "新規",
+      "leader_strength": "中",
+      "ripple": "狭",
+      "leader_stock": "ＷＴ天然ガス",
+      "entry_hint": "原油に次ぐ資源逃避先。個別エネルギー株は不発注意"
+    },
+    {
+      "rank": "C",
+      "rank_label": "監視",
+      "name": "蓄電池",
+      "score": 45,
+      "reason": "対米投融資第2弾候補でニュースあるも、全面安で買い手不在懸念",
+      "continuity": "新規",
+      "leader_strength": "弱",
+      "ripple": "中",
+      "leader_stock": "不明",
+      "entry_hint": "材料あるが地合い最悪。前場様子見後も手出し危険"
+    }
+  ],
+  "watchlist": [
+    {
+      "bucket": "先導株",
+      "name": "原油先Ｗブル",
+      "code": "2038",
+      "theme": "原油ETF",
+      "reason": "騰落率上位常連。ETF主役相場の確認",
+      "trigger": "寄り後プラス維持なら本物",
+      "invalidation": "前場で失速",
+      "time_window": "9:00-10:00"
+    },
+    {
+      "bucket": "先導株",
+      "name": "ＷＴエナジー",
+      "code": "1685",
+      "theme": "原油ETF",
+      "reason": "原油系ETF。複数銘柄上位なら資金集中確実",
+      "trigger": "寄り高後も買い継続",
+      "invalidation": "寄り天",
+      "time_window": "9:00-9:30"
+    },
+    {
+      "bucket": "先導株",
+      "name": "ＷＴ天然ガス",
+      "code": "1689",
+      "theme": "天然ガスETF",
+      "reason": "エネルギー全般逃避の確認用",
+      "trigger": "原油ETFと同時高",
+      "invalidation": "原油のみ上昇",
+      "time_window": "9:00-10:00"
+    },
+    {
+      "bucket": "危険株",
+      "name": "半導体関連全般",
+      "code": "-",
+      "theme": "半導体",
+      "reason": "SOX-0.53%、日経先物-2.79%で主力壊滅",
+      "trigger": "なし",
+      "invalidation": "触らない",
+      "time_window": "終日"
+    },
+    {
+      "bucket": "危険株",
+      "name": "防衛関連",
+      "code": "-",
+      "theme": "防衛",
+      "reason": "前日分散で集中せず。全面安で追撃買い不在",
+      "trigger": "なし",
+      "invalidation": "触らない",
+      "time_window": "終日"
+    },
+    {
+      "bucket": "危険株",
+      "name": "個別材料株",
+      "code": "-",
+      "theme": "各種",
+      "reason": "地合い最悪時の個別材料は無視される。期末売り圧力",
+      "trigger": "なし",
+      "invalidation": "地合い回復まで",
+      "time_window": "終日"
+    }
+  ],
+  "avoid_themes": [
+    {
+      "name": "半導体",
+      "reason": "SOX弱含み、日経大幅安で主力株総崩れ。逆張り危険"
+    },
+    {
+      "name": "防衛",
+      "reason": "前日分散で一極集中せず。材料あっても地合い悪すぎ"
+    },
+    {
+      "name": "SaaS",
+      "reason": "ニュースあるがグロース壊滅環境。特集記事は逆指標"
+    }
+  ],
+  "skip_rule": "個別株への新規エントリー全面禁止。ETF以外は期末需給で予測不能",
+  "summary": "日経先物-2.79%の暴落相場。前日教訓通り原油・ガスETFのみ資金逃避で上昇。個別株は防衛・半導体・蓄電池すべて分散で集中度ゼロ。期末需給の混乱期、ETF監視のみで個別株手出し無用。9:30までに原油ETF失速なら完全撤退"
+}
 ```
