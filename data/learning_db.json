@@ -9,19 +9,19 @@
         "円高"
       ],
       "predicted_top_theme": "資源エネルギー",
-      "actual_top_theme": "原油関連（レバレッジ型含む）",
+      "actual_top_theme": "原油関連（原油ブル・WTエナジー・WT原油）",
       "theme_hit": true,
-      "theme_match_reason": "原油高を背景に原油先Wブル、WTエナジー、WT天然ガス、WT原油が上位独占。朝予測した資源エネルギーテーマが完全的中。レアアースも関連で上昇",
-      "best_call": "資源エネルギーテーマ予測と原油ブル等の寄り付き急騰追撃禁止判断",
-      "worst_call": "半導体を回避テーマに指定したが実際は活発テーマに浮上",
-      "wrong_hypothesis": "半導体を完全回避としたが、実際のactive_themesに半導体が含まれデータセンター・AI関連も動いた。選別相場でも半導体内の銘柄選別は必要だった",
-      "next_ban_rule": "回避テーマ指定時も、そのテーマ内の決算好材料株や個別材料株は除外検討すること。全面回避は機会損失",
-      "next_focus": "原油価格維持か反落か。中東情勢継続監視。期末特有資金フロー（配当再投資、リバランス）の影響を週明け注視",
-      "key_lesson": "テーマ予測的中でも具体的主役銘柄（原油ブル系）特定不足。レバ型ETFも監視対象に",
-      "theme_score": 90,
-      "execution_score": 70,
+      "theme_match_reason": "原油高を背景に原油ブル、WTエナジー等が上位独占。レアアース・ナガオカも高騰。資源エネ予測が完全的中。朝の原油価格維持想定通り。",
+      "best_call": "資源エネルギーテーマ選定と原油ブル等の寄り天追撃禁止判断",
+      "worst_call": "半導体を回避テーマに指定したが実際は活発テーマに登場",
+      "wrong_hypothesis": "半導体を完全回避テーマに指定したが、実際にはactive_themesに半導体が含まれデータセンター・AIと連動。セクター全否定は過剰だった。",
+      "next_ban_rule": "テーマ全体回避でなく個別材料確認。半導体も決算・新技術等の明確材料あれば可。材料不在の惰性上昇のみ回避。",
+      "next_focus": "週末・期末の資金フロー動向。中東情勢継続で原油価格維持なら資源継続。個人買い越し傾向の小型材料株にも注目。",
+      "key_lesson": "テーマ的中時も寄り天追撃禁止が利益確保の鍵。セクター全否定より材料有無で選別。",
+      "theme_score": 95,
+      "execution_score": 90,
       "skip_score": 85,
-      "overall_score": 82,
+      "overall_score": 90,
       "market_snapshot": {
         "nikkei_change": "-3.29%",
         "dji_change": "-1.63%",
@@ -32,25 +32,25 @@
   ],
   "pattern_stats": {
     "NY下落": {
-      "count": 1,
-      "hits": 1,
+      "count": 2,
+      "hits": 2,
       "hit_rate": 1.0
     },
     "SOX横ばい": {
-      "count": 1,
-      "hits": 1,
+      "count": 2,
+      "hits": 2,
       "hit_rate": 1.0
     },
     "円高": {
-      "count": 1,
-      "hits": 1,
+      "count": 2,
+      "hits": 2,
       "hit_rate": 1.0
     }
   },
   "theme_stats": {
     "資源エネルギー": {
-      "count": 1,
-      "hits": 1,
+      "count": 2,
+      "hits": 2,
       "hit_rate": 1.0
     }
   },
