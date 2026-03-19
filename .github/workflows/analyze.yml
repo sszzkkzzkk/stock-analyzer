@@ -32,6 +32,7 @@ jobs:
   run:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -138,11 +139,8 @@ jobs:
           echo "session=$SESSION" >> "$GITHUB_OUTPUT"
           echo "run_now=$RUN_NOW" >> "$GITHUB_OUTPUT"
 
-      - name: Stop when no session is due
-        if: steps.session.outputs.run_now != 'true'
-        run: echo "No session due today." && exit 0
-
       - name: Run analyzer
+        if: steps.session.outputs.run_now == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SESSION: ${{ steps.session.outputs.session }}
@@ -255,5 +253,5 @@ jobs:
           cd publish
           git add -A
           git diff --cached --quiet && echo "No changes" && exit 0
-          git commit -m "update: ${{ steps.session.outputs.session }} ${{ steps.session.outputs.today_jst }}"
+          git commit -m "update: ${{ steps.session.outputs.session || 'marketlive' }} ${{ steps.session.outputs.today_jst }}"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:gh-pages
