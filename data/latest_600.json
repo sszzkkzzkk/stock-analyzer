@@ -1,7 +1,7 @@
 {
   "date": "2026-03-19",
   "session": "600",
-  "generated_at": "22:22",
+  "generated_at": "22:30",
   "data_sources": [
     "日経平均1件",
     "日経先物1件",
@@ -17,8 +17,8 @@
     "ロイター10件"
   ],
   "market_tags": [
-    "NY下落",
-    "SOX横ばい",
+    "NY横ばい",
+    "SOX弱い",
     "円高"
   ],
   "market_data": {
@@ -38,65 +38,65 @@
     "world_indices": [
       {
         "name": "NYダウ",
-        "value": "46,225.15",
-        "value_raw": 46225.1484375,
-        "change": "-768.11",
-        "change_raw": -768.11,
-        "percent": "-1.63%",
-        "percent_raw": -1.63,
-        "time": "04:59",
+        "value": "45,913.49",
+        "value_raw": 45913.48828125,
+        "change": "-309.94",
+        "change_raw": -309.94,
+        "percent": "-0.67%",
+        "percent_raw": -0.67,
+        "time": "22:30",
         "source": "yfinance:^DJI"
       }
     ],
     "forex": [
       {
         "name": "ドル円",
-        "value": "158.71",
-        "value_raw": 158.71400451660156,
-        "change": "-1.08",
-        "change_raw": -1.08,
-        "percent": "-0.68%",
-        "percent_raw": -0.68,
-        "time": "22:22",
+        "value": "158.77",
+        "value_raw": 158.77200317382812,
+        "change": "-1.03",
+        "change_raw": -1.03,
+        "percent": "-0.64%",
+        "percent_raw": -0.64,
+        "time": "22:30",
         "source": "yfinance:JPY=X"
       }
     ],
     "futures": [
       {
         "name": "日経先物",
-        "value": "51,790.00",
-        "value_raw": 51790.0,
-        "change": "-1,655.00",
-        "change_raw": -1655.0,
-        "percent": "-3.10%",
-        "percent_raw": -3.1,
-        "time": "22:11",
+        "value": "52,030.00",
+        "value_raw": 52030.0,
+        "change": "-1,415.00",
+        "change_raw": -1415.0,
+        "percent": "-2.65%",
+        "percent_raw": -2.65,
+        "time": "22:20",
         "source": "yfinance:NIY=F"
       }
     ],
     "sox": [
       {
         "name": "SOX",
-        "value": "7,795.13",
-        "value_raw": 7795.12841796875,
-        "change": "-41.70",
-        "change_raw": -41.7,
-        "percent": "-0.53%",
-        "percent_raw": -0.53,
-        "time": "04:59",
+        "value": "7,559.22",
+        "value_raw": 7559.22216796875,
+        "change": "-235.91",
+        "change_raw": -235.91,
+        "percent": "-3.03%",
+        "percent_raw": -3.03,
+        "time": "22:30",
         "source": "yfinance:^SOX"
       }
     ],
     "oil": [
       {
         "name": "WTI原油",
-        "value": "96.56",
-        "value_raw": 96.55999755859375,
-        "change": "+0.19",
-        "change_raw": 0.19,
-        "percent": "+0.20%",
-        "percent_raw": 0.2,
-        "time": "22:12",
+        "value": "95.75",
+        "value_raw": 95.75,
+        "change": "-0.62",
+        "change_raw": -0.62,
+        "percent": "-0.64%",
+        "percent_raw": -0.64,
+        "time": "22:20",
         "source": "yfinance:CL=F"
       }
     ],
@@ -111,7 +111,7 @@
     "key_news": [
       "来週の株式相場に向けて＝中東情勢の不透明感続く、期末特有の資金フローに注目も",
       "AI脅威論の嵐を超え再評価へ、覚醒前夜の好実態「SaaS」関連株 ＜株探トップ特集＞",
-      "★本日の【イチオシ決算】 シェアテク、八十二長野、日テレＨＤ (3月19日)",
+      "★本日の【サプライズ決算】速報 (03月19日)",
       "[PTS]ナイトタイムセッション17時30分時点 上昇89銘柄・下落230銘柄（東証終値比）",
       "「蓄電池」が2位にランク、対米投融資の第２弾案件の有力候補に浮上＜注目テーマ＞",
       "【市場反応】米先週分新規失業保険申請件数/3月フィリー連銀製造業景況指数は予想上回る、ドルは続落",
@@ -128,8 +128,8 @@
         "AI脅威論の嵐を超え再評価へ、覚醒前夜の好実態「SaaS」関連株 ＜株探トップ特集＞"
       ],
       "stock_specific": [
-        "★本日の【イチオシ決算】 シェアテク、八十二長野、日テレＨＤ (3月19日)",
-        "★本日の【サプライズ決算】速報 (03月19日)"
+        "★本日の【サプライズ決算】速報 (03月19日)",
+        "★本日の【イチオシ決算】 シェアテク、八十二長野、日テレＨＤ (3月19日)"
       ],
       "supply_demand": [],
       "noise": [
@@ -149,32 +149,32 @@
     "entry_style_label": "見送り",
     "danger_level": "高",
     "battlefield": "原油ETF集中",
-    "one_line": "日経-3.1%の急落相場、原油ETFに限定集中し個別株は全面安リスク"
+    "one_line": "日経-2.65%の全面安、原油ETFと防衛性個別株以外は軒並み売り先行"
   },
   "themes": [
     {
       "rank": "A",
       "rank_label": "本命",
       "name": "原油ETF",
-      "score": 88,
-      "reason": "WTI96ドル台、2038原油Wブルが値上がり上位独占。前日教訓通り商品ETFが個別株凌駕",
+      "score": 82,
+      "reason": "WTI95ドル台維持、中東不安継続。昨日も原油先Wブルが主役",
       "continuity": "継続",
       "leader_strength": "強",
       "ripple": "狭",
       "leader_stock": "原油先Wブル",
-      "entry_hint": "ETF限定、個別株の資源は連動せず前日実績確認済"
+      "entry_hint": "ETFのみ。個別エネルギー株は分散で集中力欠く"
     },
     {
       "rank": "B",
       "rank_label": "対抗",
-      "name": "エネルギーETF",
-      "score": 72,
-      "reason": "1685WTエナジー、1689天然ガスも上位。中東不透明感継続で商品ETF全般に資金",
-      "continuity": "継続",
+      "name": "SaaS",
+      "score": 58,
+      "reason": "AI脅威論後退の特集記事。SOX-3%でもクラウド系は相対堅調",
+      "continuity": "新規",
       "leader_strength": "中",
-      "ripple": "狭",
-      "leader_stock": "WTエナジー",
-      "entry_hint": "原油ブルの次位として9:30までの動向確認"
+      "ripple": "中",
+      "leader_stock": "ベイカレント",
+      "entry_hint": "リスクオフの中で防衛的成長株として選別買い可能性"
     }
   ],
   "watchlist": [
@@ -183,46 +183,56 @@
       "name": "原油先Wブル",
       "code": "2038",
       "theme": "原油ETF",
-      "reason": "値上がり上位筆頭、原油96ドル台で継続買い",
-      "trigger": "寄り後も上昇維持なら本物確認",
-      "invalidation": "9:30までに失速",
-      "time_window": "9:00-9:30"
+      "reason": "昨日に続き上昇率トップ候補、WTI95ドル維持",
+      "trigger": "寄り天回避し前場続伸なら本物",
+      "invalidation": "寄り後即反落",
+      "time_window": "9:00-10:00"
     },
     {
       "bucket": "危険株",
-      "name": "日経レバ",
-      "code": "1570",
-      "theme": "指数連動",
-      "reason": "日経先物-3.1%、レバレッジで-6%超の大幅安",
-      "trigger": "触らない",
-      "invalidation": "常時回避",
-      "time_window": "終日"
-    },
-    {
-      "bucket": "危険株",
-      "name": "半導体関連",
-      "code": "8035",
+      "name": "半導体関連全般",
+      "code": "----",
       "theme": "半導体",
-      "reason": "円高とNY急落で輸出株全滅、前日も分散で集中せず",
-      "trigger": "触らない",
-      "invalidation": "常時回避",
+      "reason": "SOX-3%、日経先物-2.65%で全面安必至",
+      "trigger": "手出し厳禁",
+      "invalidation": "該当なし",
       "time_window": "終日"
+    },
+    {
+      "bucket": "危険株",
+      "name": "グロース小型株",
+      "code": "----",
+      "theme": "新興",
+      "reason": "リスクオフ環境で真っ先に売られる",
+      "trigger": "手出し厳禁",
+      "invalidation": "該当なし",
+      "time_window": "終日"
+    },
+    {
+      "bucket": "連想1軍",
+      "name": "ベイカレント",
+      "code": "4795",
+      "theme": "SaaS",
+      "reason": "話題株夕刊掲載、防衛的成長株として物色可能性",
+      "trigger": "下げ渋り確認後の押し目",
+      "invalidation": "前場5%超下落",
+      "time_window": "10:00-12:00"
     }
   ],
   "avoid_themes": [
     {
       "name": "半導体",
-      "reason": "SOX-0.53%、円高、日経急落で輸出株壊滅"
+      "reason": "SOX-3%、日経先物-2.65%で全面安確定"
     },
     {
-      "name": "防衛",
-      "reason": "前日も分散で集中せず、NY急落で物色余力なし"
+      "name": "個別エネルギー",
+      "reason": "昨日も分散で一極集中せず。ETFが主役の構図継続"
     },
     {
-      "name": "蓄電池",
-      "reason": "ニュースあるも日経-3.1%の地合いで買い手不在"
+      "name": "レアアース",
+      "reason": "昨日の主役だが全面安では継続力なし"
     }
   ],
-  "skip_rule": "個別株の資源エネルギー銘柄に手を出さない。ETF以外全面安リスク",
-  "summary": "日経先物-3.1%の急落相場。資金集中は原油ETF(2038)等の商品ETFのみ。前日教訓通り個別株の資源銘柄は連動せず。NY-1.63%、円高進行で個別株は全面安リスク高く見送り優先。ETFも値幅限定的で無理追い禁物"
+  "skip_rule": "寄り付き買い厳禁。原油ETF以外は全面安前提で前場様子見徹底",
+  "summary": "NYダウ-0.67%、SOX-3%、日経先物-2.65%の全面安。原油ETFのみ中東不安で続伸期待も個別株は総崩れリスク。SaaSが防衛的成長株として選別買い余地あるが基本は見送り相場。ETF動向と前場の下げ幅確認が最優先"
 }
