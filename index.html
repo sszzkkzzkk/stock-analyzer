@@ -225,6 +225,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","No
 .dual-pane{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:600px){.dual-pane{grid-template-columns:1fr}.mover-grid{grid-template-columns:1fr}}
 
+
+/* 根拠タグ */
+.reason-tags{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 6px}
+.reason-tag{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--text);font-weight:600}
+.reason-tag.macro{border-color:rgba(247,183,49,.3);color:var(--warn);background:rgba(247,183,49,.06)}
+.reason-tag.bad{border-color:rgba(255,107,107,.3);color:var(--bad);background:rgba(255,107,107,.06)}
+.reason-tag.good{border-color:rgba(49,209,88,.3);color:var(--good);background:rgba(49,209,88,.06)}
+
+/* 監視銘柄 優先番号 */
+.watch-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;flex-shrink:0;border:2px solid}
+.watch-num.n1{background:rgba(255,204,102,.2);border-color:var(--gold);color:var(--gold)}
+.watch-num.n2{background:rgba(255,204,102,.12);border-color:rgba(255,204,102,.5);color:var(--gold)}
+.watch-num.n3{background:rgba(255,204,102,.08);border-color:rgba(255,204,102,.3);color:var(--gold)}
+.watch-num.n4{background:rgba(159,214,255,.08);border-color:rgba(159,214,255,.3);color:var(--silver)}
+.watch-num.n5{background:rgba(159,214,255,.06);border-color:rgba(159,214,255,.2);color:var(--silver)}
+.watch-num.nsub{background:rgba(255,255,255,.04);border-color:var(--line);color:var(--muted)}
+
+/* 危険株セクション */
+.danger-section{background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.25);border-radius:14px;padding:12px}
+.danger-section-title{font-size:12px;font-weight:800;color:var(--bad);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.watch-card.danger-card{background:rgba(255,107,107,.06);border-color:rgba(255,107,107,.2)}
+.watch-card.danger-card .watch-bucket{color:var(--bad);border-color:rgba(255,107,107,.3)}
+
+/* 監視銘柄 tier区切り */
+.watch-tier-label{font-size:10px;font-weight:800;color:var(--muted);padding:4px 0 4px 2px;letter-spacing:.05em}
+.watch-tier-label.primary{color:var(--gold)}
+.watch-tier-label.secondary{color:var(--silver)}
+.watch-tier-label.reserve{color:var(--muted)}
+
 </style>
 </head>
 <body>
@@ -415,41 +444,65 @@ function render600(d, accuracy){
   const watchlist=arr(d.watchlist);
   const avoidThemes=arr(d.avoid_themes);
 
-  // 主戦場タイトルは battlefield を使う。なければ A本命テーマ名にフォールバック
-  const bf = s.battlefield && s.battlefield !== "分析中" && s.battlefield !== ""
-    ? s.battlefield
-    : (themes.find(t=>(t.rank||"").toUpperCase()==="A")?.name || themes[0]?.name || "—");
+  // ── 主戦場タイトル：必ず断定表示 ──
+  // 優先順: battlefield → A本命テーマ → summary冒頭 → "—"
+  let bf = s.battlefield||"";
+  if(!bf || bf==="分析中" || bf==="—" || bf=="-"){
+    const aTheme = themes.find(t=>(t.rank||"").toUpperCase()==="A");
+    bf = aTheme?.name || themes[0]?.name || "";
+  }
+  if(!bf){
+    // summaryの先頭テーマ的な単語を抽出（最終フォールバック）
+    const sum = d.summary||"";
+    const m = sum.match(/^([^。、\n]{2,12})/);
+    bf = m ? m[1] : "本日の分析";
+  }
 
-  // 説明文は3文に絞る（先頭3文だけ表示、残りはCSSでclamp）
-  const oneLine = s.one_line || d.summary || "";
+  // ── 根拠タグ：conclusion or summary から抽出 ──
+  // main.pyのone_lineを箇条書き的に分解、なければsummaryから推測
+  const oneLine = s.one_line || s.conclusion || d.summary || "";
+  // 句点・読点・スペースで分割して短いフレーズを3つ抽出
+  const reasonRaw = oneLine.split(/[。、\n　 ]+/).filter(t=>t.length>=4&&t.length<=20).slice(0,3);
+  // 色分けキーワード判定
+  function reasonCls(t){
+    if(/NY|ダウ|米|下落|円安|円高|原油|金利|関税|SOX/.test(t)) return "macro";
+    if(/弱|重|危|禁|注意|回避|売/.test(t)) return "bad";
+    if(/強|好|上昇|急騰|集中|優勢|本命/.test(t)) return "good";
+    return "";
+  }
+  const reasonTagsHtml = reasonRaw.length
+    ? `<div class="reason-tags">${reasonRaw.map(t=>`<span class="reason-tag ${reasonCls(t)}">${esc(t)}</span>`).join("")}</div>`
+    : "";
 
-  const dangerCls = s.danger_level==="高" ? "danger" : "";
+  const dangerCls = s.danger_level==="高"?"danger":"";
+  const oneLine3 = oneLine.split(/。/).slice(0,2).join("。") + (oneLine.includes("。")?"。":"");
 
   let html = `<div class="stack">`;
 
-  // ① 主戦場 断定表示
+  // ① 主戦場 断定ヒーロー
   html += `<div class="battlefield-hero">
     <div class="bf-label">今日の主戦場</div>
     <div class="bf-title">${esc(bf)}</div>
-    <div class="bf-sub">${esc(oneLine)}</div>
+    ${reasonTagsHtml}
+    <div class="bf-sub">${esc(oneLine3||oneLine)}</div>
     <div class="bf-meta">
       <span class="bf-chip">${esc(s.market_regime_label||"—")}</span>
       <span class="bf-chip">${esc(s.entry_style_label||"—")}</span>
       <span class="bf-chip ${dangerCls}">危険度 ${esc(s.danger_level||"—")}</span>
       ${freshnessHtml(d.date)}
     </div>
-    <div style="margin-top:10px">${confidenceBadgeHtml(accuracy, d.market_tags||[])}</div>
+    <div style="margin-top:8px">${confidenceBadgeHtml(accuracy, d.market_tags||[])}</div>
   </div>`;
 
-  // ② 資金集中テーマ上位3（主戦場カードの直下）
+  // ② 資金集中テーマ 上位3
   const topThemes = themes.slice(0,5);
   if(topThemes.length){
     html += `<div class="theme-summary">`;
     topThemes.forEach(t=>{
-      const rank = (t.rank||"C").toUpperCase();
-      const rankCls = rank==="A"?"ts-a":rank==="B"?"ts-b":"ts-c";
-      const rankLabel = t.rank_label || (rank==="A"?"本命":rank==="B"?"対抗":"監視");
-      const score = Math.min(100,Math.max(0,parseInt(t.score)||50));
+      const rank=(t.rank||"C").toUpperCase();
+      const rankCls=rank==="A"?"ts-a":rank==="B"?"ts-b":"ts-c";
+      const rankLabel=t.rank_label||(rank==="A"?"本命":rank==="B"?"対抗":"監視");
+      const score=Math.min(100,Math.max(0,parseInt(t.score)||50));
       html += `<div class="theme-summary-item ${rankCls}">
         <span class="ts-rank">${esc(rank)} ${esc(rankLabel)}</span>
         <span class="ts-name">${esc(t.name||"—")}</span>
@@ -460,17 +513,17 @@ function render600(d, accuracy){
     html += `</div>`;
   }
 
-  // ③ テーマ詳細（各テーマの根拠・先導株・仕掛けヒント）
+  // ③ テーマ詳細
   if(themes.length){
     html += `<div class="section-title">テーマ詳細</div><div class="themes-section">`;
     themes.forEach(t=>{
-      const rank = (t.rank||"C").toUpperCase();
-      const rankCls = rank==="A"?"rank-a":rank==="B"?"rank-b":"rank-c";
-      const rankLabel = t.rank_label || rank;
-      const score = Math.min(100,Math.max(0,parseInt(t.score)||50));
-      const cont = t.continuity||"";
-      const ls   = t.leader_strength||"";
-      const rip  = t.ripple||"";
+      const rank=(t.rank||"C").toUpperCase();
+      const rankCls=rank==="A"?"rank-a":rank==="B"?"rank-b":"rank-c";
+      const rankLabel=t.rank_label||rank;
+      const score=Math.min(100,Math.max(0,parseInt(t.score)||50));
+      const cont=t.continuity||"";
+      const ls=t.leader_strength||"";
+      const rip=t.ripple||"";
       html += `<div class="theme-card ${rankCls}">
         <div class="theme-header">
           <span class="theme-rank-badge">${esc(rank)} ${esc(rankLabel)}</span>
@@ -491,16 +544,27 @@ function render600(d, accuracy){
     html += `</div>`;
   }
 
-  // ④ 監視銘柄（テーマ本物度確認）
-  if(watchlist.length){
-    html += `<div class="section-title">テーマ本物度を確認する監視銘柄</div><div class="watch-grid">`;
-    watchlist.forEach((w,i)=>{
+  // ④ 監視銘柄（危険株を分離、優先番号付き）
+  const safeWatch   = watchlist.filter(w=>(w.bucket||"")!=="危険株");
+  const dangerWatch = watchlist.filter(w=>(w.bucket||"")==="危険株");
+
+  if(safeWatch.length){
+    html += `<div class="section-title">テーマ本物度を確認する監視銘柄</div>`;
+
+    // tier分け: 1-3位=最優先, 4-5位=準主役, 6位以降=予備
+    const primary   = safeWatch.slice(0,3);
+    const secondary = safeWatch.slice(3,5);
+    const reserve   = safeWatch.slice(5,10);
+
+    function watchCardHtml(w, globalIdx){
       const url = w.code ? `https://finance.yahoo.co.jp/quote/${String(w.code).replace(/\D/g,"")}.T` : null;
       const namePart = url
-        ? `<a href="${url}" target="_blank" rel="noopener">${esc(w.name||"—")} (${esc(w.code)})</a>`
-        : `${esc(w.name||"—")} ${w.code?`(${esc(w.code)})`:""}`;
-      html += `<div class="watch-card ${i===0?"primary":""}">
+        ? `<a href="${url}" target="_blank" rel="noopener">${esc(w.name||"—")}${w.code?` (${esc(w.code)})`:""}` + `</a>`
+        : `${esc(w.name||"—")}${w.code?` (${esc(w.code)})`:""}`;
+      const numCls = globalIdx<=3?"n"+globalIdx:globalIdx<=5?"n"+globalIdx:"nsub";
+      return `<div class="watch-card">
         <div class="watch-head">
+          <span class="watch-num ${numCls}">${globalIdx}</span>
           <span class="watch-bucket">${esc(w.bucket||"—")}</span>
           <span class="watch-name">${namePart}</span>
         </div>
@@ -512,20 +576,68 @@ function render600(d, accuracy){
           ${w.time_window?`<div class="watch-row"><span class="watch-key">時間帯</span><span>${esc(w.time_window)}</span></div>`:""}
         </div>
       </div>`;
-    });
+    }
+
+    html += `<div class="watch-grid">`;
+    if(primary.length){
+      html += `<div class="watch-tier-label primary">▶ 最優先 ${primary.length}件</div>`;
+      primary.forEach((w,i)=>{ html += watchCardHtml(w, i+1); });
+    }
+    if(secondary.length){
+      html += `<div class="watch-tier-label secondary">▶ 準主役 ${secondary.length}件</div>`;
+      secondary.forEach((w,i)=>{ html += watchCardHtml(w, i+4); });
+    }
+    if(reserve.length){
+      html += `<div class="watch-tier-label reserve">▶ 予備 ${reserve.length}件</div>`;
+      reserve.forEach((w,i)=>{ html += watchCardHtml(w, i+6); });
+    }
     html += `</div>`;
   }
 
-  // ⑤ 見ないテーマ
+  // ⑤ 危険株（独立セクション）
+  if(dangerWatch.length){
+    html += `<div class="danger-section">
+      <div class="danger-section-title">⛔ 触るな・危険株</div>
+      <div class="watch-grid">`;
+    dangerWatch.forEach(w=>{
+      const url = w.code ? `https://finance.yahoo.co.jp/quote/${String(w.code).replace(/\D/g,"")}.T` : null;
+      const namePart = url
+        ? `<a href="${url}" target="_blank" rel="noopener">${esc(w.name||"—")}${w.code?` (${esc(w.code)})`:""}` + `</a>`
+        : `${esc(w.name||"—")}${w.code?` (${esc(w.code)})`:""}`;
+      html += `<div class="watch-card danger-card">
+        <div class="watch-head">
+          <span class="watch-bucket">危険株</span>
+          <span class="watch-name">${namePart}</span>
+        </div>
+        <div class="watch-rows">
+          ${w.reason?`<div class="watch-row"><span class="watch-key">危険理由</span><span>${esc(w.reason)}</span></div>`:""}
+          ${w.invalidation?`<div class="watch-row"><span class="watch-key">撤退</span><span>${esc(w.invalidation)}</span></div>`:""}
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
+
+  // ⑥ 見ないテーマ（目立つ赤枠セクション）
   if(avoidThemes.length){
-    html += `<div class="section-title">見ないテーマ</div><div class="watch-grid">`;
+    html += `<div class="danger-section" style="border-color:rgba(255,107,107,.2)">
+      <div class="danger-section-title">🚫 見ないテーマ</div>
+      <div class="watch-grid">`;
     avoidThemes.forEach(t=>{
-      html += `<div class="watch-card"><div class="watch-head"><span class="watch-bucket" style="color:var(--bad);border-color:rgba(255,107,107,.3)">回避</span><span class="watch-name">${esc(t.name||"—")}</span></div><div class="watch-rows"><div class="watch-row"><span class="watch-key">理由</span><span>${esc(t.reason||"—")}</span></div></div></div>`;
+      html += `<div class="watch-card danger-card">
+        <div class="watch-head">
+          <span class="watch-bucket" style="color:var(--bad);border-color:rgba(255,107,107,.3)">回避</span>
+          <span class="watch-name">${esc(t.name||"—")}</span>
+        </div>
+        <div class="watch-rows">
+          <div class="watch-row"><span class="watch-key">理由</span><span>${esc(t.reason||"—")}</span></div>
+        </div>
+      </div>`;
     });
-    html += `</div>`;
+    html += `</div></div>`;
   }
 
-  // ⑥ 絶対やらないこと
+  // ⑦ 絶対やらないこと
   if(d.skip_rule){
     html += `<div class="skip-rule"><div class="skip-rule-label">🚫 今日絶対やらないこと</div><div class="skip-rule-text">${esc(d.skip_rule)}</div></div>`;
   }
@@ -533,6 +645,7 @@ function render600(d, accuracy){
   html += `</div>`;
   el.innerHTML = html;
 }
+
 // ═══════════════════════════════
 // 9:10 相場確認 + 学習ログ
 // ═══════════════════════════════
