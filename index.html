@@ -84,16 +84,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","No
 
 /* 主戦場ヒーロー */
 .battlefield-hero{
-  background:linear-gradient(135deg,rgba(110,168,254,.12),rgba(139,92,246,.08));
-  border:1px solid rgba(110,168,254,.3);
+  background:linear-gradient(135deg,rgba(110,168,254,.14),rgba(139,92,246,.10));
+  border:1px solid rgba(110,168,254,.35);
   border-radius:16px;padding:14px;
 }
-.bf-label{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px}
-.bf-title{font-size:28px;font-weight:900;color:#fff;line-height:1.1}
-.bf-sub{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5}
-.bf-meta{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.bf-label{font-size:10px;color:rgba(110,168,254,.7);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.bf-title{font-size:32px;font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.01em}
+.bf-sub{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.bf-meta{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
 .bf-chip{background:rgba(110,168,254,.12);border:1px solid rgba(110,168,254,.3);border-radius:999px;padding:4px 10px;font-size:11px;color:var(--accent);font-weight:700}
 .bf-chip.danger{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.3);color:var(--bad)}
+/* テーマサマリー（主戦場カード直下） */
+.theme-summary{display:grid;gap:6px;margin-top:0}
+.theme-summary-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.02)}
+.theme-summary-item.ts-a{background:rgba(255,204,102,.08);border-color:rgba(255,204,102,.3)}
+.theme-summary-item.ts-b{background:rgba(159,214,255,.06);border-color:rgba(159,214,255,.2)}
+.theme-summary-item.ts-c{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.05)}
+.ts-rank{font-size:10px;font-weight:900;padding:3px 7px;border-radius:999px;flex-shrink:0;white-space:nowrap}
+.ts-a .ts-rank{background:rgba(255,204,102,.2);border:1px solid rgba(255,204,102,.4);color:var(--gold)}
+.ts-b .ts-rank{background:rgba(159,214,255,.12);border:1px solid rgba(159,214,255,.3);color:var(--silver)}
+.ts-c .ts-rank{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--muted)}
+.ts-name{font-size:16px;font-weight:900;flex:1}
+.ts-a .ts-name{color:var(--gold)}
+.ts-b .ts-name{color:var(--silver)}
+.ts-c .ts-name{color:var(--muted)}
+.ts-score{font-size:12px;font-weight:900;color:var(--muted);flex-shrink:0}
+.ts-bar{width:48px;height:4px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden;flex-shrink:0}
+.ts-bar-fill{height:100%;border-radius:999px}
+.ts-a .ts-bar-fill{background:var(--gold)}
+.ts-b .ts-bar-fill{background:var(--silver)}
+.ts-c .ts-bar-fill{background:var(--muted)}
 
 /* テーマカード */
 .themes-section{display:grid;gap:8px}
@@ -184,6 +204,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","No
   .metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .bf-title{font-size:22px}
 }
+
+/* 信頼度バッジ */
+.confidence-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid}
+.confidence-badge.high{background:rgba(49,209,88,.12);border-color:rgba(49,209,88,.4);color:#31d158}
+.confidence-badge.mid{background:rgba(247,183,49,.12);border-color:rgba(247,183,49,.4);color:var(--warn)}
+.confidence-badge.low{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.4);color:var(--bad)}
+.confidence-badge.new{background:rgba(110,168,254,.12);border-color:rgba(110,168,254,.3);color:var(--accent)}
+/* 相場確認パネル */
+.market-check{background:rgba(17,26,52,.8);border:1px solid var(--line);border-radius:14px;padding:12px}
+.market-check-title{font-size:12px;font-weight:800;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.mover-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.mover-item{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:8px}
+.mover-rank{font-size:9px;color:var(--muted);margin-bottom:2px}
+.mover-name{font-size:13px;font-weight:800;line-height:1.2}
+.mover-change{font-size:11px;font-weight:700;margin-top:2px}
+.theme-actual{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.theme-actual-tag{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:11px}
+/* 2ペインレイアウト */
+.dual-pane{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.dual-pane{grid-template-columns:1fr}.mover-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -232,6 +273,48 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","No
 
 <script>
 let selectedMarket="日経平均";
+
+// 累計的中率をlearning_dbから計算
+function getAccuracyInfo(d600){
+  // d600にlearning_db相当の情報がない場合はsafeLoadで取得済みのstateを使う
+  // ここではstate.d600のmarket_tagsと過去データを使って信頼度を出す
+  // 実装: latest_600.jsonに learning_ctx_summary を含めてもらう想定
+  // なければ"初回"扱い
+  if(!d600) return null;
+  const ctx = d600.learning_context_summary || "";
+  const tags = d600.market_tags || [];
+  return {ctx, tags};
+}
+
+// learning_db.jsonから的中率を取得
+async function loadAccuracy(){
+  const db = await safe("learning_db.json");
+  if(!db || !db.total_days) return null;
+  return {
+    total: db.total_days,
+    hit:   db.hit_days,
+    rate:  db.total_days > 0 ? Math.round(db.hit_days / db.total_days * 100) : 0,
+    theme_stats: db.theme_stats || {},
+    pattern_stats: db.pattern_stats || {},
+  };
+}
+
+function confidenceBadgeHtml(accuracy, tags){
+  if(!accuracy) return `<span class="confidence-badge new">📊 学習中（初日）</span>`;
+  const {total, hit, rate} = accuracy;
+  if(total < 5) return `<span class="confidence-badge new">📊 学習中 ${total}日分</span>`;
+
+  // 今日の相場タグと過去パターンの一致度
+  let patternRate = rate; // デフォルトは全体的中率
+  if(tags && tags.length && accuracy.pattern_stats){
+    const rates = tags.map(t => accuracy.pattern_stats[t]?.hit_rate || null).filter(v=>v!==null);
+    if(rates.length) patternRate = Math.round(rates.reduce((a,b)=>a+b,0)/rates.length*100);
+  }
+
+  const cls = patternRate >= 70 ? "high" : patternRate >= 50 ? "mid" : "low";
+  const label = patternRate >= 70 ? "高信頼" : patternRate >= 50 ? "中信頼" : "要注意";
+  return `<span class="confidence-badge ${cls}">🎯 ${label} ${patternRate}% （${total}日中${hit}日的中）</span>`;
+}
 let state={d600:null,d905:null,d1200:null,d1535:null,live:null};
 
 const esc=v=>String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
@@ -324,7 +407,7 @@ function setMeta(){
 // ═══════════════════════════════
 // 6:00 本番画面
 // ═══════════════════════════════
-function render600(d){
+function render600(d, accuracy){
   const el=document.getElementById("tab600");
   if(!d){el.innerHTML=`<div class="notice">6:00データがありません。朝6時以降に更新されます。</div>`;return}
   const s=d.strategy||{};
@@ -332,15 +415,20 @@ function render600(d){
   const watchlist=arr(d.watchlist);
   const avoidThemes=arr(d.avoid_themes);
 
-  // 主戦場ヒーロー
-  const bf=s.battlefield||themes[0]?.name||"分析中";
-  const oneLine=s.one_line||d.summary||"";
-  const dangerCls=s.danger_level==="高"?"danger":"";
+  // 主戦場タイトルは battlefield を使う。なければ A本命テーマ名にフォールバック
+  const bf = s.battlefield && s.battlefield !== "分析中" && s.battlefield !== ""
+    ? s.battlefield
+    : (themes.find(t=>(t.rank||"").toUpperCase()==="A")?.name || themes[0]?.name || "—");
 
-  let html=`<div class="stack">`;
+  // 説明文は3文に絞る（先頭3文だけ表示、残りはCSSでclamp）
+  const oneLine = s.one_line || d.summary || "";
 
-  // ① 主戦場
-  html+=`<div class="battlefield-hero">
+  const dangerCls = s.danger_level==="高" ? "danger" : "";
+
+  let html = `<div class="stack">`;
+
+  // ① 主戦場 断定表示
+  html += `<div class="battlefield-hero">
     <div class="bf-label">今日の主戦場</div>
     <div class="bf-title">${esc(bf)}</div>
     <div class="bf-sub">${esc(oneLine)}</div>
@@ -350,20 +438,40 @@ function render600(d){
       <span class="bf-chip ${dangerCls}">危険度 ${esc(s.danger_level||"—")}</span>
       ${freshnessHtml(d.date)}
     </div>
+    <div style="margin-top:10px">${confidenceBadgeHtml(accuracy, d.market_tags||[])}</div>
   </div>`;
 
-  // ② テーマ一覧
+  // ② 資金集中テーマ上位3（主戦場カードの直下）
+  const topThemes = themes.slice(0,5);
+  if(topThemes.length){
+    html += `<div class="theme-summary">`;
+    topThemes.forEach(t=>{
+      const rank = (t.rank||"C").toUpperCase();
+      const rankCls = rank==="A"?"ts-a":rank==="B"?"ts-b":"ts-c";
+      const rankLabel = t.rank_label || (rank==="A"?"本命":rank==="B"?"対抗":"監視");
+      const score = Math.min(100,Math.max(0,parseInt(t.score)||50));
+      html += `<div class="theme-summary-item ${rankCls}">
+        <span class="ts-rank">${esc(rank)} ${esc(rankLabel)}</span>
+        <span class="ts-name">${esc(t.name||"—")}</span>
+        <div class="ts-bar"><div class="ts-bar-fill" style="width:${score}%"></div></div>
+        <span class="ts-score">${score}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ③ テーマ詳細（各テーマの根拠・先導株・仕掛けヒント）
   if(themes.length){
-    html+=`<div class="section-title">資金集中テーマ</div><div class="themes-section">`;
+    html += `<div class="section-title">テーマ詳細</div><div class="themes-section">`;
     themes.forEach(t=>{
-      const rank=(t.rank||"C").toUpperCase();
-      const rankCls=rank==="A"?"rank-a":rank==="B"?"rank-b":"rank-c";
-      const rankLabel=t.rank_label||rank;
-      const score=Math.min(100,Math.max(0,parseInt(t.score)||50));
-      const cont=t.continuity||"";
-      const ls=t.leader_strength||"";
-      const rip=t.ripple||"";
-      html+=`<div class="theme-card ${rankCls}">
+      const rank = (t.rank||"C").toUpperCase();
+      const rankCls = rank==="A"?"rank-a":rank==="B"?"rank-b":"rank-c";
+      const rankLabel = t.rank_label || rank;
+      const score = Math.min(100,Math.max(0,parseInt(t.score)||50));
+      const cont = t.continuity||"";
+      const ls   = t.leader_strength||"";
+      const rip  = t.ripple||"";
+      html += `<div class="theme-card ${rankCls}">
         <div class="theme-header">
           <span class="theme-rank-badge">${esc(rank)} ${esc(rankLabel)}</span>
           <span class="theme-name">${esc(t.name||"—")}</span>
@@ -380,17 +488,18 @@ function render600(d){
         ${t.entry_hint?`<div class="theme-entry">仕掛け: ${esc(t.entry_hint)}</div>`:""}
       </div>`;
     });
-    html+=`</div>`;
+    html += `</div>`;
   }
 
-  // ③ 監視銘柄
+  // ④ 監視銘柄（テーマ本物度確認）
   if(watchlist.length){
-    html+=`<div class="section-title">テーマ本物度を確認する監視銘柄</div><div class="watch-grid">`;
+    html += `<div class="section-title">テーマ本物度を確認する監視銘柄</div><div class="watch-grid">`;
     watchlist.forEach((w,i)=>{
-      const url=w.code?`https://finance.yahoo.co.jp/quote/${String(w.code).replace(/\D/g,"")}.T`:null;
-      const namePart=url?`<a href="${url}" target="_blank" rel="noopener">${esc(w.name||"—")} (${esc(w.code)})</a>`:`${esc(w.name||"—")} ${w.code?`(${esc(w.code)})`:""}`;
-      const isPrimary=i===0;
-      html+=`<div class="watch-card ${isPrimary?"primary":""}">
+      const url = w.code ? `https://finance.yahoo.co.jp/quote/${String(w.code).replace(/\D/g,"")}.T` : null;
+      const namePart = url
+        ? `<a href="${url}" target="_blank" rel="noopener">${esc(w.name||"—")} (${esc(w.code)})</a>`
+        : `${esc(w.name||"—")} ${w.code?`(${esc(w.code)})`:""}`;
+      html += `<div class="watch-card ${i===0?"primary":""}">
         <div class="watch-head">
           <span class="watch-bucket">${esc(w.bucket||"—")}</span>
           <span class="watch-name">${namePart}</span>
@@ -404,128 +513,162 @@ function render600(d){
         </div>
       </div>`;
     });
-    html+=`</div>`;
+    html += `</div>`;
   }
 
-  // ④ 見ないテーマ
+  // ⑤ 見ないテーマ
   if(avoidThemes.length){
-    html+=`<div class="section-title">見ないテーマ</div><div class="watch-grid">`;
+    html += `<div class="section-title">見ないテーマ</div><div class="watch-grid">`;
     avoidThemes.forEach(t=>{
-      html+=`<div class="watch-card"><div class="watch-head"><span class="watch-bucket" style="color:var(--bad);border-color:rgba(255,107,107,.3)">回避</span><span class="watch-name">${esc(t.name||"—")}</span></div><div class="watch-rows"><div class="watch-row"><span class="watch-key">理由</span><span>${esc(t.reason||"—")}</span></div></div></div>`;
+      html += `<div class="watch-card"><div class="watch-head"><span class="watch-bucket" style="color:var(--bad);border-color:rgba(255,107,107,.3)">回避</span><span class="watch-name">${esc(t.name||"—")}</span></div><div class="watch-rows"><div class="watch-row"><span class="watch-key">理由</span><span>${esc(t.reason||"—")}</span></div></div></div>`;
     });
-    html+=`</div>`;
+    html += `</div>`;
   }
 
-  // ⑤ 絶対やらないこと
+  // ⑥ 絶対やらないこと
   if(d.skip_rule){
-    html+=`<div class="skip-rule"><div class="skip-rule-label">🚫 今日絶対やらないこと</div><div class="skip-rule-text">${esc(d.skip_rule)}</div></div>`;
+    html += `<div class="skip-rule"><div class="skip-rule-label">🚫 今日絶対やらないこと</div><div class="skip-rule-text">${esc(d.skip_rule)}</div></div>`;
   }
 
-  html+=`</div>`;
-  el.innerHTML=html;
+  html += `</div>`;
+  el.innerHTML = html;
 }
-
 // ═══════════════════════════════
-// 9:10 学習ログ
+// 9:10 相場確認 + 学習ログ
 // ═══════════════════════════════
 function render905(d){
   const el=document.getElementById("tab905");
   if(!d){el.innerHTML=`<div class="notice">9:10データがありません</div>`;return}
   const lg=d.log||{};
   const hit=lg.battlefield_correct;
-  const hitCls=hit?"hit":"miss";
+
+  // 実際の動き（top_gainersなどはd.market_dataから取れないのでlogに含まれる情報を使う）
+  const actualBF = lg.actual_battlefield || "—";
+  const predBF   = lg.predicted_battlefield || "—";
+  const flow     = lg.capital_flow_note || "—";
+  const moved    = lg.what_moved_as_predicted || "—";
+  const diff     = lg.what_was_different || "—";
+  const hintAft  = lg.hint_for_afternoon || "—";
+  const hintTmr  = lg.hint_for_tomorrow || "—";
+  const acc      = lg.theme_accuracy || "—";
 
   el.innerHTML=`<div class="stack">
-    <div class="log-panel">
-      <div class="log-header">
-        <span class="log-icon">📝</span>
-        <span class="log-title">寄り後 仮説検証ログ</span>
-        <span class="log-freshness">${freshnessHtml(d.date)}</span>
+    <div class="dual-pane">
+      <!-- 左：実際の相場確認 -->
+      <div class="market-check">
+        <div class="market-check-title">📈 実際の相場（寄り後）</div>
+        <div class="log-grid">
+          <div class="log-item ${hit?"hit":"miss"}">
+            <div class="log-key">主戦場の予測 vs 実際</div>
+            <div class="log-val ${hit?"good":"bad"}">${hit?"✅ 的中":"❌ 外れ"}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px">予測: ${esc(predBF)} → 実際: ${esc(actualBF)}</div>
+          </div>
+          <div class="log-item">
+            <div class="log-key">テーマ精度</div>
+            <div class="log-val">${esc(acc)}</div>
+          </div>
+          <div class="log-item">
+            <div class="log-key">資金の流れ</div>
+            <div class="log-val">${esc(flow)}</div>
+          </div>
+          <div class="log-item hit">
+            <div class="log-key">予測通りだったこと</div>
+            <div class="log-val good">${esc(moved)}</div>
+          </div>
+          <div class="log-item miss">
+            <div class="log-key">予測と違ったこと</div>
+            <div class="log-val bad">${esc(diff)}</div>
+          </div>
+        </div>
       </div>
-      <div class="log-grid">
-        <div class="log-item ${hitCls}">
-          <div class="log-key">主戦場の予測精度</div>
-          <div class="log-val ${hit?"good":"bad"}">${hit?"✅ 的中":"❌ 外れ"} &nbsp; 予測: ${esc(lg.predicted_battlefield||"—")} → 実際: ${esc(lg.actual_battlefield||"—")}</div>
-        </div>
-        <div class="log-item">
-          <div class="log-key">テーマ精度</div>
-          <div class="log-val">${esc(lg.theme_accuracy||"—")}</div>
-        </div>
-        <div class="log-item hit">
-          <div class="log-key">予測通りだったこと</div>
-          <div class="log-val good">${esc(val(lg.what_moved_as_predicted))}</div>
-        </div>
-        <div class="log-item miss">
-          <div class="log-key">予測と違ったこと</div>
-          <div class="log-val bad">${esc(val(lg.what_was_different))}</div>
-        </div>
-        <div class="log-item">
-          <div class="log-key">資金の実際の流れ</div>
-          <div class="log-val">${esc(val(lg.capital_flow_note))}</div>
-        </div>
-        <div class="log-item key">
-          <div class="log-key">後場へのヒント</div>
-          <div class="log-val warn">${esc(val(lg.hint_for_afternoon))}</div>
-        </div>
-        <div class="log-item key">
-          <div class="log-key">明日の朝へのヒント</div>
-          <div class="log-val warn">${esc(val(lg.hint_for_tomorrow))}</div>
+      <!-- 右：次への学習ヒント -->
+      <div class="market-check">
+        <div class="market-check-title">📝 学習ヒント</div>
+        <div class="log-grid">
+          <div class="log-item key">
+            <div class="log-key">後場への引き継ぎ</div>
+            <div class="log-val warn">${esc(hintAft)}</div>
+          </div>
+          <div class="log-item key">
+            <div class="log-key">明日の朝へのヒント</div>
+            <div class="log-val warn">${esc(hintTmr)}</div>
+          </div>
+          <div class="log-item" style="margin-top:4px">
+            <div class="log-key" style="font-size:9px">更新時刻</div>
+            <div class="log-val" style="font-size:11px;color:var(--muted)">${esc(d.generated_at||"—")} ${freshnessHtml(d.date)}</div>
+          </div>
         </div>
       </div>
     </div>
   </div>`;
 }
-
 // ═══════════════════════════════
-// 12:00 学習ログ
+// 12:00 前場答え合わせ + 学習整理
 // ═══════════════════════════════
 function render1200(d){
   const el=document.getElementById("tab1200");
   if(!d){el.innerHTML=`<div class="notice">12:00データがありません</div>`;return}
   const lg=d.log||{};
 
+  const winner   = lg.am_winner_theme || "—";
+  const loser    = lg.am_loser_theme  || "—";
+  const newTheme = lg.new_theme_emerged || "";
+  const correct  = lg.hypothesis_correction || "—";
+  const flow     = lg.capital_flow_am || "—";
+  const signV    = lg.sign_that_was_visible || "—";
+  const signH    = lg.sign_that_was_hidden  || "—";
+  const hint600  = lg.hint_for_tomorrow_600 || "—";
+
   el.innerHTML=`<div class="stack">
-    <div class="log-panel">
-      <div class="log-header">
-        <span class="log-icon">📝</span>
-        <span class="log-title">前場 学習整理ログ</span>
-        <span class="log-freshness">${freshnessHtml(d.date)}</span>
+    <div class="dual-pane">
+      <!-- 左：前場の実際の相場 -->
+      <div class="market-check">
+        <div class="market-check-title">📈 前場の実際の動き</div>
+        <div class="log-grid">
+          <div class="log-item hit">
+            <div class="log-key">前場で強かったテーマ</div>
+            <div class="log-val good">${esc(winner)}</div>
+          </div>
+          <div class="log-item miss">
+            <div class="log-key">前場で弱かったテーマ</div>
+            <div class="log-val bad">${esc(loser)}</div>
+          </div>
+          ${newTheme?`<div class="log-item key"><div class="log-key">⚡ 新規浮上テーマ</div><div class="log-val warn">${esc(newTheme)}</div></div>`:""}
+          <div class="log-item">
+            <div class="log-key">前場の資金フロー</div>
+            <div class="log-val">${esc(flow)}</div>
+          </div>
+          <div class="log-item">
+            <div class="log-key">朝の仮説の修正点</div>
+            <div class="log-val">${esc(correct)}</div>
+          </div>
+        </div>
       </div>
-      <div class="log-grid">
-        <div class="log-item hit">
-          <div class="log-key">前場で本当に強かったテーマ</div>
-          <div class="log-val good">${esc(val(lg.am_winner_theme))}</div>
-        </div>
-        <div class="log-item miss">
-          <div class="log-key">前場で弱かったテーマ</div>
-          <div class="log-val bad">${esc(val(lg.am_loser_theme))}</div>
-        </div>
-        ${lg.new_theme_emerged?`<div class="log-item key"><div class="log-key">朝には見えていなかった新規テーマ</div><div class="log-val warn">${esc(lg.new_theme_emerged)}</div></div>`:""}
-        <div class="log-item">
-          <div class="log-key">朝の仮説のどこを修正すべきか</div>
-          <div class="log-val">${esc(val(lg.hypothesis_correction))}</div>
-        </div>
-        <div class="log-item">
-          <div class="log-key">前場の資金フローの特徴</div>
-          <div class="log-val">${esc(val(lg.capital_flow_am))}</div>
-        </div>
-        <div class="log-item hit">
-          <div class="log-key">朝の時点で見抜けたはずのサイン</div>
-          <div class="log-val good">${esc(val(lg.sign_that_was_visible))}</div>
-        </div>
-        <div class="log-item miss">
-          <div class="log-key">朝の段階では見えなかったサイン</div>
-          <div class="log-val bad">${esc(val(lg.sign_that_was_hidden))}</div>
-        </div>
-        <div class="log-item key">
-          <div class="log-key">明日の朝6:00分析に活かすべきヒント</div>
-          <div class="log-val warn">${esc(val(lg.hint_for_tomorrow_600))}</div>
+      <!-- 右：翌朝への学習整理 -->
+      <div class="market-check">
+        <div class="market-check-title">📝 翌朝6:00への学習</div>
+        <div class="log-grid">
+          <div class="log-item hit">
+            <div class="log-key">朝の時点で見抜けたはずのサイン</div>
+            <div class="log-val good">${esc(signV)}</div>
+          </div>
+          <div class="log-item miss">
+            <div class="log-key">朝の段階では見えなかったサイン</div>
+            <div class="log-val bad">${esc(signH)}</div>
+          </div>
+          <div class="log-item key">
+            <div class="log-key">明日の朝6:00に活かすヒント</div>
+            <div class="log-val warn">${esc(hint600)}</div>
+          </div>
+          <div class="log-item" style="margin-top:4px">
+            <div class="log-key" style="font-size:9px">更新時刻</div>
+            <div class="log-val" style="font-size:11px;color:var(--muted)">${esc(d.generated_at||"—")} ${freshnessHtml(d.date)}</div>
+          </div>
         </div>
       </div>
     </div>
   </div>`;
 }
-
 // ═══════════════════════════════
 // 15:35 学習・答え合わせ
 // ═══════════════════════════════
@@ -605,14 +748,15 @@ async function loadAll(){
   ["tab600","tab905","tab1200","tab1535"].forEach(id=>{
     document.getElementById(id).innerHTML=`<div class="notice">読み込み中...</div>`;
   });
-  const [live,d600,d905,d1200,d1535]=await Promise.all([
+  const [live,d600,d905,d1200,d1535,accuracy]=await Promise.all([
     safe("market_live.json"),safe("latest_600.json"),
-    safe("latest_905.json"),safe("latest_1200.json"),safe("latest_1535.json")
+    safe("latest_905.json"),safe("latest_1200.json"),safe("latest_1535.json"),
+    loadAccuracy()
   ]);
-  state={live,d600,d905,d1200,d1535};
+  state={live,d600,d905,d1200,d1535,accuracy};
   setMeta();
   renderMetrics();
-  render600(d600);
+  render600(d600, accuracy);
   render905(d905);
   render1200(d1200);
   render1535(d1535);
