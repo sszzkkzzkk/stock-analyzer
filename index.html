@@ -32,7 +32,7 @@ body{
 .title{font-size:22px;font-weight:900;line-height:1.05}
 .subtitle{font-size:12px;color:var(--muted);margin-top:3px}
 .header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.header-meta{font-size:11px;color:var(--muted);padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03)}
+.header-meta{font-size:10px;color:var(--muted);padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* 取引日バッジ */
 .trading-badge{
@@ -43,7 +43,7 @@ border:1px solid var(–line);
 .trading-badge.old{background:rgba(255,107,107,.15);border-color:rgba(255,107,107,.4);color:#ff6b6b}
 .trading-badge.nodata{background:rgba(155,155,155,.1);border-color:var(–line);color:var(–muted)}
 
-.btn{border:1px solid var(–line);background:var(–panel2);color:var(–text);border-radius:14px;padding:10px 14px;font:inherit;cursor:pointer}
+.btn{border:1px solid var(–line);background:rgba(17,26,52,.8);color:var(–muted);border-radius:14px;padding:8px 14px;font:inherit;cursor:pointer;font-size:13px}
 .top-wrap{background:rgba(6,13,26,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.04)}
 .top-inner{max-width:1180px;margin:0 auto;padding:10px 12px}
 
@@ -55,7 +55,7 @@ border:1px solid var(–line);
 .metric-name{font-size:10px;color:var(–muted)}
 .metric-time{font-size:10px;color:var(–muted);white-space:nowrap}
 /* N/Aは薄く */
-.metric-time.na{color:rgba(154,166,199,.35);font-size:9px}
+.metric-time.na{color:rgba(154,166,199,.0);font-size:9px;visibility:hidden}
 .metric-value{font-size:15px;font-weight:900;margin-top:4px}
 .metric-change{font-size:11px;font-weight:700;margin-top:3px}
 
@@ -67,14 +67,14 @@ border:1px solid var(–line);
 .focus-main{font-size:18px;font-weight:900;line-height:1.1}
 .focus-big-change{font-size:16px;font-weight:900;margin-top:2px}
 .focus-sub{font-size:12px;color:var(–muted);line-height:1.35;margin-top:3px}
-.pills,.chips{display:flex;gap:6px;flex-wrap:wrap}
+.pills,.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start}
 .pill,.chip{background:var(–chip);border:1px solid var(–line);border-radius:999px;padding:5px 9px;font-size:11px;line-height:1.2;display:inline-flex;align-items:center}
 .pill.live{background:rgba(49,209,88,.12);border-color:rgba(49,209,88,.35);color:#31d158}
 
 .tabs-wrap{position:sticky;top:0;z-index:280;background:rgba(6,13,26,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.04)}
 .tabs{max-width:1180px;margin:0 auto;padding:10px 12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.tab{border:1px solid var(–line);background:var(–panel);color:var(–text);border-radius:999px;padding:11px 10px;font:inherit;font-weight:800;cursor:pointer;text-align:center;position:relative}
-.tab.active{border-color:transparent;background:linear-gradient(135deg,var(–accent),var(–accent2))}
+.tab{border:1px solid var(–line);background:rgba(11,18,40,.8);color:var(–muted);border-radius:999px;padding:11px 10px;font:inherit;font-weight:800;cursor:pointer;text-align:center;position:relative}
+.tab.active{border-color:transparent;background:linear-gradient(135deg,var(–accent),var(–accent2));color:#fff}
 /* 当日データバッジ */
 .tab-dot{width:7px;height:7px;border-radius:50%;background:var(–good);position:absolute;top:6px;right:8px;display:none}
 .tab-dot.show{display:block}
@@ -84,7 +84,7 @@ border:1px solid var(–line);
 .panel.active{display:block}
 .stack{display:grid;gap:12px}
 .hero{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:12px}
-.hero-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.hero-top{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:flex-start;margin-bottom:8px}
 .hero-kicker{font-size:11px;color:var(–muted);margin-bottom:4px}
 .hero-title{font-size:26px;font-weight:900;line-height:1.04}
 .hero-text{font-size:13px;color:var(–muted);line-height:1.45}

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-19 19:19:17",
+  "generated_at": "2026-03-19 19:32:38",
   "items": [
     {
       "name": "日経平均",
@@ -11,17 +11,17 @@
     },
     {
       "name": "日経先物",
-      "value": "52,630.00",
-      "change": "-815.00",
-      "percent": "-1.52%",
+      "value": "52,505.00",
+      "change": "-940.00",
+      "percent": "-1.76%",
       "time": "N/A",
       "source": "yfinance:NIY=F"
     },
     {
       "name": "ドル円",
-      "value": "159.13",
-      "change": "-0.67",
-      "percent": "-0.42%",
+      "value": "159.15",
+      "change": "-0.65",
+      "percent": "-0.41%",
       "time": "N/A",
       "source": "yfinance:JPY=X"
     },
@@ -43,9 +43,9 @@
     },
     {
       "name": "WTI原油",
-      "value": "95.10",
-      "change": "-1.27",
-      "percent": "-1.32%",
+      "value": "95.73",
+      "change": "-0.64",
+      "percent": "-0.66%",
       "time": "N/A",
       "source": "yfinance:CL=F"
     }
