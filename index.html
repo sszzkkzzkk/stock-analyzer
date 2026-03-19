@@ -801,47 +801,51 @@ function render1200(d){
   const signH    = lg.sign_that_was_hidden  || "—";
   const hint600  = lg.hint_for_tomorrow_600 || "—";
 
+  // 後場監視銘柄
+  const pmWatch     = arr(d.pm_watchlist||[]);
+  const safePmWatch = pmWatch.filter(w=>(w.bucket||"")!=="危険株");
+  const dangerPmWatch = pmWatch.filter(w=>(w.bucket||"")==="危険株");
+
+  function pmCard(w, idx){
+    const url = w.code ? `https://finance.yahoo.co.jp/quote/${String(w.code).replace(/\D/g,"")}.T` : null;
+    const nm = url
+      ? `<a href="${url}" target="_blank" rel="noopener">${esc(w.name||"—")}${w.code?` (${esc(w.code)})`:""}` + `</a>`
+      : `${esc(w.name||"—")}${w.code?` (${esc(w.code)})`:""}`;
+    const nc = idx<=3?"n"+idx:idx<=5?"n"+idx:"nsub";
+    return `<div class="watch-card">
+      <div class="watch-head">
+        <span class="watch-num ${nc}">${idx}</span>
+        <span class="watch-bucket">${esc(w.bucket||"—")}</span>
+        <span class="watch-name">${nm}</span>
+      </div>
+      ${w.theme?`<div class="watch-theme">${esc(w.theme)}</div>`:""}
+      <div class="watch-rows">
+        ${w.reason?`<div class="watch-row"><span class="watch-key">注目理由</span><span>${esc(w.reason)}</span></div>`:""}
+        ${w.trigger?`<div class="watch-row"><span class="watch-key">仕掛け</span><span>${esc(w.trigger)}</span></div>`:""}
+        ${w.invalidation?`<div class="watch-row"><span class="watch-key">失効</span><span>${esc(w.invalidation)}</span></div>`:""}
+        ${w.time_window?`<div class="watch-row"><span class="watch-key">時間帯</span><span>${esc(w.time_window)}</span></div>`:""}
+      </div>
+    </div>`;
+  }
+
   el.innerHTML=`<div class="stack">
     <div class="dual-pane">
-      <!-- 左：前場の実際の相場 -->
       <div class="market-check">
         <div class="market-check-title">📈 前場の実際の動き</div>
         <div class="log-grid">
-          <div class="log-item hit">
-            <div class="log-key">前場で強かったテーマ</div>
-            <div class="log-val good">${esc(winner)}</div>
-          </div>
-          <div class="log-item miss">
-            <div class="log-key">前場で弱かったテーマ</div>
-            <div class="log-val bad">${esc(loser)}</div>
-          </div>
+          <div class="log-item hit"><div class="log-key">前場で強かったテーマ</div><div class="log-val good">${esc(winner)}</div></div>
+          <div class="log-item miss"><div class="log-key">前場で弱かったテーマ</div><div class="log-val bad">${esc(loser)}</div></div>
           ${newTheme?`<div class="log-item key"><div class="log-key">⚡ 新規浮上テーマ</div><div class="log-val warn">${esc(newTheme)}</div></div>`:""}
-          <div class="log-item">
-            <div class="log-key">前場の資金フロー</div>
-            <div class="log-val">${esc(flow)}</div>
-          </div>
-          <div class="log-item">
-            <div class="log-key">朝の仮説の修正点</div>
-            <div class="log-val">${esc(correct)}</div>
-          </div>
+          <div class="log-item"><div class="log-key">前場の資金フロー</div><div class="log-val">${esc(flow)}</div></div>
+          <div class="log-item"><div class="log-key">朝の仮説の修正点</div><div class="log-val">${esc(correct)}</div></div>
         </div>
       </div>
-      <!-- 右：翌朝への学習整理 -->
       <div class="market-check">
         <div class="market-check-title">📝 翌朝6:00への学習</div>
         <div class="log-grid">
-          <div class="log-item hit">
-            <div class="log-key">朝の時点で見抜けたはずのサイン</div>
-            <div class="log-val good">${esc(signV)}</div>
-          </div>
-          <div class="log-item miss">
-            <div class="log-key">朝の段階では見えなかったサイン</div>
-            <div class="log-val bad">${esc(signH)}</div>
-          </div>
-          <div class="log-item key">
-            <div class="log-key">明日の朝6:00に活かすヒント</div>
-            <div class="log-val warn">${esc(hint600)}</div>
-          </div>
+          <div class="log-item hit"><div class="log-key">朝の時点で見抜けたはずのサイン</div><div class="log-val good">${esc(signV)}</div></div>
+          <div class="log-item miss"><div class="log-key">朝の段階では見えなかったサイン</div><div class="log-val bad">${esc(signH)}</div></div>
+          <div class="log-item key"><div class="log-key">明日の朝6:00に活かすべきヒント</div><div class="log-val warn">${esc(hint600)}</div></div>
           <div class="log-item" style="margin-top:4px">
             <div class="log-key" style="font-size:9px">更新時刻</div>
             <div class="log-val" style="font-size:11px;color:var(--muted)">${esc(d.generated_at||"—")} ${freshnessHtml(d.date)}</div>
@@ -849,6 +853,32 @@ function render1200(d){
         </div>
       </div>
     </div>
+    ${safePmWatch.length ? `
+      <div class="section-title">後場の監視銘柄</div>
+      <div class="watch-grid">
+        <div class="watch-tier-label primary">▶ 後場注目 ${safePmWatch.length}件</div>
+        ${safePmWatch.map((w,i)=>pmCard(w,i+1)).join("")}
+      </div>` : ""}
+    ${dangerPmWatch.length ? `
+      <div class="danger-section">
+        <div class="danger-section-title">⛔ 後場 触るな・危険株</div>
+        <div class="watch-grid">
+          ${dangerPmWatch.map(w=>`<div class="watch-card danger-card">
+            <div class="watch-head">
+              <span class="watch-bucket">危険株</span>
+              <span class="watch-name">${esc(w.name||"—")}${w.code?` (${esc(w.code)})`:""}` + `</span>
+            </div>
+            <div class="watch-rows">
+              ${w.reason?`<div class="watch-row"><span class="watch-key">危険理由</span><span>${esc(w.reason)}</span></div>`:""}
+            </div>
+          </div>`).join("")}
+        </div>
+      </div>` : ""}
+    ${arr(d.do_not_do_pm).length ? `
+      <div class="skip-rule">
+        <div class="skip-rule-label">🚫 後場でやらないこと</div>
+        <div class="skip-rule-text">${arr(d.do_not_do_pm).map(esc).join("<br>")}</div>
+      </div>` : ""}
   </div>`;
 }
 // ═══════════════════════════════
