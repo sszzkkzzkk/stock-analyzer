@@ -279,6 +279,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","No
 /* 危険度高 を赤く */
 .bf-chip.danger{background:rgba(255,107,107,.15)!important;border-color:rgba(255,107,107,.5)!important;color:var(--bad)!important}
 
+
+/* データ鮮度パネル */
+.freshness-bar{
+  background:rgba(6,13,26,.96);
+  border-bottom:1px solid rgba(255,255,255,.04);
+  padding:6px 12px;
+  max-width:1180px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;
+}
+.freshness-sessions{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.session-chip{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 8px;border-radius:8px;border:1px solid var(--line);
+  font-size:10px;background:rgba(255,255,255,.02);
+}
+.session-chip.has-today{border-color:rgba(49,209,88,.35);background:rgba(49,209,88,.06)}
+.session-chip.has-old{border-color:rgba(247,183,49,.3);background:rgba(247,183,49,.04)}
+.session-chip.no-data{opacity:.4}
+.session-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.session-dot.today{background:var(--good)}
+.session-dot.old{background:var(--warn)}
+.session-dot.none{background:var(--line)}
+.session-chip-label{font-weight:800;color:var(--text)}
+.session-chip-time{color:var(--muted)}
+.last-loaded{font-size:10px;color:rgba(154,166,199,.5);white-space:nowrap;flex-shrink:0}
+
 </style>
 </head>
 <body>
@@ -298,7 +324,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","No
         <button class="btn" id="refreshBtn">↻ 再読込</button>
       </div>
     </div>
-    <div class="hdr-meta" id="globalMeta">更新 -</div>
+
   </div>
 </header>
 
@@ -309,6 +335,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","No
   </div>
 </section>
 
+<section class="top-wrap" style="background:rgba(6,13,26,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.04)">
+  <div class="freshness-bar" id="freshnessBar"></div>
+</section>
 <section class="tabs-wrap">
   <div class="tabs">
     <button class="tab main-tab active" data-tab="tab600">📊 6:00 本番<span class="tab-dot" id="dot600"></span></button>
@@ -327,6 +356,51 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","No
 
 <script>
 let selectedMarket="日経平均";
+let lastLoadedAt = null;
+
+function renderFreshnessBar(){
+  const bar = document.getElementById("freshnessBar");
+  if(!bar) return;
+  const today = todayJST();
+
+  const sessions = [
+    { key:"600",  label:"6:00本番",  data:state.d600  },
+    { key:"905",  label:"9:10記録",  data:state.d905  },
+    { key:"1200", label:"12:00記録", data:state.d1200 },
+    { key:"1535", label:"15:35学習", data:state.d1535 },
+  ];
+
+  const chips = sessions.map(s=>{
+    const d = s.data;
+    if(!d){
+      return `<div class="session-chip no-data">
+        <span class="session-dot none"></span>
+        <span class="session-chip-label">${s.label}</span>
+        <span class="session-chip-time">未取得</span>
+      </div>`;
+    }
+    const isToday = d.date === today;
+    const chipCls = isToday ? "has-today" : "has-old";
+    const dotCls  = isToday ? "today" : "old";
+    const timeStr = d.generated_at ? d.generated_at.slice(11,16) : "—";
+    const dateStr = isToday ? "" : `(${d.date||"?"})`;
+    return `<div class="session-chip ${chipCls}">
+      <span class="session-dot ${dotCls}"></span>
+      <span class="session-chip-label">${s.label}</span>
+      <span class="session-chip-time">${timeStr}${dateStr}</span>
+    </div>`;
+  }).join("");
+
+  // 最終読み込み時刻
+  const loadedStr = lastLoadedAt
+    ? `最終読込 ${lastLoadedAt.toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit",second:"2-digit"})}`
+    : "";
+
+  bar.innerHTML = `
+    <div class="freshness-sessions">${chips}</div>
+    <div class="last-loaded">${loadedStr}</div>
+  `;
+}
 
 // 累計的中率をlearning_dbから計算
 function getAccuracyInfo(d600){
@@ -455,7 +529,8 @@ function renderMetrics(){
 function setMeta(){
   const times=[state.d600,state.d905,state.d1200,state.d1535].map(x=>x?.generated_at).filter(Boolean);
   const live=state.live?.generated_at||"";
-  document.getElementById("globalMeta").textContent=`更新 ${times.join(" / ")||"-"}${live?" / 指標 "+live:""}`;
+  const gm = document.getElementById("globalMeta");
+  if(gm) gm.textContent=`更新 ${times.join(" / ")||"-"}${live?" / 指標 "+live:""}`;
 
   const badge=document.getElementById("tradingBadge");
   const d=state.d600;
@@ -910,7 +985,9 @@ async function loadAll(){
     loadAccuracy()
   ]);
   state={live,d600,d905,d1200,d1535,accuracy};
+  lastLoadedAt = new Date();
   setMeta();
+  renderFreshnessBar();
   renderMetrics();
   render600(d600, accuracy);
   render905(d905);
@@ -937,7 +1014,6 @@ if("ResizeObserver" in window){
   if(el)ro.observe(el);
 }
 loadAll();
-setInterval(loadAll,60000);
 </script>
 </body>
 </html>
