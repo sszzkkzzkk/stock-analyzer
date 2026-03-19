@@ -675,6 +675,11 @@ Watchlist purpose: NOT just to predict. Use them to VERIFY theme is real.
 Rules:
 - Return ONLY valid JSON, no markdown
 - Use learning context to AVOID repeating past mistakes
+- battlefield: 12文字以内の断定ラベル（例: 原油集中, 半導体選別, 個別材料相場）
+- theme name: 10文字以内（短く断定的に）
+- themes max 5 total (1 A-rank, max 2 B-rank, max 2 C-rank)
+- watchlist max 10 (先導株3件→連想1軍2件→連想2軍2件→危険株3件以内)
+- avoid_themes max 3
 - market_regime: attack/selective/avoid
 - market_regime_label: 攻めやすい/選別相場/見送り寄り
 - entry_style: breakout/pullback/rebound/skip
@@ -1023,7 +1028,7 @@ def run_600(today):
             },
             "strategy":      parsed["strategy"],
             "themes":         parsed.get("themes", [])[:5],
-            "watchlist":      parsed.get("watchlist", [])[:5],
+            "watchlist":      parsed.get("watchlist", [])[:10],
             "avoid_themes":   parsed.get("avoid_themes", [])[:3],
             "skip_rule":      parsed.get("skip_rule", ""),
             "summary":        parsed.get("summary", ""),
