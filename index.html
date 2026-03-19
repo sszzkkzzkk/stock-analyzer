@@ -26,13 +26,13 @@ body{
 }
 .good{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
 .hdr{background:rgba(6,13,26,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.04)}
-.hdr-inner{max-width:1180px;margin:0 auto;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.hdr-inner{max-width:1180px;margin:0 auto;padding:10px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
 .brand{display:flex;align-items:center;gap:12px}
 .logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:22px;background:linear-gradient(135deg,var(--accent),var(--accent2))}
 .title{font-size:22px;font-weight:900;line-height:1.05}
 .subtitle{font-size:12px;color:var(--muted);margin-top:3px}
-.header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.header-meta{font-size:10px;color:var(--muted);padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%}
+.header-meta{font-size:10px;color:var(--muted);padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.03);max-width:100%;line-height:1.5;word-break:break-all}
 
 /* 取引日バッジ */
 .trading-badge{
@@ -616,7 +616,7 @@ function render1535(data,d600,d905,d1200){
       <div class="hero-top">
         <div>
           <div class="hero-kicker">一日の締め</div>
-          <div class="hero-title-sm">${esc(data.summary||"総評なし")}</div>
+          <div class="hero-title">本日の振り返り</div>
         </div>
         <div class="chips">
           <span class="chip">テーマ ${esc(r.theme_score??"-")}</span>
@@ -625,7 +625,7 @@ function render1535(data,d600,d905,d1200){
           ${freshnessHtml(data.date)}
         </div>
       </div>
-      <div class="hero-text">総評、分析の答え合わせ、次回への学習メモを残します。</div>
+      <div class="hero-text">${esc(data.summary||"総評なし")}</div>
     </div>
     <div class="grid two">
       <div class="card"><h3>今日の総評</h3><div class="list">
