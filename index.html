@@ -27,7 +27,7 @@
     .wrap{max-width:1180px;margin:0 auto;padding:12px}
 
     .hdr{
-      position:sticky; top:0; z-index:300;
+      position:relative;
       background:rgba(6,13,26,.96);
       backdrop-filter:blur(18px);
       border-bottom:1px solid rgba(255,255,255,.04);
@@ -56,7 +56,7 @@
 
     /* 上部は「指標だけ」固定。大きいヒーローは固定しない */
     .top-wrap{
-      position:sticky; top:var(--hdr-h); z-index:290;
+      position:relative;
       background:rgba(6,13,26,.96);
       backdrop-filter:blur(18px);
       border-bottom:1px solid rgba(255,255,255,.04);
@@ -97,7 +97,7 @@
     }
 
     .tabs-wrap{
-      position:sticky; top:calc(var(--hdr-h) + var(--top-h)); z-index:280;
+      position:sticky; top:0; z-index:280;
       background:rgba(6,13,26,.96);
       backdrop-filter:blur(18px);
       border-bottom:1px solid rgba(255,255,255,.04);
@@ -117,7 +117,7 @@
       border:1px solid var(--line);
       border-radius:18px;
       padding:12px;
-      scroll-margin-top:calc(var(--hdr-h) + var(--top-h) + var(--tabs-h) + 12px);
+      scroll-margin-top:calc(var(--tabs-h) + 12px);
     }
     .panel.active{display:block}
 
@@ -496,9 +496,9 @@ function render1535(data,d600,d905,d1200){
   </div>`;
 }
 function syncStickyHeights(){
-  const hdr=document.querySelector(".hdr"), top=document.querySelector(".top-wrap"), tabs=document.querySelector(".tabs-wrap");
-  document.documentElement.style.setProperty("--hdr-h",`${hdr?Math.ceil(hdr.getBoundingClientRect().height):0}px`);
-  document.documentElement.style.setProperty("--top-h",`${top?Math.ceil(top.getBoundingClientRect().height):0}px`);
+  const tabs=document.querySelector(".tabs-wrap");
+  document.documentElement.style.setProperty("--hdr-h","0px");
+  document.documentElement.style.setProperty("--top-h","0px");
   document.documentElement.style.setProperty("--tabs-h",`${tabs?Math.ceil(tabs.getBoundingClientRect().height):0}px`);
 }
 async function loadAll(){
@@ -536,7 +536,8 @@ window.addEventListener("load",syncStickyHeights);
 window.addEventListener("resize",syncStickyHeights);
 if("ResizeObserver" in window){
   const ro=new ResizeObserver(syncStickyHeights);
-  [".hdr",".top-wrap",".tabs-wrap"].forEach(sel=>{const el=document.querySelector(sel); if(el) ro.observe(el);});
+  const el=document.querySelector(".tabs-wrap");
+  if(el) ro.observe(el);
 }
 loadAll();
 setInterval(loadAll, 60000);
