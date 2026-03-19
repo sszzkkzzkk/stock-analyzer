@@ -805,7 +805,18 @@ def build_analysis_prompt_1200(today_str, morning_data, open_data, market, news)
             "sign_that_was_hidden":    "朝の段階では見えなかったサイン（60字）",
             "hint_for_tomorrow_600":   "明日の朝6:00分析に活かすべき最重要ヒント（80字）"
         },
-        "summary": "80字以内"
+        "pm_watchlist": [{
+            "bucket": "先導株",
+            "name": "銘柄名",
+            "code": "1234",
+            "theme": "所属テーマ",
+            "reason": "後場で注目する理由（40字以内）",
+            "trigger": "仕掛け条件（40字以内）",
+            "invalidation": "失効条件（30字以内）",
+            "time_window": "12:30-14:00"
+        }],
+        "do_not_do_pm": ["後場でやらないこと（60字以内）"],
+        "summary": "120字以内"
     }
     return f"""
 You are a learning log generator for a Japanese stock trader.
@@ -824,6 +835,11 @@ Focus on:
 
 Rules:
 - Return ONLY valid JSON
+- pm_watchlist件数はpm_regimeに応じて調整:
+    attack  → 最大8件（先導株3+連想1軍3+連想2軍2）
+    selective → 最大5件（先導株2+連想1軍2+連想2軍1）
+    avoid   → 最大2件（先導株1+危険株1）
+- pm_watchlist bucket: 先導株/連想1軍/連想2軍/危険株
 - hint_for_tomorrow_600 is the most important field - make it specific and actionable
 
 Required JSON schema:
@@ -1106,8 +1122,9 @@ def run_905(today):
             "session":          "905",
             "generated_at":     now,
             "data_sources":     data_sources,
-            "log":     parsed.get("log", {}),
-            "summary": parsed.get("summary", ""),
+            "log":          parsed.get("log", {}),
+            "pm_watchlist": parsed.get("pm_watchlist", [])[:8],
+            "summary":      parsed.get("summary", ""),
         }
     except Exception as e:
         print(f"[9:10] Claude分析失敗: {e}")
@@ -1150,8 +1167,9 @@ def run_1200(today):
         result = {
             "date": today.isoformat(), "session": "1200", "generated_at": now,
             "data_sources": data_sources,
-            "log":     parsed.get("log", {}),
-            "summary": parsed.get("summary", ""),
+            "log":          parsed.get("log", {}),
+            "pm_watchlist": parsed.get("pm_watchlist", [])[:8],
+            "summary":      parsed.get("summary", ""),
         }
     except Exception as e:
         print(f"[12:00] Claude分析失敗: {e}")
