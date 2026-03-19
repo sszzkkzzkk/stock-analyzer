@@ -1,227 +1,169 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>株式AI分析</title>
-  <style>
-    :root{
-      --bg:#07101d; --bg2:#0c1530; --panel:#111a34; --panel2:#182145; --panel3:#0f1730;
-      --text:#eef2ff; --muted:#9aa6c7; --line:#2d3968; --accent:#6ea8fe; --accent2:#8b5cf6;
-      --chip:#23305e; --good:#31d158; --bad:#ff6b6b; --warn:#f7b731;
-      --danger-bg:rgba(255,107,107,.16); --danger-line:rgba(255,107,107,.42); --danger-text:#ffd6d6;
-      --gold:#ffcc66; --gold-bg:rgba(255,204,102,.12); --gold-line:rgba(255,204,102,.35);
-      --silver:#9fd6ff; --silver-bg:rgba(159,214,255,.10); --silver-line:rgba(159,214,255,.28);
-      --bronze:#c6925b; --bronze-bg:rgba(198,146,91,.10); --bronze-line:rgba(198,146,91,.26);
-      --hdr-h:0px; --tabs-h:0px;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
-    body{
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Noto Sans JP",sans-serif;
-      background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
-      color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      text-rendering:optimizeLegibility;
-    }
-    .good{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
-    .wrap{max-width:1180px;margin:0 auto;padding:12px}
-    .hdr{
-      position:relative;
-      background:rgba(6,13,26,.96);
-      backdrop-filter:blur(18px);
-      border-bottom:1px solid rgba(255,255,255,.04);
-    }
-    .hdr-inner{
-      max-width:1180px; margin:0 auto; padding:12px;
-      display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;
-    }
-    .brand{display:flex; align-items:center; gap:12px; min-width:0}
-    .logo{
-      width:42px; height:42px; border-radius:12px; flex:0 0 auto;
-      display:grid; place-items:center; font-weight:900; font-size:22px;
-      background:linear-gradient(135deg,var(--accent),var(--accent2));
-    }
-    .title{font-size:22px; font-weight:900; line-height:1.05}
-    .subtitle{font-size:12px; color:var(--muted); margin-top:3px}
-    .header-actions{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
-    .header-meta{
-      font-size:11px; color:var(--muted); padding:7px 10px;
-      border:1px solid var(--line); border-radius:999px; background:rgba(255,255,255,.03);
-    }
-    .btn{
-      border:1px solid var(--line); background:var(--panel2); color:var(--text);
-      border-radius:14px; padding:10px 14px; font:inherit; cursor:pointer;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>株式AI分析</title>
+<style>
+:root{
+  --bg:#07101d; --bg2:#0c1530; --panel:#111a34; --panel2:#182145; --panel3:#0f1730;
+  --text:#eef2ff; --muted:#9aa6c7; --line:#2d3968; --accent:#6ea8fe; --accent2:#8b5cf6;
+  --chip:#23305e; --good:#31d158; --bad:#ff6b6b; --warn:#f7b731;
+  --danger-bg:rgba(255,107,107,.16); --danger-line:rgba(255,107,107,.42); --danger-text:#ffd6d6;
+  --gold:#ffcc66; --gold-bg:rgba(255,204,102,.12); --gold-line:rgba(255,204,102,.35);
+  --silver:#9fd6ff; --silver-bg:rgba(159,214,255,.10); --silver-line:rgba(159,214,255,.28);
+  --bronze:#c6925b; --bronze-bg:rgba(198,146,91,.10); --bronze-line:rgba(198,146,91,.26);
+  --hdr-h:0px; --tabs-h:0px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Noto Sans JP",sans-serif;
+  background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+.good{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+.hdr{background:rgba(6,13,26,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.04)}
+.hdr-inner{max-width:1180px;margin:0 auto;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:22px;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.title{font-size:22px;font-weight:900;line-height:1.05}
+.subtitle{font-size:12px;color:var(--muted);margin-top:3px}
+.header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.header-meta{font-size:11px;color:var(--muted);padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.03)}
 
-    .top-wrap{
-      position:relative;
-      background:rgba(6,13,26,.96);
-      backdrop-filter:blur(18px);
-      border-bottom:1px solid rgba(255,255,255,.04);
-    }
-    .top-inner{max-width:1180px; margin:0 auto; padding:10px 12px}
-    .metrics-grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px}
-    .metric{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:14px; padding:10px 12px; min-width:0; cursor:pointer;
-    }
-    .metric.active{
-      border-color:rgba(110,168,254,.48);
-      box-shadow:0 0 0 1px rgba(110,168,254,.12) inset;
-      background:rgba(110,168,254,.08);
-    }
-    .metric-top{display:flex; justify-content:space-between; gap:8px}
-    .metric-name,.metric-time{font-size:10px; color:var(--muted)}
-    .metric-value{font-size:16px; font-weight:900; margin-top:4px}
-    .metric-change{font-size:11px; font-weight:700; margin-top:4px}
-    .focus-mini{
-      margin-top:8px;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:10px 12px;
-      background:rgba(17,26,52,.92);
-      display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap;
-    }
-    .focus-kicker{font-size:11px; color:var(--muted); margin-bottom:4px}
-    .focus-main{font-size:16px; font-weight:900; line-height:1.1}
-    .focus-sub{font-size:12px; color:var(--muted); line-height:1.35}
-    .pills,.chips{display:flex; gap:6px; flex-wrap:wrap}
-    .pill,.chip{
-      background:var(--chip); border:1px solid var(--line);
-      border-radius:999px; padding:5px 9px; font-size:11px; line-height:1.2;
-      display:inline-flex; align-items:center;
-    }
+/* 取引日バッジ */
+.trading-badge{
+font-size:11px;font-weight:800;padding:5px 10px;border-radius:999px;
+border:1px solid var(–line);
+}
+.trading-badge.today{background:rgba(49,209,88,.15);border-color:rgba(49,209,88,.4);color:#31d158}
+.trading-badge.old{background:rgba(255,107,107,.15);border-color:rgba(255,107,107,.4);color:#ff6b6b}
+.trading-badge.nodata{background:rgba(155,155,155,.1);border-color:var(–line);color:var(–muted)}
 
-    .tabs-wrap{
-      position:sticky; top:0; z-index:280;
-      background:rgba(6,13,26,.96);
-      backdrop-filter:blur(18px);
-      border-bottom:1px solid rgba(255,255,255,.04);
-    }
-    .tabs{max-width:1180px; margin:0 auto; padding:10px 12px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px}
-    .tab{
-      border:1px solid var(--line); background:var(--panel); color:var(--text);
-      border-radius:999px; padding:11px 10px; font:inherit; font-weight:800; cursor:pointer;
-      text-align:center;
-    }
-    .tab.active{border-color:transparent; background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.btn{border:1px solid var(–line);background:var(–panel2);color:var(–text);border-radius:14px;padding:10px 14px;font:inherit;cursor:pointer}
+.top-wrap{background:rgba(6,13,26,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.04)}
+.top-inner{max-width:1180px;margin:0 auto;padding:10px 12px}
 
-    .content{max-width:1180px; margin:0 auto; padding:12px}
-    .panel{
-      display:none;
-      background:rgba(17,26,52,.96);
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:12px;
-      scroll-margin-top:calc(var(--tabs-h) + 12px);
-    }
-    .panel.active{display:block}
+/* 指標グリッド：スマホ2列・PC3列 */
+.metrics-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.metric{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:10px 12px;min-width:0;cursor:pointer;transition:border-color .15s}
+.metric.active{border-color:rgba(110,168,254,.48);box-shadow:0 0 0 1px rgba(110,168,254,.12) inset;background:rgba(110,168,254,.08)}
+.metric-top{display:flex;justify-content:space-between;gap:4px;align-items:flex-start}
+.metric-name{font-size:10px;color:var(–muted)}
+.metric-time{font-size:10px;color:var(–muted);white-space:nowrap}
+/* N/Aは薄く */
+.metric-time.na{color:rgba(154,166,199,.35);font-size:9px}
+.metric-value{font-size:15px;font-weight:900;margin-top:4px}
+.metric-change{font-size:11px;font-weight:700;margin-top:3px}
 
-    .stack{display:grid; gap:12px}
-    .hero{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:16px;
-      padding:12px;
-    }
-    .hero-top{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:8px}
-    .hero-kicker{font-size:11px; color:var(--muted); margin-bottom:4px}
-    .hero-title{font-size:26px; font-weight:900; line-height:1.04}
-    .hero-text{font-size:13px; color:var(--muted); line-height:1.45}
+/* 大きな前日比 */
+.metric-value-lg{font-size:22px;font-weight:900;margin-top:2px;line-height:1.1}
 
-    .grid{display:grid; gap:12px}
-    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
-    .grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .card{
-      background:var(--panel3);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:12px;
-      min-width:0;
-    }
-    .card h3{margin:0 0 10px; font-size:16px}
-    .list{display:grid; gap:8px}
-    .item{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:12px;
-      padding:10px;
-    }
-    .item-title{font-weight:800; font-size:14px; margin-bottom:4px}
-    .item-sub{font-size:13px; color:var(--muted); line-height:1.45}
-    .item.danger{background:var(--danger-bg); border-color:var(--danger-line)}
-    .item.danger .item-sub{color:var(--danger-text)}
+.focus-mini{margin-top:8px;border:1px solid var(–line);border-radius:14px;padding:10px 12px;background:rgba(17,26,52,.92);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.focus-kicker{font-size:11px;color:var(–muted);margin-bottom:4px}
+.focus-main{font-size:18px;font-weight:900;line-height:1.1}
+.focus-big-change{font-size:16px;font-weight:900;margin-top:2px}
+.focus-sub{font-size:12px;color:var(–muted);line-height:1.35;margin-top:3px}
+.pills,.chips{display:flex;gap:6px;flex-wrap:wrap}
+.pill,.chip{background:var(–chip);border:1px solid var(–line);border-radius:999px;padding:5px 9px;font-size:11px;line-height:1.2;display:inline-flex;align-items:center}
+.pill.live{background:rgba(49,209,88,.12);border-color:rgba(49,209,88,.35);color:#31d158}
 
-    .theme{
-      border-radius:14px; padding:12px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-    }
-    .theme.a{background:var(--gold-bg); border-color:var(--gold-line)}
-    .theme.b{background:var(--silver-bg); border-color:var(--silver-line)}
-    .theme-head{display:flex; gap:8px; align-items:center; margin-bottom:8px}
-    .theme-rank{
-      min-width:28px; height:28px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center;
-      border:1px solid var(--line); background:var(--panel2); font-size:12px; font-weight:900;
-    }
-    .theme-title{font-size:18px; font-weight:900}
-    .theme-text{font-size:13px; color:var(--muted); line-height:1.45}
+.tabs-wrap{position:sticky;top:0;z-index:280;background:rgba(6,13,26,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.04)}
+.tabs{max-width:1180px;margin:0 auto;padding:10px 12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tab{border:1px solid var(–line);background:var(–panel);color:var(–text);border-radius:999px;padding:11px 10px;font:inherit;font-weight:800;cursor:pointer;text-align:center;position:relative}
+.tab.active{border-color:transparent;background:linear-gradient(135deg,var(–accent),var(–accent2))}
+/* 当日データバッジ */
+.tab-dot{width:7px;height:7px;border-radius:50%;background:var(–good);position:absolute;top:6px;right:8px;display:none}
+.tab-dot.show{display:block}
 
-    .watch-tier{
-      border-radius:14px; padding:12px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-    }
-    .watch-tier.primary{background:var(--gold-bg); border-color:var(--gold-line)}
-    .watch-tier.secondary{background:var(--silver-bg); border-color:var(--silver-line)}
-    .watch-tier.reserve{background:var(--bronze-bg); border-color:var(--bronze-line)}
-    .watch-tier h4{margin:0 0 10px; font-size:14px}
-    .watch{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:14px;
-      padding:10px;
-      display:grid; gap:6px;
-    }
-    .watch-head{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-    .watch-name{font-size:15px; font-weight:900}
-    .watch-role{font-size:12px; color:var(--muted)}
-    .watch-row{display:grid; grid-template-columns:66px 1fr; gap:8px; font-size:12px; line-height:1.4}
-    .watch-key{color:var(--muted)}
+.content{max-width:1180px;margin:0 auto;padding:12px}
+.panel{display:none;background:rgba(17,26,52,.96);border:1px solid var(–line);border-radius:18px;padding:12px;scroll-margin-top:calc(var(–tabs-h)+12px)}
+.panel.active{display:block}
+.stack{display:grid;gap:12px}
+.hero{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:12px}
+.hero-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.hero-kicker{font-size:11px;color:var(–muted);margin-bottom:4px}
+.hero-title{font-size:26px;font-weight:900;line-height:1.04}
+.hero-text{font-size:13px;color:var(–muted);line-height:1.45}
 
-    .notice{
-      background:rgba(93,124,255,.10);
-      border:1px solid rgba(93,124,255,.26);
-      border-radius:14px;
-      padding:12px;
-      color:#dce7ff;
-      font-size:13px;
-      line-height:1.55;
-    }
-    .news-preview{font-size:13px; color:var(--muted); line-height:1.5}
-    .news-list{display:none; gap:8px; margin-top:8px}
-    .news-list.open{display:grid}
-    .news-item{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:12px;
-      padding:10px;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.45;
-    }
+/* データ鮮度バッジ */
+.freshness{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(–line);font-weight:700}
+.freshness.today{background:rgba(49,209,88,.12);border-color:rgba(49,209,88,.35);color:#31d158}
+.freshness.yesterday{background:rgba(247,183,49,.12);border-color:rgba(247,183,49,.35);color:var(–warn)}
+.freshness.old{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.35);color:var(–bad)}
 
-    @media (max-width:980px){
-      .metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .grid.two,.grid.three{grid-template-columns:1fr}
-      .hero-title{font-size:22px}
-    }
-  </style>
+.grid{display:grid;gap:12px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{background:var(–panel3);border:1px solid var(–line);border-radius:16px;padding:12px;min-width:0}
+.card h3{margin:0 0 10px;font-size:16px}
+.list{display:grid;gap:8px}
+.item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px}
+.item-title{font-weight:800;font-size:14px;margin-bottom:4px}
+.item-sub{font-size:13px;color:var(–muted);line-height:1.45}
+.item.danger{background:var(–danger-bg);border-color:var(–danger-line)}
+.item.danger .item-sub{color:var(–danger-text)}
+.theme{border-radius:14px;padding:12px;border:1px solid var(–line);background:rgba(255,255,255,.03)}
+.theme.a{background:var(–gold-bg);border-color:var(–gold-line)}
+.theme.b{background:var(–silver-bg);border-color:var(–silver-line)}
+.theme-head{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.theme-rank{min-width:28px;height:28px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(–line);background:var(–panel2);font-size:12px;font-weight:900}
+.theme-title{font-size:18px;font-weight:900}
+.theme-text{font-size:13px;color:var(–muted);line-height:1.45}
+.watch-tier{border-radius:14px;padding:12px;border:1px solid var(–line);background:rgba(255,255,255,.03)}
+.watch-tier.primary{background:var(–gold-bg);border-color:var(–gold-line)}
+.watch-tier.secondary{background:var(–silver-bg);border-color:var(–silver-line)}
+.watch-tier.reserve{background:var(–bronze-bg);border-color:var(–bronze-line)}
+.watch-tier h4{margin:0 0 10px;font-size:14px}
+.watch{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:10px;display:grid;gap:6px}
+.watch-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.watch-name{font-size:15px;font-weight:900}
+
+/* Yahooファイナンスリンク */
+.watch-name a{color:inherit;text-decoration:none;border-bottom:1px dashed rgba(110,168,254,.4)}
+.watch-name a:hover{border-bottom-color:var(–accent)}
+
+.watch-role{font-size:12px;color:var(–muted)}
+.watch-row{display:grid;grid-template-columns:66px 1fr;gap:8px;font-size:12px;line-height:1.4}
+.watch-key{color:var(–muted)}
+
+/* チェックリスト */
+.checklist{display:grid;gap:6px;margin-top:4px}
+.check-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:1.4;padding:6px 8px;background:rgba(255,255,255,.02);border-radius:8px;border:1px solid rgba(255,255,255,.04);cursor:pointer}
+.check-item input[type=checkbox]{margin:0;margin-top:1px;flex-shrink:0;width:14px;height:14px;accent-color:var(–good)}
+.check-item.checked span{text-decoration:line-through;color:var(–muted)}
+
+.notice{background:rgba(93,124,255,.10);border:1px solid rgba(93,124,255,.26);border-radius:14px;padding:12px;color:#dce7ff;font-size:13px;line-height:1.55}
+.news-preview{font-size:13px;color:var(–muted);line-height:1.5}
+.news-list{display:none;gap:8px;margin-top:8px}
+.news-list.open{display:grid}
+.news-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px;color:var(–muted);font-size:13px;line-height:1.45}
+
+/* セッション時間帯ラベル */
+.session-label{font-size:11px;padding:3px 8px;border-radius:999px;font-weight:700;border:1px solid var(–line)}
+.session-label.pre{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.35);color:#c4b5fd}
+.session-label.am{background:rgba(110,168,254,.12);border-color:rgba(110,168,254,.35);color:#93c5fd}
+.session-label.lunch{background:rgba(247,183,49,.12);border-color:rgba(247,183,49,.35);color:var(–warn)}
+.session-label.pm{background:rgba(49,209,88,.12);border-color:rgba(49,209,88,.35);color:#31d158}
+.session-label.after{background:rgba(155,155,155,.1);border-color:var(–line);color:var(–muted)}
+
+@media(max-width:980px){
+.metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid.two,.grid.three{grid-template-columns:1fr}
+.hero-title{font-size:22px}
+}
+@media(max-width:480px){
+.metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+
 </head>
 <body>
+
 <header class="hdr">
   <div class="hdr-inner">
     <div class="brand">
@@ -232,6 +174,7 @@
       </div>
     </div>
     <div class="header-actions">
+      <span id="tradingBadge" class="trading-badge nodata">-- / --</span>
       <div class="header-meta" id="globalMeta">更新 -</div>
       <button class="btn" id="refreshBtn">↻ 再読込</button>
     </div>
@@ -247,10 +190,10 @@
 
 <section class="tabs-wrap">
   <div class="tabs">
-    <button class="tab active" data-tab="tab600">6:00 戦略会議</button>
-    <button class="tab" data-tab="tab905">9:10 行動修正</button>
-    <button class="tab" data-tab="tab1200">12:00 後場戦略</button>
-    <button class="tab" data-tab="tab1535">15:35 総括と学習</button>
+    <button class="tab active" data-tab="tab600">6:00 戦略会議<span class="tab-dot" id="dot600"></span></button>
+    <button class="tab" data-tab="tab905">9:10 行動修正<span class="tab-dot" id="dot905"></span></button>
+    <button class="tab" data-tab="tab1200">12:00 後場戦略<span class="tab-dot" id="dot1200"></span></button>
+    <button class="tab" data-tab="tab1535">15:35 総括と学習<span class="tab-dot" id="dot1535"></span></button>
   </div>
 </section>
 
@@ -266,7 +209,6 @@ const STORAGE_USER="stock-ai-user";
 const STORAGE_REPO="stock-ai-repo";
 let selectedMarketName="日経平均";
 let state={d600:null,d905:null,d1200:null,d1535:null,marketLive:null};
-
 const els={
   globalMeta:document.getElementById("globalMeta"),
   metricsGrid:document.getElementById("metricsGrid"),
@@ -275,13 +217,13 @@ const els={
   tab905:document.getElementById("tab905"),
   tab1200:document.getElementById("tab1200"),
   tab1535:document.getElementById("tab1535"),
-  refreshBtn:document.getElementById("refreshBtn")
+  refreshBtn:document.getElementById("refreshBtn"),
+  tradingBadge:document.getElementById("tradingBadge"),
 };
-
 const esc=v=>String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 const nl2br=v=>esc(v??"").replace(/\n/g,"<br>");
 const arr=v=>Array.isArray(v)?v:[];
-const compactJoin=(list,e="なし")=>{const f=arr(list).filter(Boolean); return f.length?f.join(" / "):e;};
+const compactJoin=(list,e="なし")=>{const f=arr(list).filter(Boolean);return f.length?f.join(" / "):e;};
 
 function baseUrl(){
   const user=localStorage.getItem(STORAGE_USER)||"sszzkkzzkk";
@@ -294,12 +236,73 @@ async function fetchJson(path){
   return await res.json();
 }
 async function safeLoad(path){try{return await fetchJson(path)}catch(e){return null}}
+
 function quoteClass(change){
   const s=String(change||"");
   if(s.startsWith("+")) return "good";
   if(s.startsWith("-")) return "bad";
   return "warn";
 }
+
+// 今日の日付（JST）を YYYY-MM-DD で返す
+function todayJST(){
+  return new Date(Date.now()+9*3600*1000).toISOString().slice(0,10);
+}
+
+// データが今日のものかチェック → バッジ表示
+function freshnessClass(dateStr){
+  if(!dateStr) return "old";
+  const today=todayJST();
+  if(dateStr===today) return "today";
+  const diff=(new Date(today)-new Date(dateStr))/(1000*86400);
+  if(diff<=1) return "yesterday";
+  return "old";
+}
+function freshnessLabel(dateStr){
+  if(!dateStr) return "データなし";
+  const fc=freshnessClass(dateStr);
+  if(fc==="today") return "今日";
+  if(fc==="yesterday") return "昨日";
+  return dateStr;
+}
+
+// 取引日バッジ更新
+function updateTradingBadge(d600){
+  const badge=els.tradingBadge;
+  if(!d600){badge.textContent="データなし";badge.className="trading-badge nodata";return;}
+  const date=d600.date||"";
+  const today=todayJST();
+  if(date===today){
+    badge.textContent="📈 本日分析済み";
+    badge.className="trading-badge today";
+  } else {
+    badge.textContent=`⚠ ${date||"日付不明"}のデータ`;
+    badge.className="trading-badge old";
+  }
+}
+
+// タブのドット（当日データあり）
+function updateTabDots(d600,d905,d1200,d1535){
+  const today=todayJST();
+  [["dot600",d600],["dot905",d905],["dot1200",d1200],["dot1535",d1535]].forEach(([id,d])=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle("show", d?.date===today);
+  });
+}
+
+// 現在のセッションラベル
+function currentSessionLabel(){
+  const h=new Date(Date.now()+9*3600*1000).getUTCHours();
+  if(h<6)  return {text:"開場前（夜間）",cls:"pre"};
+  if(h<9)  return {text:"開場前（朝）",cls:"pre"};
+  if(h<11) return {text:"前場",cls:"am"};
+  if(h<12) return {text:"前場後半",cls:"am"};
+  if(h<12.5) return {text:"昼休み",cls:"lunch"};
+  if(h<15) return {text:"後場",cls:"pm"};
+  if(h<16) return {text:"引け後",cls:"after"};
+  return {text:"夜間",cls:"after"};
+}
+
 function firstMatchItem(data,names,buckets=[]){
   const market=data?.market_data||{};
   const merged=[];
@@ -321,39 +324,51 @@ function normalizeLiveItems(raw){
   return [];
 }
 function getMarketPicks(){
-  const live = normalizeLiveItems(state.marketLive);
+  const live=normalizeLiveItems(state.marketLive);
   if(live.length) return live;
   return [
     firstMatchItem(state.d600,["日経平均"],["indices"]),
     firstMatchItem(state.d600,["日経先物","日経225先物"],["futures"]),
     firstMatchItem(state.d600,["ドル円","米ドル円"],["forex"]),
-    firstMatchItem(state.d600,["NYダウ","ＮＹダウ"],["world_indices"])
+    firstMatchItem(state.d600,["NYダウ","ＮＹダウ"],["world_indices"]),
+    firstMatchItem(state.d600,["SOX"],["sox"]),
+    firstMatchItem(state.d600,["WTI原油"],["oil"]),
   ].filter(Boolean);
 }
+
 function setGlobalMeta(...datasets){
   const times=datasets.map(x=>x?.generated_at).filter(Boolean);
-  const liveTime=state.marketLive?.generated_at || state.marketLive?.updated_at || "";
-  const suffix=liveTime ? ` / 指標 ${liveTime}` : "";
+  const liveTime=state.marketLive?.generated_at||state.marketLive?.updated_at||"";
+  const suffix=liveTime?` / 指標 ${liveTime}`:"";
   els.globalMeta.textContent=`更新 ${times.length?times.join(" / "):"-"}${suffix}`;
 }
+
 function renderMetrics(){
   const picks=getMarketPicks();
   const hasLive=normalizeLiveItems(state.marketLive).length>0;
   if(!picks.length){
-    els.metricsGrid.innerHTML=`<div class="notice" style="grid-column:1/-1">主要指標データが取得できません。いまは market_live.json があればそちらを優先し、なければ朝の分析JSONの値を表示します。</div>`;
+    els.metricsGrid.innerHTML=`<div class="notice" style="grid-column:1/-1">主要指標データが取得できません</div>`;
     els.focusMini.innerHTML="";
     return;
   }
   if(!picks.some(x=>x.name===selectedMarketName)) selectedMarketName=picks[0].name;
+
   els.metricsGrid.innerHTML=picks.map(item=>{
     const klass=quoteClass(item.change);
     const active=item.name===selectedMarketName?"active":"";
+    const timeStr=item.time&&item.time!=="N/A"?item.time:"";
+    const timeCls=timeStr?"":"na";
+    const timeDisp=timeStr||"--:--";
     return `<button class="metric ${active}" data-market="${esc(item.name)}">
-      <div class="metric-top"><div class="metric-name">${esc(item.name||"-")}</div><div class="metric-time">${esc(item.time||"")}</div></div>
+      <div class="metric-top">
+        <div class="metric-name">${esc(item.name||"-")}</div>
+        <div class="metric-time ${timeCls}">${esc(timeDisp)}</div>
+      </div>
       <div class="metric-value ${klass}">${esc(item.value||"—")}</div>
       <div class="metric-change ${klass}">${esc(item.change||"—")} ${esc(item.percent||"")}</div>
     </button>`;
   }).join("");
+
   els.metricsGrid.querySelectorAll("[data-market]").forEach(btn=>{
     btn.addEventListener("click",()=>{
       selectedMarketName=btn.getAttribute("data-market");
@@ -361,19 +376,33 @@ function renderMetrics(){
       syncStickyHeights();
     });
   });
+
   const selected=picks.find(x=>x.name===selectedMarketName);
   const klass=quoteClass(selected.change);
+  const timeStr=selected.time&&selected.time!=="N/A"?selected.time:"取得中";
+  const sess=currentSessionLabel();
+
   els.focusMini.innerHTML=`
     <div>
       <div class="focus-kicker">選択中の主要指標</div>
       <div class="focus-main ${klass}">${esc(selected.name)} ${esc(selected.value)}</div>
-      <div class="focus-sub">${esc(selected.change)} ${esc(selected.percent)} / 最終更新 ${esc(selected.time)} / ${hasLive ? "market_live 優先" : "朝データを表示中"}</div>
+      <div class="focus-big-change ${klass}">${esc(selected.change)} ${esc(selected.percent)}</div>
+      <div class="focus-sub">最終更新 ${esc(timeStr)}</div>
     </div>
-    <div class="pills">
-      <span class="pill">${hasLive ? "指標ライブON" : "指標ライブ未取得"}</span>
-      <span class="pill">60秒再取得</span>
+    <div class="pills" style="align-self:flex-end">
+      <span class="pill ${hasLive?'live':''}">${hasLive?"指標ライブON":"朝データ表示中"}</span>
+      <span class="session-label ${sess.cls}">${sess.text}</span>
     </div>`;
 }
+
+// Yahooファイナンス銘柄ページURL
+function yahooUrl(code){
+  if(!code) return null;
+  const c=String(code).replace(/[^0-9A-Za-z]/g,"");
+  if(!c) return null;
+  return `https://finance.yahoo.co.jp/quote/${c}.T`;
+}
+
 function renderThemeCards(items){
   const list=arr(items).filter(Boolean);
   if(!list.length) return `<div class="notice">本命テーマデータなし</div>`;
@@ -383,54 +412,80 @@ function renderThemeCards(items){
       <div class="theme-text">${esc(x.reason||"-")}</div>
     </div>`).join("")}</div>`;
 }
+
 function classifyWatchlist(items){
   const list=arr(items).filter(Boolean).slice(0,10);
-  return {
-    primary:list.slice(0,3),
-    secondary:list.slice(3,5),
-    reserve:list.slice(5,10)
-  };
+  return {primary:list.slice(0,3),secondary:list.slice(3,5),reserve:list.slice(5,10)};
 }
-function renderWatchTier(title, cls, items, emptyText){
+
+// チェックリスト付きウォッチカード
+function renderWatchCard(x,idx){
+  const url=yahooUrl(x.code);
+  const nameHtml=url
+    ?`<a href="${url}" target="_blank" rel="noopener">${esc(x.name||"-")} ${x.code?`(${esc(x.code)})`:""}</a>`
+    :`${esc(x.name||"-")} ${x.code?`(${esc(x.code)})`:""}`;
+
+  const triggers=arr(x.trigger?[x.trigger]:[]).concat(arr(x.trigger_list||[])).filter(Boolean);
+  const checklistHtml=triggers.length
+    ?`<div class="checklist">${triggers.map((t,i)=>`
+      <label class="check-item" id="chk_${idx}_${i}">
+        <input type="checkbox" onchange="toggleCheck(this,'chk_${idx}_${i}')">
+        <span>${esc(t)}</span>
+      </label>`).join("")}</div>`
+    :`<div class="watch-row"><div class="watch-key">仕掛け</div><div>${esc(x.trigger||"-")}</div></div>`;
+
+  return `<div class="watch">
+    <div class="watch-head"><span class="pill">${idx+1}位</span><div class="watch-name">${nameHtml}</div></div>
+    <div class="watch-role">${esc(x.bucket||"-")} / ${esc(x.reason||"-")}</div>
+    ${checklistHtml}
+    <div class="watch-row"><div class="watch-key">失効</div><div>${esc(x.invalidation||"-")}</div></div>
+    <div class="watch-row"><div class="watch-key">時間帯</div><div>${esc(x.time_window||"-")}</div></div>
+  </div>`;
+}
+
+function toggleCheck(cb,id){
+  const label=document.getElementById(id);
+  if(label) label.classList.toggle("checked",cb.checked);
+}
+
+function renderWatchTier(title,cls,items,emptyText){
   if(!items.length) return `<div class="watch-tier ${cls}"><h4>${title}</h4><div class="notice">${emptyText}</div></div>`;
   return `<div class="watch-tier ${cls}">
     <h4>${title}</h4>
-    <div class="grid">${items.map((x,idx)=>`
-      <div class="watch">
-        <div class="watch-head"><span class="pill">${idx+1}位</span><div class="watch-name">${esc(x.name||"-")} ${x.code?`(${esc(x.code)})`:""}</div></div>
-        <div class="watch-role">${esc(x.bucket||"-")} / ${esc(x.reason||"-")}</div>
-        <div class="watch-row"><div class="watch-key">仕掛け</div><div>${esc(x.trigger||"-")}</div></div>
-        <div class="watch-row"><div class="watch-key">失効</div><div>${esc(x.invalidation||"-")}</div></div>
-        <div class="watch-row"><div class="watch-key">時間帯</div><div>${esc(x.time_window||"-")}</div></div>
-      </div>`).join("")}
-    </div>
+    <div class="grid">${items.map((x,idx)=>renderWatchCard(x,idx)).join("")}</div>
   </div>`;
 }
-function renderWatchBlock(items, emptyText="監視銘柄なし"){
+
+function renderWatchBlock(items,emptyText="監視銘柄なし"){
   const tiers=classifyWatchlist(items);
-  if(!tiers.primary.length && !tiers.secondary.length && !tiers.reserve.length) return `<div class="notice">${emptyText}</div>`;
+  if(!tiers.primary.length&&!tiers.secondary.length&&!tiers.reserve.length)
+    return `<div class="notice">${emptyText}</div>`;
   return `<div class="grid three">
-    ${renderWatchTier("最優先 3件", "primary", tiers.primary, "最優先なし")}
-    ${renderWatchTier("準主役 2件", "secondary", tiers.secondary, "準主役なし")}
-    ${renderWatchTier("予備 5件まで", "reserve", tiers.reserve, "予備なし")}
+    ${renderWatchTier("最優先 3件","primary",tiers.primary,"最優先なし")}
+    ${renderWatchTier("準主役 2件","secondary",tiers.secondary,"準主役なし")}
+    ${renderWatchTier("予備 5件まで","reserve",tiers.reserve,"予備なし")}
   </div>`;
 }
-function renderThemeList(items, emptyText="データなし"){
+
+function renderThemeList(items,emptyText="データなし"){
   const list=arr(items).filter(Boolean);
   if(!list.length) return `<div class="notice">${esc(emptyText)}</div>`;
   return `<div class="list">${list.map(x=>`<div class="item"><div class="item-title">${esc(x.name||"-")}</div><div class="item-sub">${esc(x.reason||"-")}</div></div>`).join("")}</div>`;
 }
+
 function renderThemeStatus(items){
   const list=arr(items).filter(Boolean);
   if(!list.length) return `<div class="notice">テーマ状態なし</div>`;
   return `<div class="list">${list.map(x=>`<div class="item"><div class="item-title">${esc(x.name||"-")} / ${esc(x.type||"-")}</div><div class="item-sub">${esc(x.comment||"-")}</div></div>`).join("")}</div>`;
 }
+
 function renderNews(items,id){
   const list=arr(items).filter(Boolean);
   if(!list.length) return `<div class="notice">ニュースなし</div>`;
   const preview=esc(list[0].title||list[0].headline||list[0].text||list[0]);
   return `<div><div class="news-preview">${preview}</div><div style="margin-top:8px"><button class="btn" data-news-toggle="${id}">ニュースを開く</button></div><div class="news-list" id="${id}">${list.slice(0,5).map(x=>`<div class="news-item">${esc(x.title||x.headline||x.text||x)}</div>`).join("")}</div></div>`;
 }
+
 function bindNewsToggles(){
   document.querySelectorAll("[data-news-toggle]").forEach(btn=>{
     btn.onclick=()=>{
@@ -442,25 +497,39 @@ function bindNewsToggles(){
     };
   });
 }
+
+function freshnessHtml(dateStr){
+  const fc=freshnessClass(dateStr);
+  const label=freshnessLabel(dateStr);
+  return `<span class="freshness ${fc}">${label}</span>`;
+}
+
 function render600(data){
-  if(!data){els.tab600.innerHTML=`<div class="notice">6:00データがありません</div>`; return;}
+  if(!data){els.tab600.innerHTML=`<div class="notice">6:00データがありません</div>`;return;}
   const s=data.strategy||{};
   const news=arr(data.major_news||data.market_data?.news||data.news);
   els.tab600.innerHTML=`<div class="stack">
     <div class="hero">
       <div class="hero-top">
-        <div><div class="hero-kicker">朝の結論</div><div class="hero-title">${esc(s.market_regime_label||"未判定")}</div></div>
-        <div class="chips">${s.entry_style_label?`<span class="chip">${esc(s.entry_style_label)}</span>`:""}${s.danger_level?`<span class="chip">危険度 ${esc(s.danger_level)}</span>`:""}</div>
+        <div>
+          <div class="hero-kicker">朝の結論</div>
+          <div class="hero-title">${esc(s.market_regime_label||"未判定")}</div>
+        </div>
+        <div class="chips">
+          ${s.entry_style_label?`<span class="chip">${esc(s.entry_style_label)}</span>`:""}
+          ${s.danger_level?`<span class="chip">危険度 ${esc(s.danger_level)}</span>`:""}
+          ${freshnessHtml(data.date)}
+        </div>
       </div>
       <div class="hero-text">${esc(s.conclusion||data.summary||"")}</div>
     </div>
     <div class="grid two">
       <div class="card"><h3>本命テーマ</h3>${renderThemeCards(data.priority_themes)}</div>
-      <div class="card"><h3>監視銘柄</h3>${renderWatchBlock(data.watchlist, "監視銘柄なし")}</div>
+      <div class="card"><h3>監視銘柄</h3>${renderWatchBlock(data.watchlist,"監視銘柄なし")}</div>
     </div>
     <div class="grid two">
-      <div class="card"><h3>やること</h3><div class="list">${arr(data.entry_conditions).length?arr(data.entry_conditions).map(x=>`<div class="item"><div class="item-sub">${esc(x)}</div></div>`).join(""):`<div class="notice">仕掛け条件なし</div>`}</div></div>
-      <div class="card"><h3>やらないこと</h3><div class="list">${arr(data.skip_conditions).length?arr(data.skip_conditions).map(x=>`<div class="item danger"><div class="item-sub">${esc(x)}</div></div>`).join(""):`<div class="notice">禁止事項なし</div>`}</div></div>
+      <div class="card"><h3>✅ やること</h3><div class="list">${arr(data.entry_conditions).length?arr(data.entry_conditions).map(x=>`<div class="item"><div class="item-sub">${esc(x)}</div></div>`).join(""):`<div class="notice">仕掛け条件なし</div>`}</div></div>
+      <div class="card"><h3>🚫 やらないこと</h3><div class="list">${arr(data.skip_conditions).length?arr(data.skip_conditions).map(x=>`<div class="item danger"><div class="item-sub">${esc(x)}</div></div>`).join(""):`<div class="notice">禁止事項なし</div>`}</div></div>
     </div>
     <div class="grid two">
       <div class="card"><h3>本日ニュース</h3>${renderNews(news,"news600")}</div>
@@ -468,15 +537,23 @@ function render600(data){
     </div>
   </div>`;
 }
+
 function render905(data){
-  if(!data){els.tab905.innerHTML=`<div class="notice">9:10データがありません</div>`; return;}
+  if(!data){els.tab905.innerHTML=`<div class="notice">9:10データがありません</div>`;return;}
   const j=data.action_judgement||{};
-  const watch = arr(data.watchlist || data.monitor_list || []);
+  const watch=arr(data.watchlist||data.monitor_list||[]);
   els.tab905.innerHTML=`<div class="stack">
     <div class="hero">
       <div class="hero-top">
-        <div><div class="hero-kicker">寄り後の判断</div><div class="hero-title">${esc(j.opening_state||"未判定")}</div></div>
-        <div class="chips">${j.best_current_theme?`<span class="chip">${esc(j.best_current_theme)}</span>`:""}${j.best_current_stock?`<span class="chip">${esc(j.best_current_stock)}</span>`:""}</div>
+        <div>
+          <div class="hero-kicker">寄り後の判断</div>
+          <div class="hero-title">${esc(j.opening_state||"未判定")}</div>
+        </div>
+        <div class="chips">
+          ${j.best_current_theme?`<span class="chip">${esc(j.best_current_theme)}</span>`:""}
+          ${j.best_current_stock?`<span class="chip">${esc(j.best_current_stock)}</span>`:""}
+          ${freshnessHtml(data.date)}
+        </div>
       </div>
       <div class="hero-text">${esc(j.action_now||data.summary||"")}</div>
     </div>
@@ -488,21 +565,29 @@ function render905(data){
       </div></div>
       <div class="card"><h3>テーマ状態</h3>${renderThemeStatus(data.theme_status)}</div>
     </div>
-    <div class="card"><h3>監視銘柄</h3>${renderWatchBlock(watch.length ? watch : arr(state.d600?.watchlist||[]), "監視銘柄なし")}</div>
+    <div class="card"><h3>監視銘柄</h3>${renderWatchBlock(watch.length?watch:arr(state.d600?.watchlist||[]),"監視銘柄なし")}</div>
     <div class="card"><h3>寄り後メモ</h3><div class="item"><div class="item-sub">${nl2br(data.summary||"-")}</div></div></div>
   </div>`;
 }
+
 function render1200(data){
-  if(!data){els.tab1200.innerHTML=`<div class="notice">12:00データがありません</div>`; return;}
+  if(!data){els.tab1200.innerHTML=`<div class="notice">12:00データがありません</div>`;return;}
   const p=data.afternoon_plan||{};
-  const fallback = arr(state.d600?.watchlist||[]).slice(0,5);
-  const newWatch = arr(data.new_watchlist||[]);
-  const displayWatch = newWatch.length >= 5 ? newWatch : [...newWatch, ...fallback].slice(0,10);
+  const fallback=arr(state.d600?.watchlist||[]).slice(0,5);
+  const newWatch=arr(data.new_watchlist||[]);
+  const displayWatch=newWatch.length>=5?newWatch:[...newWatch,...fallback].slice(0,10);
   els.tab1200.innerHTML=`<div class="stack">
     <div class="hero">
       <div class="hero-top">
-        <div><div class="hero-kicker">後場の再構築</div><div class="hero-title">${esc(p.status_label||"後場戦略")}</div></div>
-        <div class="chips">${p.pm_regime_label?`<span class="chip">${esc(p.pm_regime_label)}</span>`:""}${p.status?`<span class="chip">${esc(p.status)}</span>`:""}</div>
+        <div>
+          <div class="hero-kicker">後場の再構築</div>
+          <div class="hero-title">${esc(p.status_label||"後場戦略")}</div>
+        </div>
+        <div class="chips">
+          ${p.pm_regime_label?`<span class="chip">${esc(p.pm_regime_label)}</span>`:""}
+          ${p.status?`<span class="chip">${esc(p.status)}</span>`:""}
+          ${freshnessHtml(data.date)}
+        </div>
       </div>
       <div class="hero-text">${esc(p.summary||data.summary||"")}</div>
     </div>
@@ -518,17 +603,26 @@ function render1200(data){
         <div class="item"><div class="item-title">見送り条件</div><div class="item-sub">${arr(data.skip_conditions_pm).map(esc).join("<br>")||"なし"}</div></div>
       </div></div>
     </div>
-    <div class="card"><h3>後場の監視銘柄</h3>${renderWatchBlock(displayWatch, "後場監視銘柄なし")}</div>
+    <div class="card"><h3>後場の監視銘柄</h3>${renderWatchBlock(displayWatch,"後場監視銘柄なし")}</div>
   </div>`;
 }
+
 function render1535(data,d600,d905,d1200){
-  if(!data){els.tab1535.innerHTML=`<div class="notice">15:35データがありません</div>`; return;}
+  if(!data){els.tab1535.innerHTML=`<div class="notice">15:35データがありません</div>`;return;}
   const r=data.review||{},s600=d600?.strategy||{},s905=d905?.action_judgement||{},s1200=d1200?.afternoon_plan||{};
   els.tab1535.innerHTML=`<div class="stack">
     <div class="hero">
       <div class="hero-top">
-        <div><div class="hero-kicker">一日の締め</div><div class="hero-title">${esc(data.summary||"総評なし")}</div></div>
-        <div class="chips"><span class="chip">テーマ ${esc(r.theme_score??"-")}</span><span class="chip">執行 ${esc(r.execution_score??"-")}</span><span class="chip">見送り ${esc(r.skip_score??"-")}</span></div>
+        <div>
+          <div class="hero-kicker">一日の締め</div>
+          <div class="hero-title">${esc(data.summary||"総評なし")}</div>
+        </div>
+        <div class="chips">
+          <span class="chip">テーマ ${esc(r.theme_score??"-")}</span>
+          <span class="chip">執行 ${esc(r.execution_score??"-")}</span>
+          <span class="chip">見送り ${esc(r.skip_score??"-")}</span>
+          ${freshnessHtml(data.date)}
+        </div>
       </div>
       <div class="hero-text">総評、分析の答え合わせ、次回への学習メモを残します。</div>
     </div>
@@ -537,25 +631,29 @@ function render1535(data,d600,d905,d1200){
         <div class="item"><div class="item-title">一言総評</div><div class="item-sub">${esc(data.summary||"-")}</div></div>
         <div class="item"><div class="item-title">本当に取るべきだったテーマ</div><div class="item-sub">${esc(r.actually_best_theme||"-")}</div></div>
         <div class="item"><div class="item-title">危険だったテーマ</div><div class="item-sub">${esc(r.danger_theme_in_morning||"-")}</div></div>
+        <div class="item"><div class="item-title">次回の禁止ルール</div><div class="item-sub">${esc(r.next_ban_rule||"-")}</div></div>
+        <div class="item"><div class="item-title">次回の注目点</div><div class="item-sub">${esc(r.next_focus||"-")}</div></div>
       </div></div>
       <div class="card"><h3>分析の答え合わせ</h3><div class="list">
         <div class="item"><div class="item-title">6:00見立て</div><div class="item-sub">${esc(s600.market_regime_label||"-")} / ${esc(s600.entry_style_label||"-")}</div></div>
         <div class="item"><div class="item-title">9:10修正</div><div class="item-sub">${esc(s905.opening_state||"-")} / ${esc(s905.action_now||"-")}</div></div>
         <div class="item"><div class="item-title">12:00後場戦略</div><div class="item-sub">${esc(s1200.status_label||"-")} / ${esc(s1200.pm_regime_label||"-")}</div></div>
+        <div class="item"><div class="item-title">間違った仮説</div><div class="item-sub">${esc(r.wrong_hypothesis||"-")}</div></div>
       </div></div>
     </div>
   </div>`;
 }
+
 function syncStickyHeights(){
   const tabs=document.querySelector(".tabs-wrap");
   document.documentElement.style.setProperty("--tabs-h",`${tabs?Math.ceil(tabs.getBoundingClientRect().height):0}px`);
 }
+
 async function loadAll(){
   els.tab600.innerHTML='<div class="notice">読み込み中...</div>';
   els.tab905.innerHTML='<div class="notice">読み込み中...</div>';
   els.tab1200.innerHTML='<div class="notice">読み込み中...</div>';
   els.tab1535.innerHTML='<div class="notice">読み込み中...</div>';
-
   const [marketLive,d600,d905,d1200,d1535]=await Promise.all([
     safeLoad("market_live.json"),
     safeLoad("latest_600.json"),
@@ -563,9 +661,10 @@ async function loadAll(){
     safeLoad("latest_1200.json"),
     safeLoad("latest_1535.json")
   ]);
-
   state={marketLive,d600,d905,d1200,d1535};
   setGlobalMeta(d600,d905,d1200,d1535);
+  updateTradingBadge(d600);
+  updateTabDots(d600,d905,d1200,d1535);
   renderMetrics();
   render600(d600);
   render905(d905);
@@ -574,6 +673,7 @@ async function loadAll(){
   bindNewsToggles();
   syncStickyHeights();
 }
+
 document.querySelectorAll(".tab").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
@@ -592,7 +692,8 @@ if("ResizeObserver" in window){
   if(el) ro.observe(el);
 }
 loadAll();
-setInterval(loadAll, 60000);
+setInterval(loadAll,60000);
 </script>
+
 </body>
 </html>
