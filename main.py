@@ -1726,9 +1726,11 @@ def main():
         elif h < 13: session = "1200"
         else:        session = "1535"
 
-    print(f"=== SESSION={session} / {today} ===")
+    # 手動実行（FORCE=1）の場合は営業日チェックをスキップ
+    force = os.environ.get("FORCE", "0") == "1"
+    print(f"=== SESSION={session} / {today} / force={force} ===")
 
-    if not is_trading_day(today):
+    if not force and not is_trading_day(today):
         print("本日は取引日ではありません。終了します。")
         sys.exit(0)
 
