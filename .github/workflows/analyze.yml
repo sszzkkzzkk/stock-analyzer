@@ -20,6 +20,10 @@ on:
         description: "600 / 905 / 1200 / 1535"
         required: false
         default: "600"
+      force:
+        description: "営業日以外でも実行する (1=強制実行)"
+        required: false
+        default: "0"
 
 permissions:
   contents: write
@@ -99,6 +103,7 @@ jobs:
           SESSION=""
           RUN_NOW="false"
 
+          FORCE_INPUT="${{ github.event.inputs.force || '0' }}"
           if [ "$EVENT" = "workflow_dispatch" ]; then
             case "$INPUT" in
               600|905|1200|1535)
@@ -144,6 +149,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SESSION: ${{ steps.session.outputs.session }}
+          FORCE: ${{ github.event.inputs.force || '0' }}
         run: python main.py
 
       - name: Copy publish files
