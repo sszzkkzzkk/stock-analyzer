@@ -200,6 +200,408 @@ def fetch_strict_market_quotes():
 
 
 # ═══════════════════════════════════════════════
+# 米国テーマ翻訳テーブル
+# ═══════════════════════════════════════════════
+
+US_THEME_MAP = {
+    "defense": {
+        "label": "防衛・宇宙",
+        "etfs": ["ITA", "XAR"],
+        "us_stocks": ["LMT", "RTX", "NOC", "GE"],
+        "jp_sectors": ["防衛・宇宙関連"],
+        "jp_stocks": [
+            {"code": "7011", "name": "三菱重工"},
+            {"code": "7013", "name": "IHI"},
+            {"code": "6503", "name": "三菱電機"},
+            {"code": "7012", "name": "川崎重工"},
+            {"code": "6688", "name": "QPS研究所"},
+        ],
+        "jp_note": "地政学リスク・防衛予算増額の文脈で連動しやすい。大型3社が先導するか確認。",
+        "oil_sensitivity": "低",
+        "rate_sensitivity": "低",
+        "fx_sensitivity": "中",
+    },
+    "nuclear_power": {
+        "label": "原子力・電力インフラ",
+        "etfs": ["URA", "XLU", "GRID"],
+        "us_stocks": ["CEG", "GEV", "VST", "ETN"],
+        "jp_sectors": ["原子力関連", "電力設備・送配電"],
+        "jp_stocks": [
+            {"code": "7011", "name": "三菱重工"},
+            {"code": "6503", "name": "三菱電機"},
+            {"code": "5803", "name": "フジクラ"},
+            {"code": "5801", "name": "古河電工"},
+            {"code": "1942", "name": "関電工"},
+        ],
+        "jp_note": "AIデータセンター電力需要×原子力再稼働の文脈。電線・重電・設備工事に波及。",
+        "oil_sensitivity": "低",
+        "rate_sensitivity": "中",
+        "fx_sensitivity": "低",
+    },
+    "rare_earth": {
+        "label": "重要鉱物・レアアース",
+        "etfs": ["REMX", "PICK"],
+        "us_stocks": ["MP", "LTHM", "ALB"],
+        "jp_sectors": ["非鉄金属", "素材・化学", "商社"],
+        "jp_stocks": [
+            {"code": "5711", "name": "三菱マテリアル"},
+            {"code": "5713", "name": "住友金属鉱山"},
+            {"code": "8001", "name": "伊藤忠商事"},
+            {"code": "8053", "name": "住友商事"},
+            {"code": "4185", "name": "JSR"},
+        ],
+        "jp_note": "思惑先行でボラ高め。商社→非鉄→素材の順に波及確認。",
+        "oil_sensitivity": "低",
+        "rate_sensitivity": "低",
+        "fx_sensitivity": "中",
+    },
+    "ai_infra": {
+        "label": "AIインフラ",
+        "etfs": ["GRID", "COPX", "AIQ"],
+        "us_stocks": ["ETN", "VRT", "GEV", "CARR"],
+        "jp_sectors": ["電線・ケーブル", "変圧器・電力設備", "設備工事"],
+        "jp_stocks": [
+            {"code": "5803", "name": "フジクラ"},
+            {"code": "5801", "name": "古河電工"},
+            {"code": "5802", "name": "住友電工"},
+            {"code": "1942", "name": "関電工"},
+            {"code": "6361", "name": "荏原製作所"},
+        ],
+        "jp_note": "AI電力需要→電線・冷却・変圧器の流れ。半導体本丸より翻訳精度が高い。",
+        "oil_sensitivity": "低",
+        "rate_sensitivity": "中",
+        "fx_sensitivity": "低",
+    },
+    "semiconductor": {
+        "label": "半導体",
+        "etfs": ["SOXX", "SMH"],
+        "us_stocks": ["NVDA", "AMD", "MU", "AVGO"],
+        "jp_sectors": ["半導体製造装置", "半導体材料"],
+        "jp_stocks": [
+            {"code": "8035", "name": "東京エレクトロン"},
+            {"code": "6857", "name": "アドバンテスト"},
+            {"code": "4063", "name": "信越化学"},
+            {"code": "6146", "name": "ディスコ"},
+            {"code": "7741", "name": "HOYA"},
+        ],
+        "jp_note": "NVDAの動きに東エレク・アドバンテストが連動。SOXが-1%超なら見送り優先。",
+        "oil_sensitivity": "低",
+        "rate_sensitivity": "高",
+        "fx_sensitivity": "高",
+    },
+    "energy_shipping": {
+        "label": "海運・エネルギー輸送",
+        "etfs": ["XLE", "OIH"],
+        "us_stocks": ["XOM", "CVX", "SLB", "MPC"],
+        "jp_sectors": ["海運", "石油・資源", "エネルギー輸送"],
+        "jp_stocks": [
+            {"code": "9104", "name": "商船三井"},
+            {"code": "9101", "name": "日本郵船"},
+            {"code": "1605", "name": "INPEX"},
+            {"code": "5020", "name": "ENEOSホールディングス"},
+            {"code": "9107", "name": "川崎汽船"},
+        ],
+        "jp_note": "原油・天然ガス価格と連動。WTI95ドル超で海運・資源株に資金集中しやすい。",
+        "oil_sensitivity": "高",
+        "rate_sensitivity": "低",
+        "fx_sensitivity": "中",
+    },
+    "utility_grid": {
+        "label": "公益・送配電",
+        "etfs": ["XLU", "GRID", "FUTY"],
+        "us_stocks": ["NEE", "ETN", "AEP", "SO"],
+        "jp_sectors": ["電力・ガス", "電力設備"],
+        "jp_stocks": [
+            {"code": "9501", "name": "東京電力HD"},
+            {"code": "9503", "name": "関西電力"},
+            {"code": "1942", "name": "関電工"},
+            {"code": "1944", "name": "きんでん"},
+            {"code": "5803", "name": "フジクラ"},
+        ],
+        "jp_note": "金利低下局面で買われやすい。原子力再稼働テーマと重なりやすい。",
+        "oil_sensitivity": "低",
+        "rate_sensitivity": "高",
+        "fx_sensitivity": "低",
+    },
+    "resource_dev": {
+        "label": "資源開発",
+        "etfs": ["XLE", "GDX", "PICK"],
+        "us_stocks": ["FCX", "NEM", "BHP", "RIO"],
+        "jp_sectors": ["非鉄金属", "資源開発", "商社"],
+        "jp_stocks": [
+            {"code": "5713", "name": "住友金属鉱山"},
+            {"code": "1605", "name": "INPEX"},
+            {"code": "8031", "name": "三井物産"},
+            {"code": "8053", "name": "住友商事"},
+            {"code": "5711", "name": "三菱マテリアル"},
+        ],
+        "jp_note": "資源価格全般の上昇時に商社・非鉄が連動。円安が重なると効果が増幅。",
+        "oil_sensitivity": "高",
+        "rate_sensitivity": "低",
+        "fx_sensitivity": "高",
+    },
+}
+
+# 米国テーマ用シンボルリスト（全ETF + 主要個別株）
+US_SYMBOLS = [
+    # マクロ
+    ("macro", "^VIX",   "VIX"),
+    ("macro", "^TNX",   "US10Y金利"),
+    ("macro", "NG=F",   "天然ガス"),
+    ("macro", "GC=F",   "金"),
+    # 防衛
+    ("defense",    "ITA",  "ITA(防衛ETF)"),
+    ("defense",    "LMT",  "ロッキード"),
+    ("defense",    "RTX",  "レイセオン"),
+    # 原子力・電力
+    ("nuclear_power", "URA",  "URA(ウランETF)"),
+    ("nuclear_power", "XLU",  "XLU(公益ETF)"),
+    ("nuclear_power", "GRID", "GRID(電力設備ETF)"),
+    ("nuclear_power", "CEG",  "コンステレーション"),
+    ("nuclear_power", "GEV",  "GEベルノバ"),
+    # レアアース
+    ("rare_earth", "REMX", "REMX(レアアースETF)"),
+    ("rare_earth", "MP",   "MPマテリアルズ"),
+    # AIインフラ
+    ("ai_infra",   "ETN",  "イートン"),
+    ("ai_infra",   "VRT",  "バーティブ"),
+    # 半導体
+    ("semiconductor", "SOXX", "SOXX(半導体ETF)"),
+    ("semiconductor", "NVDA", "エヌビディア"),
+    ("semiconductor", "AMD",  "AMD"),
+    # エネルギー・海運
+    ("energy_shipping", "XLE",  "XLE(エネルギーETF)"),
+    ("energy_shipping", "XOM",  "エクソン"),
+    # 公益
+    ("utility_grid", "FUTY", "FUTY(公益ETF)"),
+    # 資源
+    ("resource_dev", "GDX",  "GDX(金鉱ETF)"),
+    ("resource_dev", "FCX",  "フリーポートマク"),
+]
+
+
+# ═══════════════════════════════════════════════
+# 米国テーマデータ取得
+# ═══════════════════════════════════════════════
+
+def fetch_us_theme_data():
+    """米国ETF・代表株・マクロ指標をyfinanceで取得してテーマ別に集計"""
+    print("[US] 米国テーマデータ取得中...")
+    results = {}   # theme_key -> list of quotes
+    macro   = []
+
+    for theme_key, symbol, label in US_SYMBOLS:
+        item = yahoo_quote(symbol, label)
+        if not item:
+            continue
+        if theme_key == "macro":
+            macro.append(item)
+        else:
+            results.setdefault(theme_key, []).append(item)
+
+    # テーマ別スコア計算（ETFの平均騰落率で強弱を判定）
+    theme_scores = {}
+    for key, items in results.items():
+        etf_items  = [i for i in items if i["label"].endswith("ETF)") or i["label"].endswith("ETF")]
+        all_items  = items
+        # ETFがあればETF優先、なければ全銘柄の平均
+        base = etf_items if etf_items else all_items
+        if not base:
+            continue
+        pcts = []
+        for i in base:
+            try:
+                p = float(str(i.get("percent","0")).replace("%","").replace("+",""))
+                pcts.append(p)
+            except:
+                pass
+        avg = sum(pcts)/len(pcts) if pcts else 0
+        theme_scores[key] = {
+            "avg_pct":   round(avg, 2),
+            "strength":  "強" if avg >= 1.0 else "中" if avg >= 0.2 else "弱" if avg >= -0.5 else "下落",
+            "quotes":    items,
+            "label":     US_THEME_MAP[key]["label"],
+            "jp_stocks": US_THEME_MAP[key]["jp_stocks"],
+            "jp_note":   US_THEME_MAP[key]["jp_note"],
+            "jp_sectors":US_THEME_MAP[key]["jp_sectors"],
+        }
+
+    # VIX・金利・天然ガスをマクロとして整理
+    macro_summary = {}
+    for m in macro:
+        macro_summary[m["label"]] = {
+            "value":   m.get("value","—"),
+            "change":  m.get("change","—"),
+            "percent": m.get("percent","—"),
+        }
+
+    print(f"[US] 取得テーマ数: {len(theme_scores)}, マクロ指標: {len(macro_summary)}")
+    return {"themes": theme_scores, "macro": macro_summary}
+
+
+# ═══════════════════════════════════════════════
+# PTS取得（株探PTSニュース）
+# ═══════════════════════════════════════════════
+
+def fetch_pts_data():
+    """株探のPTSランキングを取得"""
+    print("[PTS] PTSデータ取得中...")
+    pts = {"gainers": [], "losers": [], "source": "kabutan_pts", "status": "ok"}
+
+    try:
+        from bs4 import BeautifulSoup
+
+        # 株探のPTS夜間取引ランキングページ
+        url = "https://kabutan.jp/warning/?mode=2_9"
+        res = safe_get(url, timeout=15)
+        if not res:
+            # フォールバック：値上がりランキングページ
+            pts["status"] = "fallback"
+            return pts
+
+        soup = BeautifulSoup(res.text, "html.parser")
+
+        def parse_pts_table(soup, table_idx):
+            rows = []
+            tables = soup.find_all("table", class_="s-table")
+            if len(tables) <= table_idx:
+                # class指定なしのtableを試す
+                tables = soup.find_all("table")
+            if len(tables) <= table_idx:
+                return rows
+
+            for tr in tables[table_idx].find_all("tr")[1:16]:
+                tds = tr.find_all("td")
+                if len(tds) < 4:
+                    continue
+                try:
+                    name = tds[0].get_text(strip=True)
+                    code = tds[1].get_text(strip=True) if len(tds) > 1 else ""
+                    price= tds[2].get_text(strip=True) if len(tds) > 2 else ""
+                    chg  = tds[3].get_text(strip=True) if len(tds) > 3 else ""
+                    vol  = tds[4].get_text(strip=True) if len(tds) > 4 else ""
+                    if name and (code or price):
+                        rows.append({
+                            "name": name, "code": code,
+                            "pts_price": price, "pts_change": chg,
+                            "pts_volume": vol,
+                        })
+                except:
+                    continue
+            return rows
+
+        # 値上がり・値下がり両方取得
+        gainers = parse_pts_table(soup, 0)
+        losers  = parse_pts_table(soup, 1)
+
+        if not gainers:
+            # 別URLパターンを試す
+            url2 = "https://kabutan.jp/warning/?mode=2_9&market=1"
+            res2 = safe_get(url2, timeout=15)
+            if res2:
+                soup2 = BeautifulSoup(res2.text, "html.parser")
+                gainers = parse_pts_table(soup2, 0)
+
+        pts["gainers"] = gainers[:15]
+        pts["losers"]  = losers[:10]
+        pts["status"]  = "ok" if gainers else "empty"
+        print(f"[PTS] 値上がり: {len(gainers)}件, 値下がり: {len(losers)}件")
+
+    except Exception as e:
+        print(f"[PTS] 取得エラー: {e}")
+        pts["status"] = "error"
+
+    return pts
+
+
+# ═══════════════════════════════════════════════
+# 米国テーマ × PTS 統合コンテキスト生成
+# ═══════════════════════════════════════════════
+
+def build_us_context(us_data, pts_data):
+    """米国テーマ + PTS反応をClaudeプロンプト用に変換"""
+
+    # 米国テーマを強い順にソート
+    themes = us_data.get("themes", {})
+    macro  = us_data.get("macro",  {})
+    sorted_themes = sorted(themes.items(), key=lambda x: x[1]["avg_pct"], reverse=True)
+
+    # マクロサマリー
+    vix = macro.get("VIX", {})
+    us10y = macro.get("US10Y金利", {})
+    ng = macro.get("天然ガス", {})
+    gold = macro.get("金", {})
+
+    macro_lines = []
+    if vix: macro_lines.append(f"VIX: {vix.get('value','—')} ({vix.get('percent','—')})")
+    if us10y: macro_lines.append(f"US10Y: {us10y.get('value','—')} ({us10y.get('change','—')})")
+    if ng: macro_lines.append(f"天然ガス: {ng.get('value','—')} ({ng.get('percent','—')})")
+    if gold: macro_lines.append(f"金: {gold.get('value','—')} ({gold.get('percent','—')})")
+
+    # PTSの値上がりランキング（テーマ翻訳テーブルの銘柄コードと照合）
+    pts_gainers = pts_data.get("gainers", [])
+    pts_losers  = pts_data.get("losers",  [])
+
+    # PTS反応をテーマ別に分類
+    pts_by_theme = {}
+    for theme_key, theme_info in US_THEME_MAP.items():
+        jp_codes = {s["code"] for s in theme_info["jp_stocks"]}
+        theme_gainers = [p for p in pts_gainers if p.get("code","") in jp_codes]
+        theme_losers  = [p for p in pts_losers  if p.get("code","") in jp_codes]
+        if theme_gainers or theme_losers:
+            pts_by_theme[theme_key] = {
+                "label":   theme_info["label"],
+                "gainers": theme_gainers,
+                "losers":  theme_losers,
+            }
+
+    # テキスト生成
+    lines = ["=== 米国テーマ連動分析 ==="]
+
+    # マクロ
+    if macro_lines:
+        lines.append("[マクロ] " + " / ".join(macro_lines))
+
+    # テーマ強弱
+    lines.append("\n[米国テーマ強弱]")
+    for key, info in sorted_themes[:6]:
+        strength = info["strength"]
+        avg = info["avg_pct"]
+        label = info["label"]
+        jp_stocks_str = "・".join([s["name"] for s in info["jp_stocks"][:3]])
+        lines.append(
+            f"  {strength} {label} ({avg:+.1f}%)"
+            f" → 日本波及: {jp_stocks_str}"
+            f" ※{info['jp_note'][:30]}"
+        )
+
+    # PTS反応
+    if pts_gainers:
+        lines.append(f"\n[PTS値上がり上位] (status: {pts_data.get('status','?')})")
+        for p in pts_gainers[:10]:
+            lines.append(f"  {p['name']}({p.get('code','')}) {p.get('pts_change','—')} 出来高:{p.get('pts_volume','—')}")
+
+    # テーマ別PTS反応
+    if pts_by_theme:
+        lines.append("\n[テーマ別PTS反応]")
+        for key, info in pts_by_theme.items():
+            g_names = [p["name"] for p in info["gainers"]]
+            l_names = [p["name"] for p in info["losers"]]
+            if g_names:
+                lines.append(f"  {info['label']}: 上昇={','.join(g_names[:3])}")
+            if l_names:
+                lines.append(f"  {info['label']}: 下落={','.join(l_names[:2])}")
+
+    lines.append("=== 米国テーマ連動分析ここまで ===")
+
+    return "\n".join(lines), {
+        "sorted_themes": [(k, v["label"], v["avg_pct"], v["strength"]) for k,v in sorted_themes],
+        "pts_by_theme": pts_by_theme,
+        "macro": macro,
+    }
+
+
+# ═══════════════════════════════════════════════
 # ニュース・テーマ取得
 # ═══════════════════════════════════════════════
 
@@ -376,6 +778,8 @@ def classify_news(news_items):
 def fetch_all_market_data():
     strict = fetch_strict_market_quotes()
     kabu = fetch_kabutan_theme_news()
+    us_data = fetch_us_theme_data()
+    pts_data = fetch_pts_data()
     combined_news = kabu["news"]
     result = {
         "indices":         strict["indices"],
@@ -385,6 +789,9 @@ def fetch_all_market_data():
         "sox":             strict["sox"],
         "oil":             strict["oil"],
         "sector":          [],
+        "us_themes":       us_data.get("themes", {}),
+        "us_macro":        us_data.get("macro",  {}),
+        "pts":             pts_data,
         "top_gainers":     kabu["top_gainers"],
         "top_losers":      kabu["top_losers"],
         "volume_surge":    kabu["volume_surge"],
@@ -435,13 +842,20 @@ def load_learning_db():
     db = load("learning_db.json")
     if not db:
         db = {
-            "version": 2,
+            "version": 3,
             "records": [],
             "pattern_stats": {},
             "theme_stats": {},
+            "us_theme_stats": {},      # 米国テーマ→日本波及の的中率
+            "pts_reaction_stats": {},  # PTS反応→寄り後継続率
             "total_days": 0,
             "hit_days": 0,
         }
+    # バージョン移行
+    if db.get("version", 1) < 3:
+        db.setdefault("us_theme_stats", {})
+        db.setdefault("pts_reaction_stats", {})
+        db["version"] = 3
     return db
 
 
@@ -597,7 +1011,7 @@ def validate_600_analysis_json(obj):
 # プロンプト構築
 # ═══════════════════════════════════════════════
 
-def build_analysis_prompt_600(today_str, learning_ctx, market, key_news):
+def build_analysis_prompt_600(today_str, learning_ctx, market, key_news, us_ctx=""):
     """
     6:00 本番画面用プロンプト
     目的: 「今日、何に資金が集まるか」を即断できる情報を生成する
@@ -615,6 +1029,7 @@ def build_analysis_prompt_600(today_str, learning_ctx, market, key_news):
         "recent_themes":  market["themes"][:10],
         "news":           key_news[:10],
         "classified_news":market["classified_news"],
+        "pts_gainers":    market.get("pts",{}).get("gainers",[])[:10],
     }
     schema = {
         "strategy": {
@@ -654,7 +1069,17 @@ def build_analysis_prompt_600(today_str, learning_ctx, market, key_news):
         ],
         "avoid_themes": [{"name": "テーマ名", "reason": "避ける理由（40字以内）"}],
         "skip_rule": "今日絶対やらないこと（60字以内）",
-        "summary": "今日の資金集中先まとめ（100字以内）"
+        "summary": "今日の資金集中先まとめ（100字以内）",
+        "us_theme_signals": [
+            {
+                "theme_key": "defense",
+                "theme_label": "防衛・宇宙",
+                "us_strength": "強/中/弱",
+                "pts_reaction": "あり/なし/不明",
+                "jp_translation": "日本株で注目すべきセクター・銘柄群",
+                "priority": "本命/対抗/様子見/見送り"
+            }
+        ]
     }
     return f"""
 You are a Japanese short-term stock trader's AI. Your ONLY job at 6:00 AM:
@@ -668,6 +1093,8 @@ Today is {today_str}.
 
 Market data:
 {json.dumps(compact_market, ensure_ascii=False)}
+
+{us_ctx}
 
 PRIMARY MISSION:
 Answer "Where will capital concentrate today?" with maximum precision.
@@ -710,6 +1137,12 @@ Rules:
 - continuity: 継続/新規/終息
 - leader_strength: 強/中/弱
 - ripple: 広/中/狭
+- 米国テーマ連動分析がある場合は必ず参照すること:
+    1. 米国で強いテーマ → 日本株での波及可能性を評価
+    2. PTSで先行反応している銘柄 → 先導株候補として優先
+    3. 米国強い × PTS反応あり → 本命テーマの根拠として活用
+    4. 米国強い × PTS反応なし → 見送り候補または翌日以降に様子見
+- us_theme_signals: 米国起点で日本株に波及が見込まれるテーマ（最大3件）をJSONに追加
 
 Required JSON schema:
 {json.dumps(schema, ensure_ascii=False)}
@@ -1016,6 +1449,29 @@ def update_learning_db(today, review, market_tags, market):
         stat = db["pattern_stats"][tag]
         stat["hit_rate"] = stat["hits"] / stat["count"]
 
+    # ── us_theme_stats 更新 ──
+    db.setdefault("us_theme_stats", {})
+    db.setdefault("pts_reaction_stats", {})
+    # run_600で保存したus_theme_signalsを1535レビュー時に取得して更新
+    pred_600 = load("latest_600.json") or {}
+    us_signals = pred_600.get("us_theme_signals", [])
+    for sig in us_signals:
+        key = sig.get("theme_key", "")
+        if not key: continue
+        uts = db["us_theme_stats"].setdefault(key, {
+            "label": "", "total": 0, "jp_hit": 0, "pts_correct": 0, "hit_rate": 0.0
+        })
+        uts["label"] = sig.get("theme_label", key)
+        uts["total"] += 1
+        # 予測優先度が本命/対抗でテーマ的中していれば jp_hit
+        priority = sig.get("priority", "")
+        if priority in ("本命", "対抗") and review.get("theme_hit"):
+            uts["jp_hit"] += 1
+        # PTS反応あり予測 → 実際にテーマ的中で pts_correct
+        if sig.get("pts_reaction") == "あり" and review.get("theme_hit"):
+            uts["pts_correct"] += 1
+        uts["hit_rate"] = round(uts["jp_hit"] / uts["total"], 3) if uts["total"] else 0.0
+
     save_learning_db(db)
     total = db["total_days"]
     hit   = db["hit_days"]
@@ -1040,9 +1496,16 @@ def run_600(today):
     print(f"[6:00] 相場タグ: {market_tags}")
     today_str = today.strftime("%Y年%m月%d日")
 
+    # 米国テーマ + PTS コンテキスト生成
+    us_ctx_text, us_meta = build_us_context(
+        {"themes": market.get("us_themes", {}), "macro": market.get("us_macro", {})},
+        market.get("pts", {})
+    )
+    print(f"[6:00] 米国テーマ: {len(market.get('us_themes',{}))}件, PTS: {len(market.get('pts',{}).get('gainers',[]))}件")
+
     try:
-        print("[6:00] Claude分析中（学習データ参照）...")
-        prompt = build_analysis_prompt_600(today_str, learning_ctx, market, key_news)
+        print("[6:00] Claude分析中（学習データ参照 + 米国テーマ連動）...")
+        prompt = build_analysis_prompt_600(today_str, learning_ctx, market, key_news, us_ctx_text)
         raw    = call_claude(prompt, max_tokens=2400)
         save_text("claude_raw_600.txt", raw)
         parsed = parse_json(raw)
@@ -1053,6 +1516,12 @@ def run_600(today):
             "generated_at":  now,
             "data_sources":  data_sources,
             "market_tags":   market_tags,
+            "us_theme_signals": parsed.get("us_theme_signals", []),
+            "pts_gainers":    market.get("pts",{}).get("gainers",[])[:10],
+            "us_themes_raw":  [
+                {"key": k, "label": v["label"], "avg_pct": v["avg_pct"], "strength": v["strength"]}
+                for k, v in market.get("us_themes",{}).items()
+            ],
             "market_data": {
                 "indices":        market["indices"][:6],
                 "world_indices":  market["world_indices"][:6],
@@ -1080,6 +1549,12 @@ def run_600(today):
             "generated_at":  now,
             "data_sources":  data_sources,
             "market_tags":   market_tags,
+            "us_theme_signals": parsed.get("us_theme_signals", []),
+            "pts_gainers":    market.get("pts",{}).get("gainers",[])[:10],
+            "us_themes_raw":  [
+                {"key": k, "label": v["label"], "avg_pct": v["avg_pct"], "strength": v["strength"]}
+                for k, v in market.get("us_themes",{}).items()
+            ],
             "market_data": {
                 "indices": market["indices"][:6], "world_indices": market["world_indices"][:6],
                 "forex": market["forex"][:4], "futures": market["futures"][:4],
