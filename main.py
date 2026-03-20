@@ -159,6 +159,7 @@ def yahoo_quote(symbol, label):
             jst_time = "—"
         return {
             "name": label,
+            "label": label,
             "value": f"{price:,.2f}",
             "value_raw": price,
             "change": f"{sign}{change:,.2f}",
