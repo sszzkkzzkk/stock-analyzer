@@ -337,6 +337,124 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","No
 .us-macro-chip.vix-high{border-color:rgba(255,107,107,.3);color:var(--bad)}
 .us-macro-chip.vix-low{border-color:rgba(49,209,88,.3);color:var(--good)}
 
+
+/* ── 今日の結論エリア ── */
+.conclusion-bar{
+  background:linear-gradient(135deg,rgba(15,23,42,.98),rgba(10,18,36,.98));
+  border:1px solid rgba(110,168,254,.25);
+  border-radius:16px;padding:14px;
+}
+.conclusion-title{font-size:10px;font-weight:800;color:rgba(110,168,254,.7);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.conclusion-battlefield{font-size:28px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:10px}
+.conclusion-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+.conclusion-cell{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:8px 10px}
+.conclusion-cell-label{font-size:9px;font-weight:800;color:var(--muted);margin-bottom:3px;letter-spacing:.05em}
+.conclusion-cell-val{font-size:15px;font-weight:900}
+.conclusion-cell.c-best .conclusion-cell-val{color:var(--gold)}
+.conclusion-cell.c-second .conclusion-cell-val{color:var(--silver)}
+.conclusion-cell.c-avoid .conclusion-cell-val{color:var(--bad);font-size:13px}
+.conclusion-cell.c-ban .conclusion-cell-val{color:var(--warn);font-size:12px;line-height:1.4}
+.conclusion-watch{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.conclusion-watch-chip{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700}
+/* 昨日の学び */
+.yesterday-hint{background:rgba(247,183,49,.06);border:1px solid rgba(247,183,49,.25);border-radius:12px;padding:10px 12px;margin-bottom:0}
+.yesterday-hint-title{font-size:10px;font-weight:800;color:var(--warn);margin-bottom:6px;letter-spacing:.05em}
+.yesterday-hint-text{font-size:12px;color:rgba(255,255,255,.75);line-height:1.6}
+/* 禁止・危険ミニバー */
+.ban-mini{background:rgba(255,107,107,.07);border:1px solid rgba(255,107,107,.2);border-radius:10px;padding:8px 12px}
+.ban-mini-title{font-size:10px;font-weight:800;color:var(--bad);margin-bottom:5px}
+.ban-mini-list{display:flex;flex-direction:column;gap:3px}
+.ban-mini-item{font-size:12px;color:rgba(255,180,180,.85);display:flex;align-items:flex-start;gap:5px}
+/* 9:10 行動判断 */
+.verdict-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:900;border:1px solid}
+.verdict-badge.v-ok{background:rgba(49,209,88,.12);border-color:rgba(49,209,88,.4);color:var(--good)}
+.verdict-badge.v-half{background:rgba(247,183,49,.12);border-color:rgba(247,183,49,.4);color:var(--warn)}
+.verdict-badge.v-no{background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.4);color:var(--bad)}
+.next-action-card{background:rgba(110,168,254,.06);border:1px solid rgba(110,168,254,.2);border-radius:12px;padding:10px 12px}
+.next-action-title{font-size:10px;font-weight:800;color:rgba(110,168,254,.8);margin-bottom:6px}
+/* 12:00 後場行動 */
+.pm-verdict-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.pm-verdict-row:last-child{border-bottom:none}
+.pm-verdict-badge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;flex-shrink:0}
+.pm-verdict-badge.pv-go{background:rgba(49,209,88,.15);border:1px solid rgba(49,209,88,.3);color:var(--good)}
+.pm-verdict-badge.pv-wait{background:rgba(247,183,49,.12);border:1px solid rgba(247,183,49,.3);color:var(--warn)}
+.pm-verdict-badge.pv-end{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);color:var(--bad)}
+.pm-verdict-badge.pv-skip{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted)}
+/* watchlist purpose badge */
+.purpose-badge{font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;flex-shrink:0}
+.purpose-badge.pb-main{background:rgba(255,204,102,.2);color:var(--gold)}
+.purpose-badge.pb-lead{background:rgba(110,168,254,.15);color:var(--accent)}
+.purpose-badge.pb-relay{background:rgba(139,92,246,.15);color:#c4b5fd}
+.purpose-badge.pb-sub{background:rgba(255,255,255,.06);color:var(--muted)}
+.purpose-badge.pb-watch{background:rgba(255,255,255,.04);color:var(--muted)}
+.purpose-badge.pb-danger{background:rgba(255,107,107,.15);color:var(--bad)}
+
+
+/* ══════════════════════════════
+   今日の結論（最上部固定ブロック）
+══════════════════════════════ */
+.conclusion-block{
+  background:linear-gradient(135deg,rgba(17,26,52,.98),rgba(10,16,35,.98));
+  border:1px solid rgba(110,168,254,.2);
+  border-radius:16px;padding:14px 12px;
+}
+.conclusion-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.conclusion-row:last-child{margin-bottom:0}
+.conclusion-key{font-size:10px;font-weight:800;color:rgba(154,166,199,.6);width:52px;flex-shrink:0;padding-top:2px;letter-spacing:.03em}
+.conclusion-val{font-size:15px;font-weight:900;color:#fff;flex:1;line-height:1.3}
+.conclusion-val.battlefield{font-size:24px;letter-spacing:-.01em;color:#fff}
+.conclusion-stocks{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.conclusion-stock{background:rgba(255,204,102,.12);border:1px solid rgba(255,204,102,.3);border-radius:8px;padding:4px 10px;font-size:13px;font-weight:900;color:var(--gold)}
+.conclusion-stock.second{background:rgba(159,214,255,.08);border-color:rgba(159,214,255,.2);color:var(--silver)}
+.conclusion-stock.watch{background:rgba(255,255,255,.04);border-color:var(--line);color:var(--muted)}
+.conclusion-avoid{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.conclusion-avoid-tag{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.25);border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;color:var(--bad)}
+.conclusion-ban{display:flex;flex-direction:column;gap:4px;flex:1}
+.conclusion-ban-item{font-size:12px;color:var(--bad);font-weight:700;display:flex;align-items:center;gap:4px}
+.conclusion-ban-item::before{content:"🚫";font-size:10px}
+.yesterday-hint{background:rgba(247,183,49,.06);border:1px solid rgba(247,183,49,.2);border-radius:10px;padding:8px 10px;font-size:12px;color:var(--warn);margin-bottom:8px}
+.yesterday-hint-label{font-size:9px;font-weight:800;color:rgba(247,183,49,.6);margin-bottom:3px;letter-spacing:.05em}
+
+/* 監視銘柄カード改善 */
+.watch-purpose{font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;flex-shrink:0}
+.watch-purpose.win{background:rgba(255,204,102,.2);border:1px solid rgba(255,204,102,.4);color:var(--gold)}
+.watch-purpose.check{background:rgba(110,168,254,.12);border:1px solid rgba(110,168,254,.3);color:var(--accent)}
+.watch-purpose.watch-only{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted)}
+.watch-purpose.no-touch{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);color:var(--bad)}
+
+/* テーマ失効条件 */
+.expiry-list{margin-top:6px;display:flex;flex-direction:column;gap:3px}
+.expiry-item{font-size:11px;color:rgba(255,107,107,.8);display:flex;align-items:center;gap:4px}
+.expiry-item::before{content:"⚠";font-size:9px}
+
+/* 9:10 verdict バナー */
+.verdict-banner{border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.verdict-banner.maintain{background:rgba(49,209,88,.1);border:1px solid rgba(49,209,88,.3)}
+.verdict-banner.partial{background:rgba(247,183,49,.1);border:1px solid rgba(247,183,49,.3)}
+.verdict-banner.revoke{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3)}
+.verdict-text{font-size:18px;font-weight:900}
+.verdict-reason{font-size:12px;color:var(--muted);flex:1}
+
+/* next_actionブロック */
+.next-action-block{background:rgba(110,168,254,.06);border:1px solid rgba(110,168,254,.2);border-radius:12px;padding:10px 12px}
+.next-action-title{font-size:10px;font-weight:800;color:rgba(110,168,254,.7);margin-bottom:8px;letter-spacing:.05em}
+.next-action-row{display:flex;align-items:center;gap:8px;padding:4px 0}
+.next-action-label{font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;flex-shrink:0}
+.next-action-label.primary{background:rgba(49,209,88,.15);border:1px solid rgba(49,209,88,.3);color:var(--good)}
+.next-action-label.secondary{background:rgba(247,183,49,.12);border:1px solid rgba(247,183,49,.3);color:var(--warn)}
+.next-action-label.stop{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.3);color:var(--bad)}
+.next-action-text{font-size:13px;font-weight:700}
+
+/* テーマ後場判定 */
+.theme-verdict-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.theme-verdict-row:last-child{border-bottom:none}
+.theme-verdict-name{font-size:13px;font-weight:800;flex:1}
+.theme-verdict-badge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:999px;flex-shrink:0}
+.theme-verdict-badge.continue{background:rgba(49,209,88,.15);border:1px solid rgba(49,209,88,.3);color:var(--good)}
+.theme-verdict-badge.pullback{background:rgba(247,183,49,.12);border:1px solid rgba(247,183,49,.3);color:var(--warn)}
+.theme-verdict-badge.done{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);color:var(--bad)}
+.theme-verdict-badge.skip{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--muted)}
+
 </style>
 </head>
 <body>
@@ -574,7 +692,77 @@ function render600(d, accuracy){
 
   let html = `<div class="stack">`;
 
-  // ① 主戦場 断定ヒーロー
+  // ① 今日の結論（最上部固定）
+  const tc = d.top_conclusion || {};
+  const topStocks  = arr(tc.top_stocks || []);
+  const avoidShort = arr(tc.avoid_themes_short || []);
+  const banRules   = arr(tc.ban_rules || (d.skip_rule ? [d.skip_rule] : []));
+  const yhint      = tc.yesterday_hint || "";
+
+  // 昨日の学びがあれば表示
+  if(yhint){
+    html += `<div class="yesterday-hint">
+      <div class="yesterday-hint-label">📖 昨日の学び</div>
+      <div>${esc(yhint)}</div>
+    </div>`;
+  }
+
+  html += `<div class="conclusion-block">`;
+
+  // 主戦場
+  html += `<div class="conclusion-row">
+    <span class="conclusion-key">主戦場</span>
+    <span class="conclusion-val battlefield">${esc(bf)}</span>
+  </div>`;
+
+  // 本命テーマ
+  const topThemeName = tc.top_theme || (themes[0]?.name || "—");
+  html += `<div class="conclusion-row">
+    <span class="conclusion-key">本命</span>
+    <span class="conclusion-val">${esc(topThemeName)}</span>
+  </div>`;
+
+  // 優先銘柄
+  if(topStocks.length){
+    // watchlistからコードで銘柄名を逆引き
+    const codeToName = {};
+    watchlist.forEach(w=>{ if(w.code) codeToName[String(w.code)] = w.name; });
+    html += `<div class="conclusion-row">
+      <span class="conclusion-key">銘柄</span>
+      <div class="conclusion-stocks">
+        ${topStocks.map((code,i)=>{
+          const nm = codeToName[String(code)] || "";
+          const cls = i===0?"":"i===1?second:watch";
+          const c = i===0?"":"i===1?"+" second":"" +" watch"";
+          return `<span class="conclusion-stock${i===0?"":(i===1?" second":" watch")}">${esc(code)}${nm?" "+esc(nm):""}</span>`;
+        }).join("")}
+      </div>
+    </div>`;
+  }
+
+  // 回避テーマ
+  if(avoidShort.length){
+    html += `<div class="conclusion-row">
+      <span class="conclusion-key">回避</span>
+      <div class="conclusion-avoid">
+        ${avoidShort.map(t=>`<span class="conclusion-avoid-tag">${esc(t)}</span>`).join("")}
+      </div>
+    </div>`;
+  }
+
+  // 禁止事項
+  if(banRules.length){
+    html += `<div class="conclusion-row">
+      <span class="conclusion-key">禁止</span>
+      <div class="conclusion-ban">
+        ${banRules.map(r=>`<span class="conclusion-ban-item">${esc(r)}</span>`).join("")}
+      </div>
+    </div>`;
+  }
+
+  html += `</div>`;
+
+  // ① 主戦場 断定ヒーロー（詳細）
   html += `<div class="battlefield-hero">
     <div class="bf-label">今日の主戦場</div>
     <div class="bf-title">${esc(bf)}</div>
@@ -635,6 +823,10 @@ function render600(d, accuracy){
         </div>
         ${t.leader_stock?`<div class="theme-leader">▶ 先導株: ${esc(t.leader_stock)}</div>`:""}
         ${t.entry_hint?`<div class="theme-entry">仕掛け: ${esc(t.entry_hint)}</div>`:""}
+        ${arr(t.invalidation_signs||t.expiry_conditions||[]).length?`
+          <div class="expiry-list">
+            ${arr(t.invalidation_signs||t.expiry_conditions||[]).map(s=>`<span class="expiry-item">${esc(s)}</span>`).join("")}
+          </div>`:""}
       </div>`;
     });
     html += `<button class="theme-detail-toggle" onclick="
@@ -726,18 +918,24 @@ function render600(d, accuracy){
         ? `<a href="${url}" target="_blank" rel="noopener">${esc(w.name||"—")}${w.code?` (${esc(w.code)})`:""}` + `</a>`
         : `${esc(w.name||"—")}${w.code?` (${esc(w.code)})`:""}`;
       const numCls = globalIdx<=3?"n"+globalIdx:globalIdx<=5?"n"+globalIdx:"nsub";
+      // purposeラベルの色分け
+      const purpose = w.purpose || w.role || w.bucket || "";
+      const purposeCls = purpose==="利益狙い"||purpose==="本命"?"win"
+        : purpose==="触らない"||purpose==="監視のみ"?"no-touch"
+        : "check";
       return `<div class="watch-card">
         <div class="watch-head">
           <span class="watch-num ${numCls}">${globalIdx}</span>
-          <span class="watch-bucket">${esc(w.bucket||"—")}</span>
+          <span class="watch-bucket">${esc(w.role||w.bucket||"—")}</span>
           <span class="watch-name">${namePart}</span>
+          ${purpose?`<span class="watch-purpose ${purposeCls}">${esc(purpose)}</span>`:""}
         </div>
         ${w.theme?`<div class="watch-theme">${esc(w.theme)}</div>`:""}
         <div class="watch-rows">
-          ${w.reason?`<div class="watch-row"><span class="watch-key">確認目的</span><span>${esc(w.reason)}</span></div>`:""}
-          ${w.trigger?`<div class="watch-row"><span class="watch-key">仕掛け</span><span>${esc(w.trigger)}</span></div>`:""}
-          ${w.invalidation?`<div class="watch-row"><span class="watch-key">失効</span><span>${esc(w.invalidation)}</span></div>`:""}
-          ${w.time_window?`<div class="watch-row"><span class="watch-key">時間帯</span><span>${esc(w.time_window)}</span></div>`:""}
+          ${w.reason?`<div class="watch-row"><span class="watch-key">役割</span><span>${esc(w.reason)}</span></div>`:""}
+          ${w.trigger?`<div class="watch-row"><span class="watch-key" style="color:var(--good)">入る</span><span style="font-weight:700">${esc(w.trigger)}</span></div>`:""}
+          ${w.invalidation?`<div class="watch-row"><span class="watch-key" style="color:var(--bad)">否定</span><span style="font-weight:700">${esc(w.invalidation)}</span></div>`:""}
+          ${w.time_window?`<div class="watch-row"><span class="watch-key">時間</span><span>${esc(w.time_window)}</span></div>`:""}
         </div>
       </div>`;
     }
@@ -811,69 +1009,85 @@ function render600(d, accuracy){
 }
 
 // ═══════════════════════════════
-// 9:10 相場確認 + 学習ログ
+// 9:10 寄り後 verdict + 次の行動
 // ═══════════════════════════════
 function render905(d){
   const el=document.getElementById("tab905");
   if(!d){el.innerHTML=`<div class="notice">9:10データがありません</div>`;return}
-  const lg=d.log||{};
-  const hit=lg.battlefield_correct;
 
-  // 実際の動き（top_gainersなどはd.market_dataから取れないのでlogに含まれる情報を使う）
-  const actualBF = lg.actual_battlefield || "—";
-  const predBF   = lg.predicted_battlefield || "—";
-  const flow     = lg.capital_flow_note || "—";
-  const moved    = lg.what_moved_as_predicted || "—";
-  const diff     = lg.what_was_different || "—";
-  const hintAft  = lg.hint_for_afternoon || "—";
-  const hintTmr  = lg.hint_for_tomorrow || "—";
-  const acc      = lg.theme_accuracy || "—";
+  const verdict    = d.verdict || "";
+  const vReason    = d.verdict_reason || "";
+  const actualBF   = d.actual_battlefield || "—";
+  const flow       = d.capital_flow || "—";
+  const nextAction = d.next_action || {};
+  const themeStatus= arr(d.theme_status||[]);
+  const watchUpdate= arr(d.watch_update||[]);
+  const hintAft    = d.hint_for_afternoon || "—";
+  const hintTmr    = d.hint_for_tomorrow || "—";
+
+  // verdict色分け
+  const vCls = verdict.includes("維持")?"maintain":verdict.includes("修正")?"partial":"revoke";
+  const vIcon = verdict.includes("維持")?"✅":verdict.includes("修正")?"⚠️":"❌";
 
   el.innerHTML=`<div class="stack">
+
+    <!-- verdict バナー -->
+    <div class="verdict-banner ${vCls}">
+      <span style="font-size:24px">${vIcon}</span>
+      <div>
+        <div class="verdict-text">${esc(verdict||"—")}</div>
+        <div class="verdict-reason">${esc(vReason)}</div>
+      </div>
+    </div>
+
+    <!-- 次の行動 -->
+    ${nextAction.primary||nextAction.secondary||nextAction.stop?`
+    <div class="next-action-block">
+      <div class="next-action-title">⚡ 今すぐやること</div>
+      ${nextAction.primary?`<div class="next-action-row"><span class="next-action-label primary">最優先</span><span class="next-action-text">${esc(nextAction.primary)}</span></div>`:""}
+      ${nextAction.secondary?`<div class="next-action-row"><span class="next-action-label secondary">次点</span><span class="next-action-text">${esc(nextAction.secondary)}</span></div>`:""}
+      ${nextAction.stop?`<div class="next-action-row"><span class="next-action-label stop">やめる</span><span class="next-action-text">${esc(nextAction.stop)}</span></div>`:""}
+    </div>`:""}
+
     <div class="dual-pane">
-      <!-- 左：実際の相場確認 -->
+      <!-- 左：実際の相場 -->
       <div class="market-check">
-        <div class="market-check-title">📈 実際の相場（寄り後）</div>
+        <div class="market-check-title">📈 実際の相場</div>
         <div class="log-grid">
-          <div class="log-item ${hit?"hit":"miss"}">
-            <div class="log-key">主戦場の予測 vs 実際</div>
-            <div class="log-val ${hit?"good":"bad"}">${hit?"✅ 的中":"❌ 外れ"}</div>
-            <div style="font-size:12px;color:var(--muted);margin-top:3px">予測: ${esc(predBF)} → 実際: ${esc(actualBF)}</div>
-          </div>
-          <div class="log-item">
-            <div class="log-key">テーマ精度</div>
-            <div class="log-val">${esc(acc)}</div>
-          </div>
-          <div class="log-item">
-            <div class="log-key">資金の流れ</div>
-            <div class="log-val">${esc(flow)}</div>
-          </div>
-          <div class="log-item hit">
-            <div class="log-key">予測通りだったこと</div>
-            <div class="log-val good">${esc(moved)}</div>
-          </div>
-          <div class="log-item miss">
-            <div class="log-key">予測と違ったこと</div>
-            <div class="log-val bad">${esc(diff)}</div>
-          </div>
+          <div class="log-item"><div class="log-key">実際の主戦場</div><div class="log-val">${esc(actualBF)}</div></div>
+          <div class="log-item"><div class="log-key">資金フロー</div><div class="log-val">${esc(flow)}</div></div>
+          ${themeStatus.length?`<div class="log-item">
+            <div class="log-key">テーマ状況</div>
+            <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
+              ${themeStatus.map(t=>{
+                const bc=t.status==="継続"?"continue":t.status==="終息"?"done":"skip";
+                const ac=t.pm_action==="継続狙い"?"continue":t.pm_action==="見送り"||t.pm_action==="撤退"?"done":"pullback";
+                return `<div class="theme-verdict-row">
+                  <span class="theme-verdict-name">${esc(t.name)}</span>
+                  <span class="theme-verdict-badge ${bc}">${esc(t.status)}</span>
+                  <span class="theme-verdict-badge ${ac}">${esc(t.pm_action)}</span>
+                </div>`;
+              }).join("")}
+            </div>
+          </div>`:""}
         </div>
       </div>
-      <!-- 右：次への学習ヒント -->
+      <!-- 右：銘柄更新 -->
       <div class="market-check">
-        <div class="market-check-title">📝 学習ヒント</div>
+        <div class="market-check-title">📊 銘柄 verdict</div>
         <div class="log-grid">
-          <div class="log-item key">
-            <div class="log-key">後場への引き継ぎ</div>
-            <div class="log-val warn">${esc(hintAft)}</div>
-          </div>
-          <div class="log-item key">
-            <div class="log-key">明日の朝へのヒント</div>
-            <div class="log-val warn">${esc(hintTmr)}</div>
-          </div>
-          <div class="log-item" style="margin-top:4px">
-            <div class="log-key" style="font-size:9px">更新時刻</div>
-            <div class="log-val" style="font-size:11px;color:var(--muted)">${esc(d.generated_at||"—")} ${freshnessHtml(d.date)}</div>
-          </div>
+          ${watchUpdate.map(w=>{
+            const vc=w.pts_verdict==="本命維持"?"continue":w.pts_verdict==="見送り"?"done":"pullback";
+            return `<div class="log-item">
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-weight:900">${esc(w.name||w.code||"—")}</span>
+                <span class="theme-verdict-badge ${vc}">${esc(w.pts_verdict||"—")}</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px">${esc(w.reason||"")}</div>
+            </div>`;
+          }).join("")}
+          <div class="log-item key"><div class="log-key">後場引き継ぎ</div><div class="log-val warn">${esc(hintAft)}</div></div>
+          <div class="log-item key"><div class="log-key">明日へのヒント</div><div class="log-val warn">${esc(hintTmr)}</div></div>
         </div>
       </div>
     </div>
@@ -923,7 +1137,35 @@ function render1200(d){
     </div>`;
   }
 
+  const pmPlan   = d.pm_plan || {};
+  const themePmVerdict = arr(d.theme_pm_verdict||[]);
+
   el.innerHTML=`<div class="stack">
+
+    <!-- 後場方針バナー -->
+    ${pmPlan.pm_regime_label?`
+    <div class="verdict-banner ${pmPlan.pm_regime==='attack'?'maintain':pmPlan.pm_regime==='avoid'?'revoke':'partial'}">
+      <span style="font-size:20px">${pmPlan.pm_regime==='attack'?'🟢':pmPlan.pm_regime==='avoid'?'🔴':'🟡'}</span>
+      <div>
+        <div class="verdict-text">${esc(pmPlan.pm_regime_label)}</div>
+        <div class="verdict-reason">${esc(pmPlan.summary||"")}</div>
+      </div>
+    </div>`:""}
+
+    <!-- テーマ後場判定 -->
+    ${themePmVerdict.length?`
+    <div class="market-check">
+      <div class="market-check-title">🎯 テーマ別 後場判定</div>
+      ${themePmVerdict.map(t=>{
+        const vc=t.verdict==="継続狙い"?"continue":t.verdict==="前場限り"||t.verdict==="見送り"?"done":"pullback";
+        return `<div class="theme-verdict-row">
+          <span class="theme-verdict-name">${esc(t.name)}</span>
+          <span class="theme-verdict-badge ${vc}">${esc(t.verdict)}</span>
+          <span style="font-size:11px;color:var(--muted);flex:1;text-align:right">${esc(t.reason||"")}</span>
+        </div>`;
+      }).join("")}
+    </div>`:""}
+
     <div class="dual-pane">
       <div class="market-check">
         <div class="market-check-title">📈 前場の実際の動き</div>

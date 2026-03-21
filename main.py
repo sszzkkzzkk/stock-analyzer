@@ -1039,37 +1039,70 @@ def build_analysis_prompt_600(today_str, learning_ctx, market, key_news, us_ctx=
             "entry_style": "pullback",
             "entry_style_label": "寄り後押し目待ち",
             "danger_level": "中",
-            "battlefield": "今日の主戦場テーマ名（1つ）",
+            "battlefield": "今日の主戦場テーマ名（12字以内の断定ラベル）",
             "one_line": "今日の相場を一言で（40字以内）"
+        },
+        "conclusion": {
+            "battlefield": "主戦場（12字以内）",
+            "top_stock": {"code": "2038", "name": "本命銘柄名"},
+            "second_stock": {"code": "8035", "name": "次点銘柄名"},
+            "watch_codes": ["9104", "1605"],
+            "avoid_summary": "回避テーマを15字以内で（例：防衛・材料不明GU）",
+            "ban_summary": "今日の禁止事項を30字以内で（例：材料不明GU追撃禁止）"
         },
         "themes": [
             {
                 "rank": "A",
                 "rank_label": "本命",
-                "name": "テーマ名",
+                "name": "テーマ名（10字以内）",
                 "score": 85,
                 "reason": "資金が集まる根拠（60字以内）",
                 "continuity": "継続/新規/終息",
                 "leader_strength": "強/中/弱",
                 "ripple": "広/中/狭",
                 "leader_stock": "先導株名",
-                "entry_hint": "仕掛けヒント（40字以内）"
+                "entry_hint": "仕掛けヒント（40字以内）",
+                "invalidation_signs": [
+                    "テーマ失効サイン1（例: 先導株がVWAP割れ）",
+                    "テーマ失効サイン2（例: 9:20時点で連想株が追随しない）"
+                ]
             }
         ],
         "watchlist": [
             {
-                "bucket": "先導株",
+                "role": "本命",
                 "name": "銘柄名",
                 "code": "1234",
                 "theme": "所属テーマ",
-                "reason": "テーマ本物度確認の根拠（40字以内）",
-                "trigger": "仕掛け条件（40字以内）",
-                "invalidation": "失効条件（30字以内）",
-                "time_window": "9:00-9:20"
+                "purpose": "利益狙い/先導確認/連想本線/連想補助/監視のみ/触らない",
+                "trigger": "必ず数値条件で: 例「寄り+2%以上かつ出来高前日比150%超」",
+                "invalidation": "必ず明確条件で: 例「9:30までに前日比マイ転」または「前日高値割れ」",
+                "time_window": "9:00-9:30"
+            }
+        ],
+        "pts_judgments": [
+            {
+                "code": "2038",
+                "name": "銘柄名",
+                "pts_reaction": "強い/弱い/薄い/反応なし",
+                "judgment": "本命維持/補強/ノイズ/見送り",
+                "reason": "判断理由（30字以内）"
             }
         ],
         "avoid_themes": [{"name": "テーマ名", "reason": "避ける理由（40字以内）"}],
-        "skip_rule": "今日絶対やらないこと（60字以内）",
+        "danger_summary": ["危険株要約1（例: 前日急騰テーマ株 → 寄り天リスク）"],
+        "skip_rules": [
+            "禁止事項1（例: 材料不明GU追撃禁止）",
+            "禁止事項2（例: 防衛株は逆風確認まで見送り）"
+        ],
+        "top_conclusion": {
+            "battlefield": "主戦場ラベル（12字以内）",
+            "top_theme": "本命テーマ名",
+            "top_stocks": ["本命銘柄コード1", "次点銘柄コード2", "監視銘柄コード3"],
+            "avoid_themes_short": ["回避テーマ1", "回避テーマ2"],
+            "ban_rules": ["禁止事項1（20字以内）", "禁止事項2（20字以内）"],
+            "yesterday_hint": "昨日の学びから今日に活かす一言（なければ空文字）"
+        },
         "summary": "今日の資金集中先まとめ（100字以内）",
         "us_theme_signals": [
             {
@@ -1138,6 +1171,15 @@ Rules:
 - continuity: 継続/新規/終息
 - leader_strength: 強/中/弱
 - ripple: 広/中/狭
+- watchlist role（必須）: 本命/先導確認/連想本線/連想補助/監視のみ/触らない
+- watchlist purpose（必須）: 利益狙い/先導確認/連想本線/連想補助/監視のみ/触らない
+- trigger は必ず数値条件または時間条件を含めること（例: 寄り+2%以上、9:30までに〇〇）
+- invalidation は必ず明確な条件を含めること（例: 前日比マイ転、VWAP割れ）
+- invalidation_signs: テーマ失効サインを2〜3件、具体的に記述
+- skip_rules は配列で最大3件（各30字以内）
+- danger_summary は配列で要約（各20字以内）
+- pts_judgments: PTSデータがある場合は必ず本命維持/補強/ノイズ/見送りで判定
+- conclusion は必ず埋めること（top_stock/second_stock/avoid_summary/ban_summary）
 - 米国テーマ連動分析がある場合は必ず参照すること:
     1. 米国で強いテーマ → 日本株での波及可能性を評価
     2. PTSで先行反応している銘柄 → 先導株候補として優先
@@ -1154,134 +1196,157 @@ Return ONLY JSON.
 
 def build_analysis_prompt_905(today_str, morning_data, market, news):
     """
-    9:10 学習ログ用プロンプト
-    目的: 朝6:00の仮説が実際にどうだったかを記録する
-    売買判断ではなく「仮説検証」が主目的
+    9:10 寄り後記録 + 次の売買行動判断
+    目的: 朝仮説の検証 + 後場・残りの前場への行動方針を即断
     """
-    morning_themes = [t.get("name","") for t in arr(morning_data.get("themes", morning_data.get("priority_themes", [])))]
-    morning_battlefield = morning_data.get("strategy", {}).get("battlefield", "")
+    morning_themes = [t.get("name","") for t in arr(morning_data.get("themes",[]))]
+    morning_bf     = morning_data.get("strategy",{}).get("battlefield","")
+    morning_top    = morning_data.get("top_conclusion", {})
+
     compact = {
-        "morning_battlefield": morning_battlefield,
-        "morning_themes":      morning_themes,
-        "morning_watchlist":   [w.get("name","") for w in arr(morning_data.get("watchlist", []))[:5]],
-        "actual_top_gainers":  market["top_gainers"][:10],
-        "actual_volume_surge": market["volume_surge"][:8],
-        "actual_themes":       market["themes"][:10],
-        "news":                news[:8],
+        "morning_battlefield": morning_bf,
+        "morning_top_theme":   morning_themes[:3],
+        "morning_ban_rules":   morning_top.get("ban_rules",[]),
+        "actual_gainers":      market["top_gainers"][:10],
+        "actual_losers":       market["top_losers"][:5],
+        "volume_surge":        market["volume_surge"][:6],
+        "actual_themes":       market["themes"][:8],
+        "news":                news[:6],
     }
     schema = {
-        "log": {
-            "battlefield_correct": True,
-            "predicted_battlefield": "朝に予測した主戦場",
-            "actual_battlefield":    "実際の主戦場",
-            "theme_accuracy": "的中/部分的中/外れ",
-            "what_moved_as_predicted":  "予測通りだったこと（60字）",
-            "what_was_different":       "予測と違ったこと（60字）",
-            "capital_flow_note":        "資金の実際の流れ（80字）",
-            "hint_for_afternoon":       "後場に活かすヒント（60字）",
-            "hint_for_tomorrow":        "明日の朝に活かすヒント（60字）"
+        "verdict": "朝仮説維持/半分修正/全面撤回",
+        "verdict_reason": "判定根拠（40字以内）",
+        "actual_battlefield": "実際の主戦場テーマ名",
+        "capital_flow": "資金の流れ（40字以内）",
+        "theme_status": [
+            {
+                "name": "テーマ名",
+                "status": "継続/弱まり/終息/新規",
+                "pm_action": "継続狙い/押し目待ち/見送り/撤退"
+            }
+        ],
+        "next_action": {
+            "primary": "今すぐ最優先でやること（30字以内）",
+            "secondary": "次点でやること（30字以内）",
+            "stop": "今すぐやめること（30字以内）"
         },
-        "summary": "80字以内"
+        "watch_update": [
+            {
+                "code": "銘柄コード",
+                "name": "銘柄名",
+                "pts_verdict": "本命維持/補強/ノイズ/見送り",
+                "reason": "理由（30字以内）"
+            }
+        ],
+        "hint_for_afternoon": "後場への引き継ぎ（40字以内）",
+        "hint_for_tomorrow": "明日の朝6:00へのヒント（40字以内）"
     }
     return f"""
-You are a learning log generator for a Japanese stock trader.
-Today is {today_str} 9:10.
+You are a Japanese day trader's AI assistant. It is 9:10 AM - markets just opened.
+Your job: Verify morning hypothesis and give IMMEDIATE next action.
 
-Your job: Record how accurate the 6:00 AM prediction was. This is NOT a trading decision.
-This log will be used to improve tomorrow's 6:00 prediction.
+Today is {today_str}.
 
-Data:
+Morning prediction vs actual market:
 {json.dumps(compact, ensure_ascii=False)}
 
-Focus on:
-1. Was the predicted battlefield (主戦場) correct?
-2. Where did capital actually flow?
-3. What hint does this give for tomorrow morning?
+CRITICAL: Give a clear verdict first, then next actions.
+- verdict: 朝仮説維持 / 半分修正 / 全面撤回
+- next_action must be specific and actionable RIGHT NOW
+- pm_action per theme: 継続狙い/押し目待ち/見送り/撤退
+- pts_verdict per watchlist stock: 本命維持/補強/ノイズ/見送り
 
 Rules:
 - Return ONLY valid JSON
-- Be specific and factual, not vague
-- theme_accuracy: 的中/部分的中/外れ
+- Be decisive. No ambiguous language.
+- next_action.primary must be actionable in the next 5 minutes
 
 Required JSON schema:
 {json.dumps(schema, ensure_ascii=False)}
 
 Return ONLY JSON.
 """.strip()
-
 
 def build_analysis_prompt_1200(today_str, morning_data, open_data, market, news):
     """
-    12:00 学習ログ用プロンプト
-    目的: 前場の答え合わせ + 翌朝6:00に活かすヒントの整理
-    後場の売買判断ではなく「学習材料の構造化」が主目的
+    12:00 前場答え合わせ + 後場の売買行動方針
+    目的: 前場を総括し、後場の具体的な行動を即断できる形で出力
     """
-    morning_themes    = [t.get("name","") for t in arr(morning_data.get("themes", morning_data.get("priority_themes",[])))]
-    opening_log       = open_data.get("log", {}) if open_data else {}
+    morning_themes = [t.get("name","") for t in arr(morning_data.get("themes",[]))]
+    opening_verdict = (open_data or {}).get("verdict","")
     compact = {
         "morning_battlefield":  morning_data.get("strategy",{}).get("battlefield",""),
-        "morning_themes":       morning_themes,
-        "opening_log_summary":  opening_log.get("capital_flow_note",""),
-        "actual_top_gainers":   market["top_gainers"][:10],
-        "actual_top_losers":    market["top_losers"][:6],
-        "actual_volume_surge":  market["volume_surge"][:8],
-        "actual_themes":        market["themes"][:10],
-        "news":                 news[:8],
+        "morning_themes":       morning_themes[:3],
+        "opening_verdict":      opening_verdict,
+        "am_top_gainers":       market["top_gainers"][:10],
+        "am_top_losers":        market["top_losers"][:5],
+        "am_themes":            market["themes"][:10],
+        "news":                 news[:6],
     }
     schema = {
         "log": {
-            "am_winner_theme":         "前場で本当に強かったテーマ",
-            "am_loser_theme":          "前場で弱かったテーマ",
-            "new_theme_emerged":       "朝には見えていなかった新規テーマ（なければ空文字）",
-            "hypothesis_correction":   "朝の仮説のどこを修正すべきか（80字）",
-            "capital_flow_am":         "前場の資金フローの特徴（80字）",
-            "sign_that_was_visible":   "朝の時点で見抜けたはずのサイン（60字）",
-            "sign_that_was_hidden":    "朝の段階では見えなかったサイン（60字）",
-            "hint_for_tomorrow_600":   "明日の朝6:00分析に活かすべき最重要ヒント（80字）"
+            "am_winner_theme":       "前場で強かったテーマ",
+            "am_loser_theme":        "前場で弱かったテーマ",
+            "new_theme_emerged":     "新規浮上テーマ（なければ空文字）",
+            "hypothesis_correction": "朝仮説の修正点（60字）",
+            "capital_flow_am":       "前場の資金フロー特徴（60字）",
+            "sign_that_was_visible": "朝に見抜けたはずのサイン（40字）",
+            "sign_that_was_hidden":  "朝に見えなかったサイン（40字）",
+            "hint_for_tomorrow_600": "明日朝6:00最重要ヒント（60字）"
         },
-        "pm_watchlist": [{
-            "bucket": "先導株",
-            "name": "銘柄名",
-            "code": "1234",
-            "theme": "所属テーマ",
-            "reason": "後場で注目する理由（40字以内）",
-            "trigger": "仕掛け条件（40字以内）",
-            "invalidation": "失効条件（30字以内）",
-            "time_window": "12:30-14:00"
-        }],
-        "do_not_do_pm": ["後場でやらないこと（60字以内）"],
-        "summary": "120字以内"
+        "pm_plan": {
+            "pm_regime": "attack/selective/avoid",
+            "pm_regime_label": "後場は攻めやすい/選別相場/見送り",
+            "summary": "後場の方針一言（40字以内）"
+        },
+        "theme_pm_verdict": [
+            {
+                "name": "テーマ名",
+                "verdict": "継続狙い/押し目待ち/前場限り/見送り",
+                "reason": "判定根拠（30字以内）"
+            }
+        ],
+        "pm_watchlist": [
+            {
+                "bucket": "本命/先導確認/連想本線/連想補助/監視のみ/触らない",
+                "name": "銘柄名",
+                "code": "1234",
+                "theme": "所属テーマ",
+                "reason": "後場注目理由（40字以内）",
+                "trigger": "後場仕掛け条件（数値条件必須）",
+                "invalidation": "失効条件（明確条件必須）",
+                "time_window": "12:30-14:00"
+            }
+        ],
+        "do_not_do_pm": ["後場でやらないこと（20字以内）"],
+        "summary": "後場方針まとめ（80字以内）"
     }
     return f"""
-You are a learning log generator for a Japanese stock trader.
-Today is {today_str} 12:00.
+You are a Japanese day trader's AI. It is noon. Morning session just ended.
+Your job: Review morning and give CLEAR afternoon trading plan.
 
-Your job: Analyze the morning session and extract lessons for tomorrow's 6:00 prediction.
-This is NOT about afternoon trading. Focus on what you can learn for tomorrow.
+Today is {today_str}.
 
-Data:
+Morning vs actual data:
 {json.dumps(compact, ensure_ascii=False)}
 
-Focus on:
-1. What theme actually dominated the morning?
-2. What correction is needed to the morning hypothesis?
-3. What ONE hint should be used in tomorrow's 6:00 analysis?
+CRITICAL OUTPUT REQUIREMENTS:
+- theme_pm_verdict: for EACH theme from morning, give verdict: 継続狙い/押し目待ち/前場限り/見送り
+- pm_watchlist: concrete stocks for afternoon with numeric trigger conditions
+- pm_regime: attack/selective/avoid based on afternoon outlook
+- do_not_do_pm: max 3 items, 20 chars each, absolute prohibitions
 
 Rules:
 - Return ONLY valid JSON
-- pm_watchlist件数はpm_regimeに応じて調整:
-    attack  → 最大8件（先導株3+連想1軍3+連想2軍2）
-    selective → 最大5件（先導株2+連想1軍2+連想2軍1）
-    avoid   → 最大2件（先導株1+危険株1）
-- pm_watchlist bucket: 先導株/連想1軍/連想2軍/危険株
-- hint_for_tomorrow_600 is the most important field - make it specific and actionable
+- pm_watchlist trigger MUST include numeric condition (e.g. 12:45以降+1%維持で参戦)
+- pm_watchlist invalidation MUST be specific (e.g. VWAP割れ, 13:00時点でマイ転)
+- pm_watchlist件数: attack→最大8件, selective→最大5件, avoid→最大2件
 
 Required JSON schema:
 {json.dumps(schema, ensure_ascii=False)}
 
 Return ONLY JSON.
 """.strip()
-
 
 def build_analysis_prompt_1535(today_str, pred_600, pred_905, pred_1200, market, news):
     """
@@ -1517,7 +1582,13 @@ def run_600(today):
             "generated_at":  now,
             "data_sources":  data_sources,
             "market_tags":   market_tags,
+            "conclusion":       parsed.get("conclusion", {}),
+            "pts_judgments":    parsed.get("pts_judgments", []),
+            "skip_rules":       parsed.get("skip_rules", []),
+            "danger_summary":   parsed.get("danger_summary", []),
             "us_theme_signals": parsed.get("us_theme_signals", []),
+            "top_conclusion": parsed.get("top_conclusion", {}),
+            "pts_judgments":  parsed.get("pts_judgments", []),
             "pts_gainers":    market.get("pts",{}).get("gainers",[])[:10],
             "us_themes_raw":  [
                 {"key": k, "label": v["label"], "avg_pct": v["avg_pct"], "strength": v["strength"]}
@@ -1550,7 +1621,13 @@ def run_600(today):
             "generated_at":  now,
             "data_sources":  data_sources,
             "market_tags":   market_tags,
+            "conclusion":       parsed.get("conclusion", {}),
+            "pts_judgments":    parsed.get("pts_judgments", []),
+            "skip_rules":       parsed.get("skip_rules", []),
+            "danger_summary":   parsed.get("danger_summary", []),
             "us_theme_signals": parsed.get("us_theme_signals", []),
+            "top_conclusion": parsed.get("top_conclusion", {}),
+            "pts_judgments":  parsed.get("pts_judgments", []),
             "pts_gainers":    market.get("pts",{}).get("gainers",[])[:10],
             "us_themes_raw":  [
                 {"key": k, "label": v["label"], "avg_pct": v["avg_pct"], "strength": v["strength"]}
