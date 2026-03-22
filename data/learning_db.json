@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "records": [
     {
       "date": "2026-03-19",
@@ -49,6 +49,143 @@
       "count": 6,
       "hits": 5,
       "hit_rate": 0.8333333333333334
+    },
+    "NY急落": {
+      "count": 0,
+      "hits": 0,
+      "hit_rate": 0.0,
+      "strong_themes": [
+        "内需・サービス",
+        "医療・ヘルスケア",
+        "食品・飲料",
+        "不動産"
+      ],
+      "weak_themes": [
+        "半導体",
+        "電線・ケーブル",
+        "海運",
+        "資源エネルギー"
+      ],
+      "note": "リスクオフで内需ディフェンシブに資金逃避"
+    },
+    "NY上昇": {
+      "count": 0,
+      "hits": 0,
+      "hit_rate": 0.0,
+      "strong_themes": [
+        "半導体",
+        "電線・ケーブル",
+        "AIインフラ",
+        "自動車・EV"
+      ],
+      "weak_themes": [
+        "不動産",
+        "食品・飲料"
+      ],
+      "note": "リスクオンで輸出・ハイテクに資金集中"
+    },
+    "SOX急落": {
+      "count": 0,
+      "hits": 0,
+      "hit_rate": 0.0,
+      "strong_themes": [
+        "内需・サービス",
+        "銀行・金融",
+        "建設・インフラ"
+      ],
+      "weak_themes": [
+        "半導体",
+        "電線・ケーブル",
+        "AIインフラ"
+      ],
+      "note": "半導体テーマは全面回避"
+    },
+    "SOX強い": {
+      "count": 0,
+      "hits": 0,
+      "hit_rate": 0.0,
+      "strong_themes": [
+        "半導体",
+        "電線・ケーブル",
+        "AIインフラ"
+      ],
+      "weak_themes": [],
+      "note": "半導体・電力インフラに追い風"
+    },
+    "円安": {
+      "count": 0,
+      "hits": 0,
+      "hit_rate": 0.0,
+      "strong_themes": [
+        "自動車・EV",
+        "海運",
+        "資源エネルギー",
+        "観光・インバウンド"
+      ],
+      "weak_themes": [
+        "小売・外食",
+        "食品・飲料"
+      ],
+      "note": "輸出関連・訪日外客関連に恩恵"
+    },
+    "原油高騰": {
+      "count": 0,
+      "hits": 0,
+      "hit_rate": 0.0,
+      "strong_themes": [
+        "資源エネルギー",
+        "海運",
+        "原子力・電力"
+      ],
+      "weak_themes": [
+        "航空",
+        "化学・素材"
+      ],
+      "note": "資源株・エネルギー輸送に資金集中"
+    },
+    "原油急落": {
+      "count": 0,
+      "hits": 0,
+      "hit_rate": 0.0,
+      "strong_themes": [
+        "航空",
+        "化学・素材",
+        "小売・外食"
+      ],
+      "weak_themes": [
+        "資源エネルギー",
+        "海運"
+      ],
+      "note": "コスト恩恵セクターへ"
+    },
+    "リスクオフ": {
+      "count": 0,
+      "hits": 0,
+      "hit_rate": 0.0,
+      "strong_themes": [
+        "医療・ヘルスケア",
+        "食品・飲料",
+        "不動産",
+        "内需・サービス"
+      ],
+      "weak_themes": [
+        "半導体",
+        "海運",
+        "資源エネルギー",
+        "防衛・宇宙"
+      ],
+      "note": "全面的なリスク回避、ディフェンシブのみ"
+    },
+    "NY横ばい": {
+      "count": 0,
+      "hits": 0,
+      "hit_rate": 0.0,
+      "strong_themes": [
+        "決算好材料",
+        "内需・サービス"
+      ],
+      "weak_themes": [],
+      "note": "個別材料株が主役になりやすい"
     }
   },
   "theme_stats": {
@@ -56,8 +193,166 @@
       "count": 6,
       "hits": 5,
       "hit_rate": 0.8333333333333334
+    },
+    "防衛・宇宙": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "原子力・電力": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "半導体": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "電線・ケーブル": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "AIインフラ": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "重要鉱物・レアアース": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "海運": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "決算好材料": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "内需・サービス": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "医療・ヘルスケア": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "蓄電池": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "自動車・EV": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "銀行・金融": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "建設・インフラ": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "化学・素材": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "食品・飲料": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "小売・外食": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "不動産": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "通信・IT": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "ゲーム・エンタメ": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "観光・インバウンド": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
+    },
+    "農業・食料安保": {
+      "total": 0,
+      "hit": 0,
+      "hit_rate": 0.0,
+      "last_seen": "",
+      "note": ""
     }
   },
+  "us_theme_stats": {},
+  "pts_reaction_stats": {},
   "total_days": 1,
-  "hit_days": 0
+  "hit_days": 0,
+  "initialized_at": "2026-03-22 16:40:04",
+  "init_note": "kabutanテーマ一覧 + 過去1年相場データから初期化"
 }

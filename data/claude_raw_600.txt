@@ -5,173 +5,200 @@
     "market_regime_label": "選別相場",
     "entry_style": "breakout",
     "entry_style_label": "初動ブレイク狙い",
-    "danger_level": "中",
-    "battlefield": "原油ETF集中",
-    "one_line": "WTI93ドル台継続でエネルギーETFに資金先行、半導体は様子見"
+    "danger_level": "高",
+    "battlefield": "原油関連ETF集中",
+    "one_line": "WTI+4.7%・日経先物-4%の逆行環境下、原油ETFと資源株に資金逃避。半導体・ハイテクは全面回避"
+  },
+  "conclusion": {
+    "battlefield": "原油ETF独走",
+    "top_stock": {
+      "code": "2038",
+      "name": "原油先Ｗブル"
+    },
+    "second_stock": {
+      "code": "1685",
+      "name": "ＷＴエナジー"
+    },
+    "watch_codes": ["2038", "1685", "1689"],
+    "avoid_summary": "半導体・防衛・材料不明GU",
+    "ban_summary": "SOX連動株触るな・PTS反応薄い銘柄追撃禁止"
   },
   "themes": [
     {
       "rank": "A",
       "rank_label": "本命",
-      "name": "原油・エネルギーETF",
-      "score": 82,
-      "reason": "WTI93.64ドル+0.82%で90ドル台定着。前日も原油先ブルが上位、ETF主導続く",
-      "continuity": "継続",
+      "name": "原油ETF",
+      "score": 92,
+      "reason": "WTI+4.7%で98ドル台突入。値上がり上位に原油Wブル・WTエナジー・WT天然ガス独占。ETFが主役",
+      "continuity": "新規",
       "leader_strength": "強",
       "ripple": "狭",
       "leader_stock": "原油先Ｗブル",
-      "entry_hint": "寄り付き上昇継続なら2038追随、9:15まで"
+      "entry_hint": "寄り成り買い。WTI100ドル突破観測で初動15%超GU想定",
+      "invalidation_signs": [
+        "寄り後15分でWTI原油が97ドル割れ",
+        "2038が寄り天で前場中に+5%未満に失速",
+        "出来高が前日比200%未満で資金流入弱い"
+      ]
     },
     {
       "rank": "B",
       "rank_label": "対抗",
-      "name": "半導体・SOX連動",
+      "name": "資源エネルギー",
       "score": 68,
-      "reason": "SOX+0.87%と反発。米国は強いがPTS反応薄、東エレクの先行確認必要",
-      "continuity": "新規",
+      "reason": "原油高+円安で資源株好環境。過去的中率83%のテーマ。ただし日経-4%で全体地合い悪く連想波及は限定的",
+      "continuity": "継続",
       "leader_strength": "中",
       "ripple": "中",
-      "leader_stock": "東京エレクトロン",
-      "entry_hint": "東エレク+1%超で本物、前場様子見推奨"
-    },
-    {
-      "rank": "B",
-      "rank_label": "対抗",
-      "name": "海運・資源株",
-      "score": 65,
-      "reason": "米国海運エネルギー輸送+1.4%。原油高で海運・INPEXへ波及期待",
-      "continuity": "新規",
-      "leader_strength": "中",
-      "ripple": "中",
-      "leader_stock": "商船三井",
-      "entry_hint": "商船三井の寄り付き確認、出来高伴うか注視"
+      "leader_stock": "INPEX",
+      "entry_hint": "寄り+3%以上で出来高伴えば追撃可。前場VWAP維持必須",
+      "invalidation_signs": [
+        "INPEX・商船三井が寄り後30分でマイ転",
+        "原油ETFが失速し連想波及が9:30時点で発生しない"
+      ]
     },
     {
       "rank": "C",
       "rank_label": "監視",
-      "name": "天然ガスETF",
+      "name": "円安メリット",
       "score": 48,
-      "reason": "1689が上位だが米国天然ガス-0.32%。原油の付随買い程度",
+      "reason": "ドル円159.22で+1.3円。輸出株には理論上プラスだが、日経先物-4%の逆風強く個別選別必要。商社・海運限定",
       "continuity": "新規",
       "leader_strength": "弱",
       "ripple": "狭",
-      "leader_stock": "ＷＴ天然ガス",
-      "entry_hint": "原油ETFの勢い次第、単独では弱い"
+      "leader_stock": "三井物産",
+      "entry_hint": "9:30以降に前日比プラス維持なら押し目待ち。寄り天警戒",
+      "invalidation_signs": [
+        "商社大手が寄り天で9:20時点で全滅",
+        "海運3社が揃ってマイナス圏推移"
+      ]
     }
   ],
   "watchlist": [
     {
-      "bucket": "先導株",
+      "role": "本命",
       "name": "原油先Ｗブル",
       "code": "2038",
-      "theme": "原油・エネルギーETF",
-      "reason": "前日上位継続、WTI93ドル台でETF資金集中の先導",
-      "trigger": "寄り付き+2%以上で継続買い",
-      "invalidation": "9:30までに前日比マイ転",
-      "time_window": "9:00-9:30"
+      "theme": "原油ETF",
+      "purpose": "利益狙い",
+      "trigger": "寄り+10%以上かつWTI98ドル維持。出来高前日比300%超で初動追撃",
+      "invalidation": "寄り後15分でWTI97ドル割れまたは+5%未満に失速",
+      "time_window": "9:00-9:15"
     },
     {
-      "bucket": "先導株",
+      "role": "先導確認",
       "name": "ＷＴエナジー",
       "code": "1685",
-      "theme": "原油・エネルギーETF",
-      "reason": "原油ETF群で上位、テーマ本物度の確認銘柄",
-      "trigger": "2038に連動して上昇",
-      "invalidation": "出来高薄く動意なし",
+      "theme": "原油ETF",
+      "purpose": "連想本線",
+      "trigger": "寄り+8%以上で2038に追随。出来高前日比200%超",
+      "invalidation": "9:10時点で2038との連動性が崩れマイ転",
       "time_window": "9:00-9:20"
     },
     {
-      "bucket": "連想1軍",
-      "name": "東京エレクトロン",
-      "code": "8035",
-      "theme": "半導体・SOX連動",
-      "reason": "SOX+0.87%の翻訳先、PTS反応薄いため寄り付き確認",
-      "trigger": "寄り付き+1%超かつ出来高増",
-      "invalidation": "前場で前日比マイナス圏",
-      "time_window": "9:00-10:00"
-    },
-    {
-      "bucket": "連想1軍",
-      "name": "商船三井",
-      "code": "9104",
-      "theme": "海運・資源株",
-      "reason": "米国海運+1.4%、原油高で海運セクター連動期待",
-      "trigger": "寄り+0.5%以上で出来高確認",
-      "invalidation": "9:30までに上昇力なし",
+      "role": "連想本線",
+      "name": "ＷＴ天然ガス",
+      "code": "1689",
+      "theme": "原油ETF",
+      "purpose": "連想補助",
+      "trigger": "寄り+5%以上でエネルギーETF全般に資金波及確認",
+      "invalidation": "天然ガス価格-1.27%を受け寄り付きマイナス圏",
       "time_window": "9:00-9:30"
     },
     {
-      "bucket": "連想2軍",
+      "role": "連想補助",
       "name": "INPEX",
       "code": "1605",
-      "theme": "海運・資源株",
-      "reason": "WTI93ドル台で資源株波及、商船と同時確認",
-      "trigger": "商船三井と連動上昇",
-      "invalidation": "原油ETF失速",
-      "time_window": "9:00-10:00"
+      "theme": "資源エネルギー",
+      "purpose": "連想本線",
+      "trigger": "寄り+3%以上かつ出来高前日比150%超で資源株波及確認",
+      "invalidation": "9:30までに前日比マイ転またはVWAP割れ",
+      "time_window": "9:00-9:45"
     },
     {
-      "bucket": "危険株",
-      "name": "アスタリスク",
-      "code": "6522",
-      "theme": "個別材料",
-      "reason": "前日上位だが材料不明、ギャップ埋めリスク",
-      "trigger": "追わない",
-      "invalidation": "-",
-      "time_window": "-"
+      "role": "監視のみ",
+      "name": "商船三井",
+      "code": "9104",
+      "theme": "資源エネルギー",
+      "purpose": "連想補助",
+      "trigger": "寄り+2%以上で海運株への波及確認。原油輸送需要増観測",
+      "invalidation": "寄り天で9:20までにマイ転",
+      "time_window": "9:00-9:30"
     },
     {
-      "bucket": "危険株",
-      "name": "エデュラボ",
-      "code": "4427",
-      "theme": "個別材料",
-      "reason": "前日急騰、材料確認できず追撃危険",
-      "trigger": "手出し厳禁",
-      "invalidation": "-",
-      "time_window": "-"
+      "role": "触らない",
+      "name": "東京エレクトロン",
+      "code": "8035",
+      "theme": "半導体",
+      "purpose": "触らない",
+      "trigger": "なし（SOX-2.45%で全面逆風）",
+      "invalidation": "寄り付きから売り優勢想定。触らない",
+      "time_window": "終日"
+    },
+    {
+      "role": "触らない",
+      "name": "三菱重工",
+      "code": "7011",
+      "theme": "防衛・宇宙",
+      "purpose": "触らない",
+      "trigger": "なし（米国防衛株-2.3%で逆風）",
+      "invalidation": "PTS反応なく寄り天リスク。過去的中率0%テーマ",
+      "time_window": "終日"
+    }
+  ],
+  "pts_judgments": [
+    {
+      "code": "2038",
+      "name": "原油先Ｗブル",
+      "pts_reaction": "反応なし",
+      "judgment": "本命維持",
+      "reason": "PTS非対象だがWTI現物+4.7%で寄りGU確実"
+    },
+    {
+      "code": "1685",
+      "name": "ＷＴエナジー",
+      "pts_reaction": "反応なし",
+      "judgment": "補強",
+      "reason": "値上がり上位ランク入りで注目度高い"
     }
   ],
   "avoid_themes": [
     {
+      "name": "半導体",
+      "reason": "SOX-2.45%で全面安。日経先物-4%も重なり東エレク・アドバンテスト触るな"
+    },
+    {
       "name": "防衛・宇宙",
-      "reason": "米国防衛-1.6%で逆風、IHI・三菱重工は様子見"
+      "reason": "米国防衛株-2.3%。過去的中率0%の鬼門テーマ。PTS反応なく寄り天警戒"
     },
     {
-      "name": "原子力・電力",
-      "reason": "米国公益-1.3%、電力インフラ-0.8%で弱い"
-    },
-    {
-      "name": "個別材料株",
-      "reason": "アスタリスク・エデュラボなど材料不明の急騰は追わない"
+      "name": "AIインフラ",
+      "reason": "米国AIインフラ-3.6%。半導体逆風で電線・冷却株も連れ安リスク高い"
     }
   ],
-  "skip_rule": "商品ETF以外のテーマに初動から飛びつかない。前場様子見優先",
-  "summary": "WTI93ドル台継続で原油ETF（2038,1685）に資金集中が本命。昨日の教訓通りETFが主役。半導体はSOX+0.87%だがPTS反応薄く対抗格。海運・INPEXも連想だが出来高次第。防衛・電力は米国逆風で回避。",
+  "danger_summary": [
+    "半導体株は寄り天即マイ転リスク",
+    "防衛株は材料なしPTS反応なしで触るな",
+    "日経-4%環境で材料不明GU追撃は即死"
+  ],
+  "skip_rules": [
+    "SOX連動株（東エレク・アドバンテスト）全面禁止",
+    "PTS反応薄い銘柄の寄りGU追撃禁止",
+    "防衛・AIインフラは米国逆風確認まで見送り"
+  ],
+  "top_conclusion": {
+    "battlefield": "原油ETF独走",
+    "top_theme": "原油ETF",
+    "top_stocks": ["2038", "1685", "1605"],
+    "avoid_themes_short": ["半導体", "防衛", "AIインフラ"],
+    "ban_rules": [
+      "SOX連動株触るな",
+      "PTS反応薄い銘柄追撃禁止",
+      "材料不明GU即死回避"
+    ],
+    "yesterday_hint": "過去資源エネルギー83%的中。商品ETFを主役候補として最優先確認が吉"
+  },
+  "summary": "WTI+4.7%で98ドル台突入により原油ETF（2038/1685/1689）に資金集中確実。日経先物-4%・SOX-2.45%で半導体・ハイテク全滅環境。過去的中率83%の資源エネルギーテーマ継続も、今日の主役はETF。商品市況連動を最優先監視し、個別株の材料不明GU追撃は即死リスク。",
   "us_theme_signals": [
     {
       "theme_key": "energy_shipping",
-      "theme_label": "海運・エネルギー輸送",
-      "us_strength": "強",
-      "pts_reaction": "不明",
-      "jp_translation": "商船三井・日本郵船・INPEX（原油高連動）",
-      "priority": "対抗"
-    },
-    {
-      "theme_key": "semiconductor",
-      "theme_label": "半導体",
-      "us_strength": "強",
-      "pts_reaction": "なし",
-      "jp_translation": "東京エレクトロン・アドバンテスト（SOX連動）",
-      "priority": "対抗"
-    },
-    {
-      "theme_key": "defense",
-      "theme_label": "防衛・宇宙",
-      "us_strength": "弱",
-      "pts_reaction": "なし",
-      "jp_translation": "三菱重工・IHI（米国-1.6%で逆風）",
-      "priority": "見送り"
-    }
-  ]
-}
-```
