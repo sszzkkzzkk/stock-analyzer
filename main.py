@@ -84,19 +84,58 @@ def save_text(filename, text):
 
 
 def parse_json(raw):
+    """JSON解析。壊れたJSONも複数の方法でリカバリ"""
     cleaned = re.sub(r"```json|```", "", raw).strip()
-    start = cleaned.find("{")
-    end = cleaned.rfind("}")
-    if start == -1 or end == -1 or end <= start:
-        raise ValueError("JSONオブジェクトの外形が見つかりません")
-    body = cleaned[start:end + 1]
-    body = (
-        body.replace("\u201c", '"').replace("\u201d", '"')
+    cleaned = (
+        cleaned.replace("\u201c", '"').replace("\u201d", '"')
         .replace("\u2018", "'").replace("\u2019", "'")
     )
-    body = re.sub(r",\s*}", "}", body)
-    body = re.sub(r",\s*]", "]", body)
-    return json.loads(body)
+    start = cleaned.find("{")
+    if start == -1:
+        raise ValueError("JSONオブジェクトが見つかりません")
+
+    # 方法1: そのままパース
+    body = cleaned[start:]
+    end = body.rfind("}")
+    if end != -1:
+        candidate = body[:end+1]
+        candidate = re.sub(r",\s*}", "}", candidate)
+        candidate = re.sub(r",\s*]", "]", candidate)
+        try:
+            return json.loads(candidate)
+        except Exception:
+            pass
+
+    # 方法2: 括弧の深さを追って正しい末尾を探す
+    depth = 0
+    for i, ch in enumerate(body):
+        if ch == "{": depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                candidate = body[:i+1]
+                candidate = re.sub(r",\s*}", "}", candidate)
+                candidate = re.sub(r",\s*]", "]", candidate)
+                try:
+                    return json.loads(candidate)
+                except Exception:
+                    break
+
+    # 方法3: 末尾を削りながらパース（途中で切れた場合）
+    for trim in range(0, min(500, len(body)), 10):
+        candidate = body[:len(body)-trim].rstrip().rstrip(",")
+        # 未閉じの括弧を補完
+        opens = candidate.count("{") - candidate.count("}")
+        arr_opens = candidate.count("[") - candidate.count("]")
+        candidate += "]" * max(0, arr_opens) + "}" * max(0, opens)
+        candidate = re.sub(r",\s*}", "}", candidate)
+        candidate = re.sub(r",\s*]", "]", candidate)
+        try:
+            return json.loads(candidate)
+        except Exception:
+            continue
+
+    raise ValueError("JSONの解析に失敗しました")
 
 
 def call_claude(prompt, max_tokens=2400):
@@ -1562,9 +1601,13 @@ def run_600(today):
     print(f"[6:00] 相場タグ: {market_tags}")
     today_str = today.strftime("%Y年%m月%d日")
 
-    # 米国テーマ + PTS コンテキスト生成
+    # 米国テーマ + PTS コンテキスト生成（トークン節約のため上位5件に絞る）
+    us_themes_top = dict(sorted(
+        market.get("us_themes", {}).items(),
+        key=lambda x: x[1].get("avg_pct", 0), reverse=True
+    )[:5])
     us_ctx_text, us_meta = build_us_context(
-        {"themes": market.get("us_themes", {}), "macro": market.get("us_macro", {})},
+        {"themes": us_themes_top, "macro": market.get("us_macro", {})},
         market.get("pts", {})
     )
     print(f"[6:00] 米国テーマ: {len(market.get('us_themes',{}))}件, PTS: {len(market.get('pts',{}).get('gainers',[]))}件")
@@ -1572,10 +1615,18 @@ def run_600(today):
     try:
         print("[6:00] Claude分析中（学習データ参照 + 米国テーマ連動）...")
         prompt = build_analysis_prompt_600(today_str, learning_ctx, market, key_news, us_ctx_text)
-        raw    = call_claude(prompt, max_tokens=2400)
+        raw    = call_claude(prompt, max_tokens=3000)
         save_text("claude_raw_600.txt", raw)
-        parsed = parse_json(raw)
-        validate_600_analysis_json(parsed)
+        try:
+            parsed = parse_json(raw)
+        except Exception as je:
+            print(f"[6:00] JSON解析失敗（リカバリ試行）: {je}")
+            parsed = {}
+        if parsed:
+            try:
+                validate_600_analysis_json(parsed)
+            except Exception as ve:
+                print(f"[6:00] バリデーション警告（続行）: {ve}")
         result = {
             "date":          today.isoformat(),
             "session":       "600",
