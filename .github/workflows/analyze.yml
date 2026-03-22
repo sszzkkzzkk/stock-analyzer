@@ -144,6 +144,9 @@ jobs:
           echo "session=$SESSION" >> "$GITHUB_OUTPUT"
           echo "run_now=$RUN_NOW" >> "$GITHUB_OUTPUT"
 
+      - name: Init learning DB
+        run: python init_learning_db.py
+
       - name: Run analyzer
         if: steps.session.outputs.run_now == 'true'
         env:
