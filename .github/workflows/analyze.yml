@@ -1,19 +1,11 @@
 name: 株式AI自動分析
 
-on:
+'on':
   schedule:
     - cron: "0 21 * * 0-4"
-    - cron: "2 21 * * 0-4"
-    - cron: "4 21 * * 0-4"
     - cron: "5 0 * * 1-5"
-    - cron: "7 0 * * 1-5"
-    - cron: "9 0 * * 1-5"
     - cron: "0 3 * * 1-5"
-    - cron: "2 3 * * 1-5"
-    - cron: "4 3 * * 1-5"
     - cron: "35 6 * * 1-5"
-    - cron: "37 6 * * 1-5"
-    - cron: "39 6 * * 1-5"
   workflow_dispatch:
     inputs:
       session:
@@ -21,7 +13,7 @@ on:
         required: false
         default: "600"
       force:
-        description: "営業日以外でも実行する (1=強制実行)"
+        description: "営業日以外でも実行 (1=強制)"
         required: false
         default: "0"
 
@@ -29,13 +21,13 @@ permissions:
   contents: write
 
 concurrency:
-  group: stock-analyzer
+  group: stock-${{ github.event.schedule || github.run_id }}
   cancel-in-progress: false
 
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Checkout main
@@ -93,56 +85,55 @@ jobs:
           INPUT="${{ github.event.inputs.session }}"
           SCHED="${{ github.event.schedule }}"
           TODAY=$(TZ='Asia/Tokyo' date '+%F')
+          TIME_JST=$(TZ='Asia/Tokyo' date '+%H:%M')
 
           echo "today_jst=$TODAY" >> "$GITHUB_OUTPUT"
+          echo "time_jst=$TIME_JST" >> "$GITHUB_OUTPUT"
 
           get_date() {
-            [ -f "$1" ] && python3 -c "import json; d=json.load(open('$1',encoding='utf-8')); print(d.get('date',''))" 2>/dev/null || echo ""
+            [ -f "$1" ] && python3 -c "import json; print(json.load(open('$1')).get('date',''))" 2>/dev/null || echo ""
           }
 
           SESSION=""
           RUN_NOW="false"
 
-          FORCE_INPUT="${{ github.event.inputs.force || '0' }}"
           if [ "$EVENT" = "workflow_dispatch" ]; then
-            case "$INPUT" in
-              600|905|1200|1535)
-                SESSION="$INPUT"
-                RUN_NOW="true"
-                ;;
-              *)
-                echo "Invalid session: $INPUT"
-                exit 1
-                ;;
-            esac
+            SESSION="$INPUT"
+            RUN_NOW="true"
           else
             case "$SCHED" in
-              "0 21 * * 0-4"|"2 21 * * 0-4"|"4 21 * * 0-4")
+              "0 21 * * 0-4")
                 SESSION="600"
                 LAST=$(get_date "data/latest_600.json")
                 ;;
-              "5 0 * * 1-5"|"7 0 * * 1-5"|"9 0 * * 1-5")
+              "5 0 * * 1-5")
                 SESSION="905"
                 LAST=$(get_date "data/latest_905.json")
                 ;;
-              "0 3 * * 1-5"|"2 3 * * 1-5"|"4 3 * * 1-5")
+              "0 3 * * 1-5")
                 SESSION="1200"
                 LAST=$(get_date "data/latest_1200.json")
                 ;;
-              "35 6 * * 1-5"|"37 6 * * 1-5"|"39 6 * * 1-5")
+              "35 6 * * 1-5")
                 SESSION="1535"
                 LAST=$(get_date "data/latest_1535.json")
                 ;;
               *)
-                echo "Unknown schedule: $SCHED"
+                echo "不明なスケジュール: '$SCHED'"
+                echo "JST時刻: $TIME_JST"
                 exit 1
                 ;;
             esac
-            [ "$LAST" != "$TODAY" ] && RUN_NOW="true"
+            if [ "$LAST" != "$TODAY" ]; then
+              RUN_NOW="true"
+            else
+              echo "本日分($SESSION)は取得済み($LAST)。スキップ。"
+            fi
           fi
 
           echo "session=$SESSION" >> "$GITHUB_OUTPUT"
           echo "run_now=$RUN_NOW" >> "$GITHUB_OUTPUT"
+          echo "=== session=$SESSION run_now=$RUN_NOW JST=$TIME_JST ==="
 
       - name: Run analyzer
         if: steps.session.outputs.run_now == 'true'
@@ -150,7 +141,17 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SESSION: ${{ steps.session.outputs.session }}
           FORCE: ${{ github.event.inputs.force || '0' }}
-        run: python main.py
+        run: |
+          SUCCESS=false
+          for i in 1 2 3; do
+            echo "--- 試行 $i/3 ---"
+            if python main.py; then
+              SUCCESS=true
+              break
+            fi
+            [ $i -lt 3 ] && echo "失敗。60秒後リトライ..." && sleep 60
+          done
+          $SUCCESS || exit 1
 
       - name: Copy publish files
         shell: bash
@@ -166,6 +167,6 @@ jobs:
         run: |
           cd publish
           git add -A
-          git diff --cached --quiet && echo "No changes" && exit 0
-          git commit -m "update: ${{ steps.session.outputs.session || 'marketlive' }} ${{ steps.session.outputs.today_jst }}"
+          git diff --cached --quiet && echo "変更なし" && exit 0
+          git commit -m "update: ${{ steps.session.outputs.session }} ${{ steps.session.outputs.today_jst }} ${{ steps.session.outputs.time_jst }}"
           git push origin gh-pages
