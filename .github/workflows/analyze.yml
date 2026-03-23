@@ -1,16 +1,11 @@
 name: 株式AI自動分析
 
 'on':
-  schedule:
-    - cron: "0 21 * * 0-4"
-    - cron: "5 0 * * 1-5"
-    - cron: "0 3 * * 1-5"
-    - cron: "35 6 * * 1-5"
   workflow_dispatch:
     inputs:
       session:
         description: "600 / 905 / 1200 / 1535"
-        required: false
+        required: true
         default: "600"
       force:
         description: "営業日以外でも実行 (1=強制)"
@@ -21,7 +16,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: stock-${{ github.event.schedule || github.run_id }}
+  group: stock-${{ github.event.inputs.session }}
   cancel-in-progress: false
 
 jobs:
@@ -81,49 +76,36 @@ jobs:
         id: session
         shell: bash
         run: |
-          EVENT="${{ github.event_name }}"
-          INPUT="${{ github.event.inputs.session }}"
-          SCHED="${{ github.event.schedule }}"
+          SESSION="${{ github.event.inputs.session }}"
+          FORCE="${{ github.event.inputs.force }}"
           TODAY=$(TZ='Asia/Tokyo' date '+%F')
           TIME_JST=$(TZ='Asia/Tokyo' date '+%H:%M')
 
           echo "today_jst=$TODAY" >> "$GITHUB_OUTPUT"
           echo "time_jst=$TIME_JST" >> "$GITHUB_OUTPUT"
+          echo "session=$SESSION" >> "$GITHUB_OUTPUT"
 
           get_date() {
             [ -f "$1" ] && python3 -c "import json; print(json.load(open('$1')).get('date',''))" 2>/dev/null || echo ""
           }
 
-          SESSION=""
           RUN_NOW="false"
 
-          if [ "$EVENT" = "workflow_dispatch" ]; then
-            SESSION="$INPUT"
+          if [ "$FORCE" = "1" ]; then
             RUN_NOW="true"
+            echo "強制実行モード"
           else
-            case "$SCHED" in
-              "0 21 * * 0-4")
-                SESSION="600"
-                LAST=$(get_date "data/latest_600.json")
-                ;;
-              "5 0 * * 1-5")
-                SESSION="905"
-                LAST=$(get_date "data/latest_905.json")
-                ;;
-              "0 3 * * 1-5")
-                SESSION="1200"
-                LAST=$(get_date "data/latest_1200.json")
-                ;;
-              "35 6 * * 1-5")
-                SESSION="1535"
-                LAST=$(get_date "data/latest_1535.json")
-                ;;
+            case "$SESSION" in
+              600)  LAST=$(get_date "data/latest_600.json")  ;;
+              905)  LAST=$(get_date "data/latest_905.json")  ;;
+              1200) LAST=$(get_date "data/latest_1200.json") ;;
+              1535) LAST=$(get_date "data/latest_1535.json") ;;
               *)
-                echo "不明なスケジュール: '$SCHED'"
-                echo "JST時刻: $TIME_JST"
+                echo "不明なセッション: $SESSION"
                 exit 1
                 ;;
             esac
+
             if [ "$LAST" != "$TODAY" ]; then
               RUN_NOW="true"
             else
@@ -131,7 +113,6 @@ jobs:
             fi
           fi
 
-          echo "session=$SESSION" >> "$GITHUB_OUTPUT"
           echo "run_now=$RUN_NOW" >> "$GITHUB_OUTPUT"
           echo "=== session=$SESSION run_now=$RUN_NOW JST=$TIME_JST ==="
 
