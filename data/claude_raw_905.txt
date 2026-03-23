@@ -1,80 +1,77 @@
 ```json
 {
-  "verdict": "朝仮説維持",
-  "verdict_reason": "原油高騰テーマ完全的中。2038/1685/1689/1690全上昇",
-  "actual_battlefield": "原油・エネルギー関連",
-  "capital_flow": "原油ETF・天然ガスに集中。防衛・半導体は散発的",
+  "verdict": "全面撤回",
+  "verdict_reason": "原油エネルギー不発。実際は防衛・半導体・蓄電池へ資金流入",
+  "actual_battlefield": "防衛・エネルギー安全保障（蓄電池・小型原子炉）",
+  "capital_flow": "資源株回避。防衛・蓄電池・半導体・データセンターに分散流入",
   "theme_status": [
     {
       "name": "原油高騰",
-      "status": "継続",
-      "pm_action": "押し目待ち"
-    },
-    {
-      "name": "天然ガス",
-      "status": "継続",
-      "pm_action": "押し目待ち"
+      "status": "終息",
+      "pm_action": "撤退"
     },
     {
       "name": "資源株円安",
-      "status": "継続",
-      "pm_action": "継続狙い"
+      "status": "弱まり",
+      "pm_action": "見送り"
+    },
+    {
+      "name": "天然ガス",
+      "status": "終息",
+      "pm_action": "撤退"
     },
     {
       "name": "蓄電池",
       "status": "新規",
-      "pm_action": "見送り"
+      "pm_action": "押し目待ち"
+    },
+    {
+      "name": "防衛",
+      "status": "新規",
+      "pm_action": "継続狙い"
     },
     {
       "name": "半導体",
-      "status": "弱まり",
-      "pm_action": "撤退"
+      "status": "新規",
+      "pm_action": "見送り"
+    },
+    {
+      "name": "小型原子炉",
+      "status": "新規",
+      "pm_action": "押し目待ち"
+    },
+    {
+      "name": "水素",
+      "status": "新規",
+      "pm_action": "見送り"
     }
   ],
   "next_action": {
-    "primary": "2038/1685/1689の寄り天チェック。高値張り付きなら見送り",
-    "secondary": "ナガオカ6239資源関連で実体経済銘柄を監視",
-    "stop": "半導体・SOX連動株の新規エントリー完全停止"
+    "primary": "防衛・蓄電池関連の個別銘柄リスト抽出、出来高確認",
+    "secondary": "原油・資源株ウォッチリスト全削除、ポジション即損切",
+    "stop": "エネルギー資源株への新規エントリー完全停止"
   },
   "watch_update": [
     {
-      "code": "2038",
-      "name": "原油先Ｗブル",
-      "pts_verdict": "本命維持",
-      "reason": "仮説的中。寄り天なら利確、押し目なら追加"
-    },
-    {
-      "code": "1685",
-      "name": "ＷＴエナジー",
-      "pts_verdict": "本命維持",
-      "reason": "エネルギーETF本命。値動き次第で分割エントリー"
-    },
-    {
-      "code": "1689",
-      "name": "ＷＴ天然ガス",
-      "pts_verdict": "本命維持",
-      "reason": "朝予測通り。板薄注意で少額のみ"
-    },
-    {
-      "code": "1690",
-      "name": "ＷＴ原油",
-      "pts_verdict": "本命維持",
-      "reason": "原油テーマ中核。出来高確認後エントリー判断"
-    },
-    {
-      "code": "6239",
-      "name": "ナガオカ",
-      "pts_verdict": "補強",
-      "reason": "資源関連実体株。エネルギーテーマ補完候補"
-    },
-    {
-      "code": "6740",
-      "name": "Ｊディスプレ",
+      "code": "1514",
+      "name": "住石ＨＤ",
       "pts_verdict": "見送り",
-      "reason": "下落。半導体弱く朝の禁止ルール通り回避正解"
+      "reason": "資源系だが朝仮説外れ、本流ではない"
+    },
+    {
+      "code": "5909",
+      "name": "コロナ",
+      "pts_verdict": "ノイズ",
+      "reason": "単独材料の可能性、テーマ性不明"
+    },
+    {
+      "code": "2195",
+      "name": "アミタＨＤ",
+      "pts_verdict": "ノイズ",
+      "reason": "小型株、資金流入小、追う価値なし"
     }
   ],
-  "hint_for_afternoon": "原油ETF利確圧力警戒。後場は実体資源株へシフト検討",
-  "hint_for_tomorrow": "原油価格の海外夜間動向次第。継続なら資源株本命化"
+  "hint_for_afternoon": "防衛・蓄電池の押し目形成を監視。半導体は様子見継続",
+  "hint_for_tomorrow": "防衛・エネルギー安全保障テーマ継続性を夜間ニュースで検証必須"
 }
 ```
