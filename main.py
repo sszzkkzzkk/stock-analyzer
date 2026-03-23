@@ -1718,30 +1718,41 @@ def run_905(today):
     today_str = today.strftime("%Y年%m月%d日")
     try:
         prompt = build_analysis_prompt_905(today_str, morning, market, market["news"] + nhk)
-        raw    = call_claude(prompt, max_tokens=1600)
+        raw    = call_claude(prompt, max_tokens=2000)
         save_text("claude_raw_905.txt", raw)
-        parsed = parse_json(raw)
+        try:
+            parsed = parse_json(raw)
+        except Exception as je:
+            print(f"[9:10] JSON解析失敗: {je}")
+            parsed = {}
         result = {
-            "date":             today.isoformat(),
-            "session":          "905",
-            "generated_at":     now,
-            "data_sources":     data_sources,
-            "log":          parsed.get("log", {}),
-            "pm_watchlist": parsed.get("pm_watchlist", [])[:8],
-            "summary":      parsed.get("summary", ""),
+            "date":              today.isoformat(),
+            "session":           "905",
+            "generated_at":      now,
+            "data_sources":      data_sources,
+            # 新スキーマ
+            "verdict":           parsed.get("verdict", "—"),
+            "verdict_reason":    parsed.get("verdict_reason", ""),
+            "actual_battlefield":parsed.get("actual_battlefield", ""),
+            "capital_flow":      parsed.get("capital_flow", ""),
+            "theme_status":      parsed.get("theme_status", []),
+            "next_action":       parsed.get("next_action", {}),
+            "watch_update":      parsed.get("watch_update", []),
+            "hint_for_afternoon":parsed.get("hint_for_afternoon", ""),
+            "hint_for_tomorrow": parsed.get("hint_for_tomorrow", ""),
+            "summary":           parsed.get("summary", ""),
         }
     except Exception as e:
         print(f"[9:10] Claude分析失敗: {e}")
         result = {
             "date": today.isoformat(), "session": "905", "generated_at": now,
             "data_sources": data_sources,
-            "log": {
-                "battlefield_correct": False, "predicted_battlefield": "",
-                "actual_battlefield": "", "theme_accuracy": "外れ",
-                "what_moved_as_predicted": "", "what_was_different": "",
-                "capital_flow_note": "", "hint_for_afternoon": "",
-                "hint_for_tomorrow": f"AI分析失敗のため不明: {e}"
-            },
+            "verdict": "分析失敗",
+            "verdict_reason": str(e),
+            "actual_battlefield": "", "capital_flow": "",
+            "theme_status": [], "next_action": {},
+            "watch_update": [],
+            "hint_for_afternoon": "", "hint_for_tomorrow": "",
             "summary": f"AI分析に失敗しました: {e}",
             "analysis_status": "failed",
         }
@@ -1751,29 +1762,38 @@ def run_905(today):
 
 
 def run_1200(today):
-    morning = load("latest_600.json")
-    opening = load("latest_905.json") or {}
+    morning  = load("latest_600.json")
+    open_dat = load("latest_905.json")
     if not morning:
         raise FileNotFoundError("latest_600.json なし")
     print("[12:00] データ収集中...")
-    market  = fetch_all_market_data()
-    nhk     = fetch_nhk_news()
-    reuters = fetch_reuters_news()
-    data_sources = build_data_sources_summary(market, nhk, reuters)
+    market = fetch_all_market_data()
+    nhk    = fetch_nhk_news()
+    data_sources = build_data_sources_summary(market, nhk, [])
     now       = datetime.now(JST).strftime("%H:%M")
     today_str = today.strftime("%Y年%m月%d日")
     try:
-        prompt = build_analysis_prompt_1200(today_str, morning, opening, market,
-                                            market["news"] + nhk + reuters)
-        raw    = call_claude(prompt, max_tokens=1800)
+        prompt = build_analysis_prompt_1200(today_str, morning, open_dat, market, market["news"] + nhk)
+        raw    = call_claude(prompt, max_tokens=2400)
         save_text("claude_raw_1200.txt", raw)
-        parsed = parse_json(raw)
+        try:
+            parsed = parse_json(raw)
+        except Exception as je:
+            print(f"[12:00] JSON解析失敗: {je}")
+            parsed = {}
         result = {
-            "date": today.isoformat(), "session": "1200", "generated_at": now,
-            "data_sources": data_sources,
-            "log":          parsed.get("log", {}),
-            "pm_watchlist": parsed.get("pm_watchlist", [])[:8],
-            "summary":      parsed.get("summary", ""),
+            "date":             today.isoformat(),
+            "session":          "1200",
+            "generated_at":     now,
+            "data_sources":     data_sources,
+            # ログ（前場の答え合わせ）
+            "log":              parsed.get("log", {}),
+            # 後場プラン（新スキーマ）
+            "pm_plan":          parsed.get("pm_plan", {}),
+            "theme_pm_verdict": parsed.get("theme_pm_verdict", []),
+            "pm_watchlist":     parsed.get("pm_watchlist", [])[:8],
+            "do_not_do_pm":     parsed.get("do_not_do_pm", []),
+            "summary":          parsed.get("summary", ""),
         }
     except Exception as e:
         print(f"[12:00] Claude分析失敗: {e}")
@@ -1781,11 +1801,14 @@ def run_1200(today):
             "date": today.isoformat(), "session": "1200", "generated_at": now,
             "data_sources": data_sources,
             "log": {
-                "am_winner_theme": "", "am_loser_theme": "", "new_theme_emerged": "",
-                "hypothesis_correction": f"AI分析失敗: {e}",
+                "am_winner_theme": "", "am_loser_theme": "",
+                "new_theme_emerged": "", "hypothesis_correction": "",
                 "capital_flow_am": "", "sign_that_was_visible": "",
-                "sign_that_was_hidden": "", "hint_for_tomorrow_600": ""
+                "sign_that_was_hidden": "",
+                "hint_for_tomorrow_600": f"AI分析失敗: {e}"
             },
+            "pm_plan": {}, "theme_pm_verdict": [],
+            "pm_watchlist": [], "do_not_do_pm": [],
             "summary": f"AI分析に失敗しました: {e}",
             "analysis_status": "failed",
         }
