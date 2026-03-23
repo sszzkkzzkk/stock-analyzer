@@ -488,7 +488,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","No
 <section class="tabs-wrap">
   <div class="tabs">
     <button class="tab main-tab active" data-tab="tab600">📊 6:00 本番<span class="tab-dot" id="dot600"></span></button>
-    <button class="tab log-tab" data-tab="tab905">📝 9:10 記録<span class="tab-dot" id="dot905"></span></button>
+    <button class="tab log-tab" data-tab="tab905">📝 9:05 記録<span class="tab-dot" id="dot905"></span></button>
     <button class="tab log-tab" data-tab="tab1200">📝 12:00 記録<span class="tab-dot" id="dot1200"></span></button>
     <button class="tab log-tab" data-tab="tab1535">🎯 15:35 学習<span class="tab-dot" id="dot1535"></span></button>
   </div>
@@ -981,7 +981,7 @@ function render600(d, accuracy){
 // ═══════════════════════════════
 function render905(d){
   const el=document.getElementById("tab905");
-  if(!d){el.innerHTML=`<div class="notice">9:10データがありません</div>`;return}
+  if(!d){el.innerHTML=`<div class="notice">9:05データがありません</div>`;return}
 
   const verdict    = d.verdict || "";
   const vReason    = d.verdict_reason || "";
