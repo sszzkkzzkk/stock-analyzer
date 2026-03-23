@@ -1,208 +1,215 @@
 ```json
 {
   "strategy": {
-    "market_regime": "selective",
-    "market_regime_label": "選別相場",
+    "market_regime": "attack",
+    "market_regime_label": "攻めやすい",
     "entry_style": "breakout",
     "entry_style_label": "初動ブレイク狙い",
-    "danger_level": "高",
-    "battlefield": "原油高騰エネルギー集中",
-    "one_line": "日経-4%急落でもWTI+4.7%の原油関連ETF・資源株に資金逃避が本線"
+    "danger_level": "中",
+    "battlefield": "リスクオン・リバ集中",
+    "one_line": "イラン緊張緩和×原油急落で資源株撤退。日経+3.8%の全面高でリバ狙い銘柄に分散買い"
   },
   "conclusion": {
-    "battlefield": "原油高騰集中",
+    "battlefield": "リスクオン広範",
     "top_stock": {
-      "code": "2038",
-      "name": "原油先Ｗブル"
+      "code": "8058",
+      "name": "三菱商事"
     },
     "second_stock": {
-      "code": "1685",
-      "name": "ＷＴエナジー"
+      "code": "5020",
+      "name": "INPEX"
     },
-    "watch_codes": ["1671", "5020"],
-    "avoid_summary": "半導体・防衛・材料不明GU",
-    "ban_summary": "SOX連動株追撃禁止・寄り天警戒株即損切"
+    "watch_codes": ["8031", "6501", "8058"],
+    "avoid_summary": "原油ETF・資源高追撃",
+    "ban_summary": "商品先物ETF追撃禁止・前日急騰継続期待禁止"
   },
   "themes": [
     {
       "rank": "A",
       "rank_label": "本命",
-      "name": "原油高騰",
-      "score": 88,
-      "reason": "WTI+4.7%で98ドル突破。値上がり上位に原油ETF独占。過去資源83%的中。日経暴落で逃避買い",
+      "name": "商社リバ買い",
+      "score": 82,
+      "reason": "原油急落-10%で資源テーマ終息。VIX低下×日経先物+3.8%の全面高で商社・非鉄が戻り買い主戦場",
       "continuity": "新規",
       "leader_strength": "強",
-      "ripple": "中",
-      "leader_stock": "原油先Ｗブル",
-      "entry_hint": "寄り成買い。2038が+10%以上なら1685・1671も連動確認",
+      "ripple": "広",
+      "leader_stock": "三菱商事",
+      "entry_hint": "寄り付き強気でも押し目待ち。9:20以降の出来高継続確認",
       "invalidation_signs": [
-        "原油先Ｗブル(2038)が寄り後30分以内に+5%未達",
-        "9:30時点でWTI原油先物が97ドル割れ",
-        "原油ETF3銘柄とも出来高が前日比200%未満"
+        "三菱商事が寄り後30分以内に前日比プラス圏割れ",
+        "9:30時点で5大商社のうち3社以上がマイナス転換"
       ]
     },
     {
       "rank": "B",
       "rank_label": "対抗",
-      "name": "資源株円安",
-      "score": 72,
-      "reason": "ドル円159.36円。米国資源株-3.5%も円安で相殺。商社・INPEX・住友鉱山が防御買い対象",
+      "name": "レアアース",
+      "score": 68,
+      "reason": "米国テーマ+5.9%で最強。住友鉱山・三菱マテリアルに継続資金。ただし原油急落で資源全般は慎重",
       "continuity": "継続",
       "leader_strength": "中",
       "ripple": "中",
-      "leader_stock": "INPEX",
-      "entry_hint": "INPEXが前日比+1%維持なら追随。9:30以降の押し目",
+      "leader_stock": "住友金属鉱山",
+      "entry_hint": "米国連動の思惑先行。寄り+3%以上なら様子見、押し目形成で参戦",
       "invalidation_signs": [
-        "INPEX・住友金属鉱山が9:15時点で前日比マイナス",
-        "ドル円が158円台前半に急反落"
+        "住友鉱山が寄り天形成後にVWAP割れ",
+        "三菱マテリアルが9:30までに前日比マイ転"
+      ]
+    },
+    {
+      "rank": "B",
+      "rank_label": "対抗",
+      "name": "小型原子炉",
+      "score": 65,
+      "reason": "ニュースで5位ランク。対米投融資第2弾で注目継続。三菱重工・IHIが中心だが分散リスクあり",
+      "continuity": "継続",
+      "leader_strength": "中",
+      "ripple": "中",
+      "leader_stock": "三菱重工",
+      "entry_hint": "寄り後の出来高確認必須。9:20までに電力株も連動すれば本物",
+      "invalidation_signs": [
+        "三菱重工が9:15までに出来高前日比150%未達",
+        "電力株（関電・東電）が無反応で原子力テーマ不発"
       ]
     },
     {
       "rank": "C",
       "rank_label": "監視",
-      "name": "天然ガス",
+      "name": "半導体リバ",
+      "score": 52,
+      "reason": "SOX+1.34%だが日経先物+3.8%ほど強くない。東エレク・アドバンは戻り売り警戒。押し目待ち",
+      "continuity": "継続",
+      "leader_strength": "中",
+      "ripple": "中",
+      "leader_stock": "東京エレクトロン",
+      "entry_hint": "寄り高後の押し目形成まで待機。9:30以降VWAP接近で狙う",
+      "invalidation_signs": [
+        "東エレクが寄り後15分で高値から-1.5%以上下落",
+        "SOX指数が欧州時間で反落に転じる"
+      ]
+    },
+    {
+      "rank": "C",
+      "rank_label": "監視",
+      "name": "好決算個別",
       "score": 48,
-      "reason": "ＷＴ天然ガス(1689)が値上がり上位。米天然ガス-1.27%で弱いが原油連動で物色波及の可能性",
+      "reason": "コスモスイニ・特殊陶など上方修正組。ただし日経大幅高で埋没リスク。個別選別必須",
       "continuity": "新規",
       "leader_strength": "弱",
       "ripple": "狭",
-      "leader_stock": "ＷＴ天然ガス",
-      "entry_hint": "1689が+8%以上なら初動のみ。原油が失速なら即撤退",
+      "leader_stock": "コスモスイニシア",
+      "entry_hint": "寄り後の材料消化確認。出来高薄ければスルー",
       "invalidation_signs": [
-        "1689が寄り後15分以内に+3%未達",
-        "原油先Ｗブルが失速しVWAP割れ"
+        "寄り後30分で出来高が平均の2倍未達",
+        "9:30時点で前日比+5%未満に失速"
       ]
     }
   ],
   "watchlist": [
     {
       "role": "本命",
-      "name": "原油先Ｗブル",
-      "code": "2038",
-      "theme": "原油高騰",
+      "name": "三菱商事",
+      "code": "8058",
+      "theme": "商社リバ買い",
       "purpose": "利益狙い",
-      "trigger": "寄り+8%以上かつ出来高前日比300%超で即買い",
-      "invalidation": "9:05までに+5%未達または寄り後5分以内に高値から-3%下落",
-      "time_window": "9:00-9:10"
+      "trigger": "寄り+1.5%以上かつ9:10までに出来高前日比200%超",
+      "invalidation": "9:30までに前日比プラス圏割れまたはVWAP割れ",
+      "time_window": "9:00-10:00"
     },
     {
       "role": "先導確認",
-      "name": "ＷＴエナジー",
-      "code": "1685",
-      "theme": "原油高騰",
-      "purpose": "連想本線",
-      "trigger": "2038が+10%到達後、1685が+5%以上かつ出来高急増",
-      "invalidation": "9:20までに+3%未達または2038失速時",
-      "time_window": "9:05-9:25"
+      "name": "三井物産",
+      "code": "8031",
+      "theme": "商社リバ買い",
+      "purpose": "先導確認",
+      "trigger": "寄り+1%以上かつ三菱商事と同時騰貴",
+      "invalidation": "9:20までに三菱商事比で弱い動きまたはマイ転",
+      "time_window": "9:00-9:30"
     },
     {
       "role": "連想本線",
-      "name": "ＷＴ原油価格連動型上場投信",
-      "code": "1671",
-      "theme": "原油高騰",
-      "purpose": "連想本線",
-      "trigger": "2038・1685連騰確認後、+4%以上で追随買い検討",
-      "invalidation": "9:30時点で+2%未達",
-      "time_window": "9:15-9:30"
-    },
-    {
-      "role": "連想補助",
-      "name": "ＩＮＰＥＸ",
+      "name": "INPEX",
       "code": "1605",
-      "theme": "資源株円安",
-      "purpose": "連想補助",
-      "trigger": "前日比+1.5%以上維持かつ原油ETF連騰確認後",
-      "invalidation": "9:30までに前日比マイ転または原油ETF失速",
-      "time_window": "9:20-10:00"
+      "theme": "商社リバ買い",
+      "purpose": "連想本線",
+      "trigger": "寄り付き堅調かつ原油価格下落一服確認後",
+      "invalidation": "WTI原油が-12%超に拡大または9:30でマイ転",
+      "time_window": "9:00-10:00"
+    },
+    {
+      "role": "先導確認",
+      "name": "住友金属鉱山",
+      "code": "5713",
+      "theme": "レアアース",
+      "purpose": "先導確認",
+      "trigger": "寄り+2%以上かつ9:15までに出来高前日比250%超",
+      "invalidation": "寄り後10分で高値から-2%以上下落またはVWAP割れ",
+      "time_window": "9:00-9:30"
+    },
+    {
+      "role": "連想本線",
+      "name": "三菱マテリアル",
+      "code": "5711",
+      "theme": "レアアース",
+      "purpose": "連想本線",
+      "trigger": "住友鉱山連動で寄り+1.5%以上",
+      "invalidation": "9:20までに住友鉱山比で明確に弱いまたはマイ転",
+      "time_window": "9:00-9:30"
+    },
+    {
+      "role": "連想本線",
+      "name": "三菱重工",
+      "code": "7011",
+      "theme": "小型原子炉",
+      "purpose": "連想本線",
+      "trigger": "寄り+1%以上かつ9:15までに出来高前日比180%超",
+      "invalidation": "9:20までに出来高が伸びず前日比150%未達",
+      "time_window": "9:00-9:30"
     },
     {
       "role": "連想補助",
-      "name": "ＥＮＥＯＳ",
-      "code": "5020",
-      "theme": "原油高騰",
-      "purpose": "連想補助",
-      "trigger": "原油ETF3銘柄全て+8%以上確認後、+2%以上で検討",
-      "invalidation": "前日比マイ転または原油テーマ失速",
-      "time_window": "9:25-10:00"
-    },
-    {
-      "role": "触らない",
       "name": "東京エレクトロン",
       "code": "8035",
-      "theme": "半導体",
-      "purpose": "触らない",
-      "trigger": "なし（SOX-2.45%で逆風）",
-      "invalidation": "寄りから監視のみ。プラス転換でも追わない",
-      "time_window": "監視のみ"
+      "theme": "半導体リバ",
+      "purpose": "連想補助",
+      "trigger": "寄り後押し目形成しVWAP+0.5%で反発確認",
+      "invalidation": "寄り後30分以内に高値から-2%以上下落",
+      "time_window": "9:30-10:30"
+    },
+    {
+      "role": "監視のみ",
+      "name": "コスモスイニシア",
+      "code": "8844",
+      "theme": "好決算個別",
+      "purpose": "監視のみ",
+      "trigger": "寄り+5%以上かつ出来高が平均の3倍超",
+      "invalidation": "寄り後15分で出来高が伸びず材料消化終了",
+      "time_window": "9:00-9:20"
     },
     {
       "role": "触らない",
-      "name": "三菱重工業",
-      "code": "7011",
-      "theme": "防衛",
+      "name": "原油ETF",
+      "code": "1671",
+      "theme": "資源エネルギー",
       "purpose": "触らない",
-      "trigger": "なし（米国防衛-2.3%で連動下落警戒）",
-      "invalidation": "寄りGUでも寄り天警戒で見送り",
-      "time_window": "監視のみ"
+      "trigger": "なし（本日は触らない）",
+      "invalidation": "WTI-10%急落で資源テーマ完全終息",
+      "time_window": "終日"
+    },
+    {
+      "role": "触らない",
+      "name": "金先物ブル",
+      "code": "2036",
+      "theme": "商品先物ETF",
+      "purpose": "触らない",
+      "trigger": "なし（過去教訓により商品ETF追撃禁止）",
+      "invalidation": "商品市況連動でボラ高く個人罠リスク",
+      "time_window": "終日"
     }
   ],
   "pts_judgments": [
     {
-      "code": "2038",
-      "name": "原油先Ｗブル",
+      "code": "8058",
+      "name": "三菱商事",
       "pts_reaction": "反応なし",
       "judgment": "本命維持",
-      "reason": "PTS未取引も本体WTI+4.7%で寄り大幅高確実"
-    },
-    {
-      "code": "1685",
-      "name": "ＷＴエナジー",
-      "pts_reaction": "反応なし",
-      "judgment": "補強",
-      "reason": "値上がり上位入りで注目度高。原油連動で追随"
-    }
-  ],
-  "avoid_themes": [
-    {
-      "name": "半導体",
-      "reason": "SOX-2.45%で米国逆風。日経-4%で東エレク・アドバンテスト暴落リスク"
-    },
-    {
-      "name": "防衛",
-      "reason": "米国防衛-2.3%。過去的中率0%。三菱重工・IHIは連動下落警戒"
-    },
-    {
-      "name": "材料不明GU",
-      "reason": "日経-4%暴落日。材料なき寄りGUは寄り天即転リスク極大"
-    }
-  ],
-  "danger_summary": [
-    "半導体株は米SOX急落で寄り暴落リスク",
-    "防衛株は米国連動で下落警戒",
-    "材料不明GU株は寄り天即撤退"
-  ],
-  "skip_rules": [
-    "SOX連動株（8035・6857等）は様子見まで触らない",
-    "寄りGU+3%以上でも材料確認まで飛びつき禁止",
-    "原油ETF以外の前日急騰株は寄り天警戒で見送り"
-  ],
-  "top_conclusion": {
-    "battlefield": "原油高騰集中",
-    "top_theme": "原油高騰",
-    "top_stocks": ["2038", "1685", "1671"],
-    "avoid_themes_short": ["半導体", "防衛"],
-    "ban_rules": [
-      "SOX連動株追撃禁止",
-      "材料不明GU飛びつき禁止",
-      "寄り天警戒株即損切"
-    ],
-    "yesterday_hint": "過去資源83%的中。商品市況優先の学習活用。ETFが主役の可能性を重視"
-  },
-  "summary": "WTI+4.7%の原油高騰で2038原油先Ｗブルが本命。日経-4%暴落でも資源エネルギーに資金逃避。過去資源83%的中の実績活用。1685・1671が連動確認銘柄。半導体SOX-2.45%と防衛-2.3%は米国逆風で回避。寄りGU材料不明株は寄り天警戒",
-  "us_theme_signals": [
-    {
-      "theme_key": "energy",
-      "theme_label": "原油・エネルギー",
-      "us_strength": "強",
-      "pts_reaction": "なし",
-      "jp_translation": "原油先
