@@ -1,7 +1,7 @@
 {
   "date": "2026-03-24",
   "session": "905",
-  "generated_at": "06:01",
+  "generated_at": "09:17",
   "data_sources": [
     "日経平均1件",
     "日経先物1件",
@@ -9,84 +9,80 @@
     "ドル円1件",
     "SOX1件",
     "原油1件",
-    "値上がり11件",
-    "値下がり13件",
+    "値上がり14件",
+    "値下がり14件",
     "テーマ10件",
     "かぶたんニュース14件",
     "NHKニュース10件"
   ],
-  "verdict": "全面撤回",
-  "verdict_reason": "原油エネルギー全滅、蓄電池・レアアース・小型原子炉が実戦場",
-  "actual_battlefield": "蓄電池・レアアース・小型原子炉",
-  "capital_flow": "エネルギー資源株から次世代エネルギー技術株へ資金シフト",
+  "verdict": "半分修正",
+  "verdict_reason": "商社リバ不発。レアアース・小型原子炉は的中も非鉄金属が主導",
+  "actual_battlefield": "非鉄金属・蓄電池・レアアース連合",
+  "capital_flow": "全業種上昇の中、非鉄金属トップ。地政学リスク後退でリスクオン加速",
   "theme_status": [
     {
-      "name": "原油高騰",
+      "name": "商社リバ買い",
       "status": "終息",
       "pm_action": "撤退"
-    },
-    {
-      "name": "資源株円安",
-      "status": "終息",
-      "pm_action": "撤退"
-    },
-    {
-      "name": "天然ガス",
-      "status": "終息",
-      "pm_action": "撤退"
-    },
-    {
-      "name": "蓄電池",
-      "status": "新規",
-      "pm_action": "押し目待ち"
     },
     {
       "name": "レアアース",
-      "status": "新規",
-      "pm_action": "押し目待ち"
+      "status": "継続",
+      "pm_action": "継続狙い"
     },
     {
       "name": "小型原子炉",
+      "status": "継続",
+      "pm_action": "押し目待ち"
+    },
+    {
+      "name": "非鉄金属",
       "status": "新規",
       "pm_action": "継続狙い"
     },
     {
-      "name": "防衛",
+      "name": "蓄電池",
       "status": "新規",
-      "pm_action": "見送り"
+      "pm_action": "継続狙い"
     },
     {
-      "name": "フィジカルAI",
+      "name": "半導体",
       "status": "新規",
-      "pm_action": "見送り"
+      "pm_action": "押し目待ち"
     }
   ],
   "next_action": {
-    "primary": "小型原子炉・蓄電池関連銘柄スクリーニング即開始",
-    "secondary": "レアアース関連で出遅れ銘柄リストアップ",
-    "stop": "原油・天然ガス関連の監視完全中止"
+    "primary": "非鉄金属・蓄電池銘柄を即座にスクリーニング開始",
+    "secondary": "レアアース関連で未買い付け銘柄の押し目探し",
+    "stop": "商社リバ狙いの監視を全面停止"
   },
   "watch_update": [
     {
-      "code": "2037",
-      "name": "金先物ベア",
-      "pts_verdict": "ノイズ",
-      "reason": "ETF動き、個別株戦略に無関係"
-    },
-    {
-      "code": "2036",
-      "name": "金先物Ｗブル",
-      "pts_verdict": "ノイズ",
-      "reason": "ETF下落、個別株戦略に無関係"
-    },
-    {
-      "code": "2195",
-      "name": "アミタＨＤ",
+      "code": "6494",
+      "name": "ＮＦＫＨＤ",
       "pts_verdict": "補強",
-      "reason": "レアアース関連可能性、材料確認要"
+      "reason": "上昇率トップ圏。非鉄金属主導を体現"
+    },
+    {
+      "code": "6969",
+      "name": "松尾電",
+      "pts_verdict": "補強",
+      "reason": "レアアース・蓄電池のダブルテーマ該当"
+    },
+    {
+      "code": "6740",
+      "name": "Ｊディスプレ",
+      "pts_verdict": "ノイズ",
+      "reason": "半導体テーマだが押し目待ちが無難"
+    },
+    {
+      "code": "4356",
+      "name": "応用技術",
+      "pts_verdict": "本命維持",
+      "reason": "唯一変化率データあり。堅調な動き"
     }
   ],
-  "hint_for_afternoon": "小型原子炉・蓄電池の押し目形成を待ち後場勝負準備",
-  "hint_for_tomorrow": "次世代エネルギー技術テーマ継続性とPFAS対策株連動確認",
+  "hint_for_afternoon": "非鉄トップ継続なら蓄電池へ資金波及。TOPIXコア30の動向監視",
+  "hint_for_tomorrow": "非鉄金属の持続性確認。地政学リスク再燃の有無をチェック",
   "summary": ""
 }
