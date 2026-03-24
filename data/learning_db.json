@@ -65,6 +65,39 @@
         "sox_change": "-2.45%",
         "fx_change": "+0.16%"
       }
+    },
+    {
+      "date": "2026-03-24",
+      "market_tags": [
+        "NY上昇",
+        "SOX横ばい",
+        "円高",
+        "原油急落"
+      ],
+      "predicted_top_theme": "商社リバ買い",
+      "actual_top_theme": "TOPIXコア30大型株+個別材料S高銘柄",
+      "theme_hit": false,
+      "theme_match_reason": "商社リバは完全不発。東京海上のコア30入り材料と小型材料株のS高ラッシュに資金集中。リスクオン・リバ集中という大枠予測が個別材料相場化で外れた",
+      "sign_visible_at_600": "TOPIXコア30構成銘柄変更は事前発表済み。東京海上の組入は織り込み可能だった",
+      "sign_hidden_at_600": "商社リバ期待が全く機能しない個別材料相場化。S高11銘柄という異常な散発状況",
+      "fake_theme": "商社リバ買い",
+      "fake_reason": "日経+3.8%全面高でも商社は動かず完全不発",
+      "leader_stock_name": "東京海上",
+      "leader_characteristics": "TOPIXコア30新規組入という確定イベント。大型株で機関買いが入る構造",
+      "next_ban_rule": "リバウンド相場では「テーマ分散」を禁止。確定材料のある個別銘柄に集中すべき",
+      "next_focus": "S高11銘柄の翌日継続性とコア30変更の波及効果。個別材料相場が継続するか",
+      "key_lesson": "全面高でもテーマ連動しない。確定材料イベント銘柄が最優先",
+      "tomorrow_hint": "",
+      "theme_score": 25,
+      "execution_score": 40,
+      "skip_score": 30,
+      "overall_score": 30,
+      "market_snapshot": {
+        "nikkei_change": "+1.24%",
+        "dji_change": "+1.38%",
+        "sox_change": "+1.34%",
+        "fx_change": "+0.12%"
+      }
     }
   ],
   "pattern_stats": {
@@ -74,14 +107,14 @@
       "hit_rate": 0.8333333333333334
     },
     "SOX横ばい": {
-      "count": 6,
+      "count": 7,
       "hits": 5,
-      "hit_rate": 0.8333333333333334
+      "hit_rate": 0.7142857142857143
     },
     "円高": {
-      "count": 6,
+      "count": 7,
       "hits": 5,
-      "hit_rate": 0.8333333333333334
+      "hit_rate": 0.7142857142857143
     },
     "NY急落": {
       "count": 0,
@@ -102,7 +135,7 @@
       "note": "リスクオフで内需ディフェンシブに資金逃避"
     },
     "NY上昇": {
-      "count": 0,
+      "count": 1,
       "hits": 0,
       "hit_rate": 0.0,
       "strong_themes": [
@@ -177,7 +210,7 @@
       "note": "資源株・エネルギー輸送に資金集中"
     },
     "原油急落": {
-      "count": 0,
+      "count": 1,
       "hits": 0,
       "hit_rate": 0.0,
       "strong_themes": [
@@ -390,11 +423,16 @@
       "count": 1,
       "hits": 0,
       "hit_rate": 0.0
+    },
+    "商社リバ買い": {
+      "count": 1,
+      "hits": 0,
+      "hit_rate": 0.0
     }
   },
   "us_theme_stats": {},
   "pts_reaction_stats": {},
-  "total_days": 2,
+  "total_days": 3,
   "hit_days": 0,
   "initialized_at": "2026-03-22 16:50:49",
   "init_note": "kabutanテーマ一覧 + 過去1年相場データから初期化"
