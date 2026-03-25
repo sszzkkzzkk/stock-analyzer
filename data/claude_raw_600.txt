@@ -3,207 +3,210 @@
   "strategy": {
     "market_regime": "selective",
     "market_regime_label": "選別相場",
-    "entry_style": "pullback",
-    "entry_style_label": "寄り後押し目待ち",
+    "entry_style": "breakout",
+    "entry_style_label": "初動ブレイク狙い",
     "danger_level": "中",
-    "battlefield": "SOX反発×AI電力",
-    "one_line": "SOX+1.3%で半導体復調もWTI急落-3.2%で資源撤退。AIインフラ電力テーマに資金集中"
+    "battlefield": "レアアース・資源集中",
+    "one_line": "米国レアアース+3.7%・原油+2.7%が国内資源株へ連鎖。個別材料株との二極集中"
   },
   "conclusion": {
-    "battlefield": "SOX反発×AI電力",
+    "battlefield": "レアアース・資源集中",
     "top_stock": {
-      "code": "5803",
-      "name": "フジクラ"
+      "code": "5713",
+      "name": "住友金属鉱山"
     },
     "second_stock": {
-      "code": "8035",
-      "name": "東京エレクトロン"
+      "code": "5711",
+      "name": "三菱マテリアル"
     },
-    "watch_codes": ["5801", "6503"],
-    "avoid_summary": "原油ブル・商社・資源株",
-    "ban_summary": "WTI急落中の資源株追撃禁止・前日S高追撃禁止"
+    "watch_codes": ["8031", "1605", "5713"],
+    "avoid_summary": "前日S高蓄電池・小型原子炉",
+    "ban_summary": "前日S高株の寄り成買い・材料不明GU追撃禁止"
   },
   "themes": [
     {
       "rank": "A",
       "rank_label": "本命",
-      "name": "AI電力インフラ",
+      "name": "レアアース・重要鉱物",
       "score": 82,
-      "reason": "米AIインフラ+4.2%でフジクラ・古河電工に資金流入。SOX反発+日経先物+1265円の追い風",
+      "reason": "米国レアアース+3.7%でトランプ政権の重要鉱物政策が資金誘導。非鉄大手に資金集中",
       "continuity": "新規",
       "leader_strength": "強",
-      "ripple": "広",
-      "leader_stock": "フジクラ",
-      "entry_hint": "フジクラ寄り後押し目、9:30までに前日比+1.5%維持確認",
+      "ripple": "中",
+      "leader_stock": "住友金属鉱山",
+      "entry_hint": "寄り付き確認後、出来高急増でブレイク。商社経由の波及も監視",
       "invalidation_signs": [
-        "フジクラが寄り後30分以内に前日比マイ転",
-        "古河電工・住友電工が9:30時点で出来高前日比100%未達"
+        "住友金属鉱山が寄り後30分以内に前日比マイ転",
+        "9:30時点で三菱マテリアルが無反応（+0.5%未満）",
+        "WTI原油が欧州時間で90ドル割れ"
       ]
     },
     {
       "rank": "B",
       "rank_label": "対抗",
-      "name": "半導体本丸",
-      "score": 71,
-      "reason": "SOX+1.28%で東エレク・アドテストに反発期待。日経+2.44%の全面高追い風",
-      "continuity": "新規",
+      "name": "原油・海運",
+      "score": 68,
+      "reason": "WTI+2.73%で91ドル台回復。中東リスク継続で海運・資源商社に資金流入の可能性",
+      "continuity": "継続",
       "leader_strength": "中",
       "ripple": "中",
-      "leader_stock": "東京エレクトロン",
-      "entry_hint": "東エレク寄り+1%以上なら押し目待ち、9:20まで様子見",
+      "leader_stock": "INPEX",
+      "entry_hint": "原油ETF・海運大手の寄り付き確認。INPEXが先導株として機能するか",
       "invalidation_signs": [
-        "東エレクが9:15時点で前日比-0.5%以下",
-        "アドバンテストが出来高薄く連動しない"
+        "INPEX・商船三井が9:20時点で前日比マイ転",
+        "原油先物が寄り前に88ドル割れで急落"
+      ]
+    },
+    {
+      "rank": "B",
+      "rank_label": "対抗",
+      "name": "個別材料株",
+      "score": 65,
+      "reason": "児玉化（88%上方修正）・昭和鉄（10%増益上振れ）が確定材料で朝から資金吸収",
+      "continuity": "新規",
+      "leader_strength": "中",
+      "ripple": "狭",
+      "leader_stock": "児玉化学工業",
+      "entry_hint": "寄り後の初動GUでサプライズ決算銘柄を厳選。追撃は材料確認後",
+      "invalidation_signs": [
+        "児玉化が寄り天後5%以上押し戻し",
+        "昭和鉄が寄り後無反応（+1%未満）"
       ]
     },
     {
       "rank": "C",
       "rank_label": "監視",
-      "name": "重電・変圧器",
+      "name": "防衛・宇宙",
       "score": 48,
-      "reason": "AI電力需要の派生。三菱電機・日立が米原子力インフラ+0.5%に連動可能性",
+      "reason": "米国防衛+0.4%と弱め。中東リスクあるも大型防衛株への資金流入は限定的",
+      "continuity": "継続",
+      "leader_strength": "弱",
+      "ripple": "狭",
+      "leader_stock": "三菱重工業",
+      "entry_hint": "三菱重工が+1%超で先導確認できれば追随。様子見優先",
+      "invalidation_signs": [
+        "三菱重工が9:30時点で+0.5%未満",
+        "IHI・川崎重工が無反応"
+      ]
+    },
+    {
+      "rank": "C",
+      "rank_label": "監視",
+      "name": "半導体リバウンド",
+      "score": 45,
+      "reason": "SOX+1.21%の微反発。東エレク・アドテストの自律反発はあるが本格回復未確認",
       "continuity": "新規",
       "leader_strength": "弱",
       "ripple": "狭",
-      "leader_stock": "三菱電機",
-      "entry_hint": "フジクラ確認後、三菱電機が9:30以降に+1%突破なら追随",
+      "leader_stock": "東京エレクトロン",
+      "entry_hint": "東エレクが+2%超の強さ見せれば追随検討。過度な期待禁止",
       "invalidation_signs": [
-        "三菱電機が寄り付き後出来高薄い",
-        "AI電力テーマがフジクラ単独で終息"
+        "東京エレクトロンが寄り後前日比マイ転",
+        "SOX先物が欧州時間で-0.5%以上下落"
       ]
     }
   ],
   "watchlist": [
     {
       "role": "本命",
-      "name": "フジクラ",
-      "code": "5803",
-      "theme": "AI電力インフラ",
+      "name": "住友金属鉱山",
+      "code": "5713",
+      "theme": "レアアース・重要鉱物",
       "purpose": "利益狙い",
-      "trigger": "寄り+1.5%以上かつ9:05時点で出来高前日比120%超",
-      "invalidation": "9:30までに前日比マイ転または出来高前日比80%未達",
-      "time_window": "9:05-9:30"
+      "trigger": "寄り+1.5%以上かつ出来高前日比200%超で初動ブレイク",
+      "invalidation": "寄り後30分以内に前日比マイ転または+0.5%未満に失速",
+      "time_window": "9:00-9:30"
     },
     {
       "role": "先導確認",
-      "name": "古河電工",
-      "code": "5801",
-      "theme": "AI電力インフラ",
+      "name": "三菱マテリアル",
+      "code": "5711",
+      "theme": "レアアース・重要鉱物",
       "purpose": "連想本線",
-      "trigger": "フジクラ寄り+1.5%確認後、古河も+1%以上で追随",
-      "invalidation": "9:30時点でフジクラとの連動性なし（出来高前日比100%未達）",
-      "time_window": "9:15-9:40"
+      "trigger": "住友金属鉱山の上昇に追随し+1%以上で連動確認",
+      "invalidation": "9:30時点で+0.5%未満の無反応または前日比マイ転",
+      "time_window": "9:00-9:30"
     },
     {
-      "role": "先導確認",
-      "name": "東京エレクトロン",
-      "code": "8035",
-      "theme": "半導体本丸",
+      "role": "連想本線",
+      "name": "伊藤忠商事",
+      "code": "8031",
+      "theme": "レアアース・重要鉱物",
       "purpose": "連想本線",
-      "trigger": "寄り+1%以上かつSOX反発継続を確認",
-      "invalidation": "9:15時点で前日比-0.5%以下または出来高薄い",
-      "time_window": "9:00-9:20"
+      "trigger": "非鉄上昇後に商社へ波及。+0.8%以上で資源商社連鎖確認",
+      "invalidation": "9:45時点で前日比マイ転または非鉄株と逆行",
+      "time_window": "9:20-10:00"
     },
     {
-      "role": "連想確認",
-      "name": "三菱電機",
-      "code": "6503",
-      "theme": "重電・変圧器",
+      "role": "連想補助",
+      "name": "INPEX",
+      "code": "1605",
+      "theme": "原油・海運",
       "purpose": "連想補助",
-      "trigger": "フジクラ+2%突破後、三菱電機が9:30以降+1%超え",
-      "invalidation": "10:00時点で前日比+0.5%未達または出来高前日比70%未達",
-      "time_window": "9:30-10:30"
+      "trigger": "WTI91ドル維持で寄り+1%以上。原油高連動確認",
+      "invalidation": "寄り後前日比マイ転またはWTI88ドル割れ",
+      "time_window": "9:00-9:30"
+    },
+    {
+      "role": "連想補助",
+      "name": "商船三井",
+      "code": "9104",
+      "theme": "原油・海運",
+      "purpose": "連想補助",
+      "trigger": "INPEX連動で+1%以上。海運セクター連鎖確認",
+      "invalidation": "9:30時点で前日比マイ転",
+      "time_window": "9:10-9:40"
     },
     {
       "role": "監視のみ",
-      "name": "住友電工",
-      "code": "5802",
-      "theme": "AI電力インフラ",
-      "purpose": "連想補助",
-      "trigger": "フジクラ・古河が+2%超えを9:30維持なら追随期待",
-      "invalidation": "9:45時点で前日比マイ転または出来高前日比60%未達",
-      "time_window": "9:30-10:00"
+      "name": "児玉化学工業",
+      "code": "4222",
+      "theme": "個別材料株",
+      "purpose": "監視のみ",
+      "trigger": "寄り+10%以上のGUで材料出尽くし前の初動のみ",
+      "invalidation": "寄り天後5%以上押し戻しで利確優勢と判断",
+      "time_window": "9:00-9:10"
     },
     {
       "role": "触らない",
-      "name": "原油先Wブル",
-      "code": "2038",
-      "theme": "資源撤退",
+      "name": "前日S高蓄電池株",
+      "code": "6937",
+      "theme": "蓄電池（前日S高）",
       "purpose": "触らない",
-      "trigger": "なし（WTI-3.2%で下落継続中）",
-      "invalidation": "寄り付き確認不要・終日触らない",
-      "time_window": "終日"
-    },
-    {
-      "role": "触らない",
-      "name": "三菱商事",
-      "code": "8058",
-      "theme": "資源撤退",
-      "purpose": "触らない",
-      "trigger": "なし（原油急落で商社リバ不発リスク）",
-      "invalidation": "寄り付き確認不要・午前中触らない",
-      "time_window": "9:00-11:30"
+      "trigger": "なし（前日S高の利確売り圧力大）",
+      "invalidation": "寄り後即座に前日比マイ転で利確売り優勢確認",
+      "time_window": "9:00-9:05"
     }
   ],
   "pts_judgments": [
     {
-      "code": "52252",
-      "name": "PTS日経平均相当",
-      "pts_reaction": "強い",
-      "judgment": "本命補強",
-      "reason": "PTS+736円で全面高期待。AI電力テーマに追い風"
+      "code": "5713",
+      "name": "住友金属鉱山",
+      "pts_reaction": "反応なし",
+      "judgment": "本命維持",
+      "reason": "米国レアアース+3.7%を寄り付きで織り込む可能性大"
+    },
+    {
+      "code": "1605",
+      "name": "INPEX",
+      "pts_reaction": "反応なし",
+      "judgment": "補強",
+      "reason": "WTI+2.73%で寄り付き連動を想定"
     }
   ],
   "avoid_themes": [
     {
-      "name": "原油ブル・資源株",
-      "reason": "WTI-3.22%急落で原油ブルETF・商社・資源株は撤退継続。前日教訓適用"
+      "name": "蓄電池・小型原子炉",
+      "reason": "前日S高11銘柄の利確売り圧力。個人投機の過熱感で朝から急落リスク大"
     },
     {
-      "name": "前日S高銘柄",
-      "reason": "昨日S高11銘柄の反動リスク大。個別材料相場の継続性不明で初動回避"
+      "name": "空飛ぶクルマ",
+      "reason": "高市政策期待のテーマ株特集は思惑先行。材料不明でボラ高く選別困難"
     },
     {
-      "name": "防衛・宇宙",
-      "reason": "的中率0%テーマで材料不明。イラン停戦観測でも国内反応薄い"
+      "name": "大型防衛株",
+      "reason": "米国防衛+0.4%と弱く、過去4日間0%的中の鬼門テーマ。様子見優先"
     }
   ],
   "danger_summary": [
-    "前日S高11銘柄→寄り天反動リスク大",
-    "原油ブルETF・商社→WTI急落で続落濃厚",
-    "材料不明GU小型株→出来高確認まで触らない"
-  ],
-  "skip_rules": [
-    "WTI急落中の資源株・商社追撃禁止",
-    "前日S高銘柄の寄り成買い禁止",
-    "材料不明GUは9:30出来高確認まで見送り"
-  ],
-  "top_conclusion": {
-    "battlefield": "SOX反発×AI電力",
-    "top_theme": "AI電力インフラ",
-    "top_stocks": ["5803", "5801", "8035"],
-    "avoid_themes_short": ["原油ブル", "前日S高", "防衛"],
-    "ban_rules": [
-      "WTI急落中の資源株追撃禁止",
-      "前日S高銘柄寄り成買い禁止"
-    ],
-    "yesterday_hint": "個別材料相場からテーマ集中相場へ転換。確定材料のAI電力に集中"
-  },
-  "summary": "SOX+1.28%反発でフジクラ・東エレク本命。米AIインフラ+4.2%でAI電力需要テーマに資金集中。WTI-3.22%急落で資源株・商社は撤退継続。日経先物+1265円の全面高追い風も、前日S高11銘柄の反動警戒で選別相場。フジクラ寄り+1.5%超えを押し目待ちで狙う",
-  "us_theme_signals": [
-    {
-      "theme_key": "ai_infrastructure",
-      "theme_label": "AIインフラ電力",
-      "us_strength": "強",
-      "pts_reaction": "不明",
-      "jp_translation": "フジクラ・古河電工・住友電工（電線・冷却・変圧器）",
-      "priority": "本命"
-    },
-    {
-      "theme_key": "semiconductor",
-      "theme_label": "半導体",
-      "us_strength": "中",
-      "pts_reaction": "不明",
-      "jp_translation": "東京エレクトロン・アドバンテスト・信越化学",
-      "priority": "対抗"
-    },
+    "前日S高蓄電池11銘
