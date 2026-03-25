@@ -98,6 +98,39 @@
         "sox_change": "+1.34%",
         "fx_change": "+0.12%"
       }
+    },
+    {
+      "date": "2026-03-25",
+      "market_tags": [
+        "NY横ばい",
+        "SOX横ばい",
+        "為替横ばい",
+        "原油急落"
+      ],
+      "predicted_top_theme": "AI電力インフラ（重電・変圧器含む）",
+      "actual_top_theme": "蓄電池・小型原子炉（小型グロース株限定）",
+      "theme_hit": false,
+      "theme_match_reason": "電力インフラは方向性一致も、本丸の重電は完全スルー。資金は時価総額小の蓄電池関連に集中し大型株は指数買いのみで個別物色なし",
+      "sign_visible_at_600": "SOX+1.3%という微反発は本格復調には不十分。WTI-3.2%の急落が既に見えていた",
+      "sign_hidden_at_600": "イラン停戦報道によるリスクオン転換。地政学リスク後退で小型グロースに資金が一極集中する流れ",
+      "fake_theme": "半導体本丸（東京エレクトロン等）",
+      "fake_reason": "SOX反発を材料視も完全に資金流入なし。調整継続",
+      "leader_stock_name": "アスタリスク（蓄電池関連小型株）",
+      "leader_characteristics": "時価総額小・蓄電池テーマ・ストップ高。リスクオンで投機資金が集中する典型小型株",
+      "next_ban_rule": "SOX微反発（+2%未満）での半導体本丸予測禁止。大型重電は指数連動のみと認識し個別推奨除外",
+      "next_focus": "小型蓄電池の利確売り圧力。半導体の自律反発開始タイミング。イラン停戦進展度合いの確認",
+      "key_lesson": "テーマ方向は合っても時価総額レンジを誤ると全外れ。リスクオン時は小型に資金集中",
+      "tomorrow_hint": "",
+      "theme_score": 35,
+      "execution_score": 20,
+      "skip_score": 40,
+      "overall_score": 30,
+      "market_snapshot": {
+        "nikkei_change": "+3.03%",
+        "dji_change": "-0.18%",
+        "sox_change": "+1.28%",
+        "fx_change": "+0.20%"
+      }
     }
   ],
   "pattern_stats": {
@@ -107,9 +140,9 @@
       "hit_rate": 0.8333333333333334
     },
     "SOX横ばい": {
-      "count": 7,
+      "count": 8,
       "hits": 5,
-      "hit_rate": 0.7142857142857143
+      "hit_rate": 0.625
     },
     "円高": {
       "count": 7,
@@ -210,7 +243,7 @@
       "note": "資源株・エネルギー輸送に資金集中"
     },
     "原油急落": {
-      "count": 1,
+      "count": 2,
       "hits": 0,
       "hit_rate": 0.0,
       "strong_themes": [
@@ -243,7 +276,7 @@
       "note": "全面的なリスク回避、ディフェンシブのみ"
     },
     "NY横ばい": {
-      "count": 1,
+      "count": 2,
       "hits": 0,
       "hit_rate": 0.0,
       "strong_themes": [
@@ -254,6 +287,11 @@
       "note": "個別材料株が主役になりやすい"
     },
     "SOX弱い": {
+      "count": 1,
+      "hits": 0,
+      "hit_rate": 0.0
+    },
+    "為替横ばい": {
       "count": 1,
       "hits": 0,
       "hit_rate": 0.0
@@ -428,11 +466,31 @@
       "count": 1,
       "hits": 0,
       "hit_rate": 0.0
+    },
+    "AI電力インフラ（重電・変圧器含む）": {
+      "count": 1,
+      "hits": 0,
+      "hit_rate": 0.0
     }
   },
-  "us_theme_stats": {},
+  "us_theme_stats": {
+    "ai_infrastructure": {
+      "label": "AIインフラ電力",
+      "total": 1,
+      "jp_hit": 0,
+      "pts_correct": 0,
+      "hit_rate": 0.0
+    },
+    "semiconductor": {
+      "label": "半導体",
+      "total": 1,
+      "jp_hit": 0,
+      "pts_correct": 0,
+      "hit_rate": 0.0
+    }
+  },
   "pts_reaction_stats": {},
-  "total_days": 3,
+  "total_days": 4,
   "hit_days": 0,
   "initialized_at": "2026-03-22 16:50:49",
   "init_note": "kabutanテーマ一覧 + 過去1年相場データから初期化"
