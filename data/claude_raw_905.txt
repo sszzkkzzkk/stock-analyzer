@@ -1,68 +1,68 @@
 ```json
 {
-  "verdict": "半分修正",
-  "verdict_reason": "AI電力は的中も半導体本丸は不発。小型材料株が主戦場化",
-  "actual_battlefield": "蓄電池・小型原子炉（AI電力インフラ）",
-  "capital_flow": "AI電力テーマ継続も半導体避けて電力周辺・小型材料株に分散",
+  "verdict": "朝仮説維持",
+  "verdict_reason": "レアアース・資源テーマは的中。蓄電池・防衛・半導体も想定内",
+  "actual_battlefield": "レアアース・資源・蓄電池複合セクター",
+  "capital_flow": "資源関連に本命資金。グロース小型株は個別材料優先の分散",
   "theme_status": [
     {
-      "name": "AI電力インフラ",
+      "name": "レアアース・重要鉱物",
       "status": "継続",
       "pm_action": "継続狙い"
     },
     {
-      "name": "半導体本丸",
-      "status": "弱まり",
-      "pm_action": "見送り"
-    },
-    {
-      "name": "重電・変圧器",
-      "status": "継続",
+      "name": "蓄電池",
+      "status": "新規",
       "pm_action": "押し目待ち"
     },
     {
-      "name": "蓄電池",
-      "status": "新規",
+      "name": "原油・海運",
+      "status": "継続",
       "pm_action": "継続狙い"
     },
     {
       "name": "小型原子炉",
       "status": "新規",
-      "pm_action": "継続狙い"
+      "pm_action": "押し目待ち"
+    },
+    {
+      "name": "半導体",
+      "status": "継続",
+      "pm_action": "見送り"
     }
   ],
   "next_action": {
-    "primary": "蓄電池・小型原子炉関連の板監視開始",
-    "secondary": "フジクラ等重電押し目形成確認",
-    "stop": "半導体本丸への新規エントリー停止"
+    "primary": "INPEX・商船三井の気配値確認。資源本命継続",
+    "secondary": "蓄電池関連銘柄のスクリーニング即開始",
+    "stop": "東Ｇ小型株の新規追い。個別材料依存で読めない"
   },
   "watch_update": [
     {
-      "code": "3480",
-      "name": "ＪＳＢ",
-      "pts_verdict": "補強",
-      "reason": "値上がり率3位、AI電力テーマ継続"
+      "code": "4098",
+      "name": "チタン",
+      "pts_verdict": "本命維持",
+      "reason": "東Ｓで+0.77%。レアアース本命として稼働中"
     },
     {
-      "code": "5202",
-      "name": "板硝子",
+      "code": "6522",
+      "name": "アスタリスク",
       "pts_verdict": "ノイズ",
-      "reason": "上位だが朝仮説と無関係"
+      "reason": "東Ｇ気配のみ。個別材料不明で判断保留"
     },
     {
-      "code": "6620",
-      "name": "宮越ＨＤ",
+      "code": "3853",
+      "name": "アステリア",
       "pts_verdict": "ノイズ",
-      "reason": "電力テーマ外の個別材料"
+      "reason": "+0.59%だが資源テーマと無関係。除外"
     },
     {
-      "code": "2038",
-      "name": "原油先Ｗブル",
+      "code": "6580",
+      "name": "ライトアップ",
       "pts_verdict": "見送り",
-      "reason": "下落トップ、WTI急落禁止ルール適用"
+      "reason": "売り気配トップ。売り圧力強く危険"
     }
   ],
-  "hint_for_afternoon": "蓄電池・原子炉が後場も継続するか10:30時点で判断",
-  "hint_for_tomorrow": "AI電力テーマ3日目、半導体から電力インフラへ資金シフト継続か検証"
+  "hint_for_afternoon": "SBG・INPEX気配解消後の初動確認。資源続伸なら後場追撃",
+  "hint_for_tomorrow": "蓄電池テーマの持続性検証。海外資源価格と連動性チェック必須"
 }
 ```
