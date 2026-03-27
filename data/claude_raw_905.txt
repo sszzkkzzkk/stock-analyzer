@@ -1,68 +1,73 @@
 ```json
 {
-  "verdict": "朝仮説維持",
-  "verdict_reason": "レアアース・資源テーマは的中。蓄電池・防衛・半導体も想定内",
-  "actual_battlefield": "レアアース・資源・蓄電池複合セクター",
-  "capital_flow": "資源関連に本命資金。グロース小型株は個別材料優先の分散",
+  "verdict": "全面撤回",
+  "verdict_reason": "原油海運テーマ不発。蓄電池レアアース防衛が主戦場",
+  "actual_battlefield": "蓄電池・レアアース・防衛関連",
+  "capital_flow": "エネルギー輸送から川下電池・資源安全保障へ資金シフト",
   "theme_status": [
     {
-      "name": "レアアース・重要鉱物",
+      "name": "海運・エネ輸送",
+      "status": "終息",
+      "pm_action": "撤退"
+    },
+    {
+      "name": "原油ETF・資源",
+      "status": "終息",
+      "pm_action": "撤退"
+    },
+    {
+      "name": "蓄電池・川下技術",
       "status": "継続",
       "pm_action": "継続狙い"
     },
     {
-      "name": "蓄電池",
+      "name": "レアアース",
+      "status": "新規",
+      "pm_action": "継続狙い"
+    },
+    {
+      "name": "防衛",
       "status": "新規",
       "pm_action": "押し目待ち"
-    },
-    {
-      "name": "原油・海運",
-      "status": "継続",
-      "pm_action": "継続狙い"
     },
     {
       "name": "小型原子炉",
       "status": "新規",
       "pm_action": "押し目待ち"
-    },
-    {
-      "name": "半導体",
-      "status": "継続",
-      "pm_action": "見送り"
     }
   ],
   "next_action": {
-    "primary": "INPEX・商船三井の気配値確認。資源本命継続",
-    "secondary": "蓄電池関連銘柄のスクリーニング即開始",
-    "stop": "東Ｇ小型株の新規追い。個別材料依存で読めない"
+    "primary": "蓄電池・レアアース関連銘柄の板監視開始",
+    "secondary": "EDP・住石HD気配値確認後エントリー判断",
+    "stop": "海運・原油ETF監視即中止"
   },
   "watch_update": [
     {
-      "code": "4098",
-      "name": "チタン",
+      "code": "未定",
+      "name": "EDP",
       "pts_verdict": "本命維持",
-      "reason": "東Ｓで+0.77%。レアアース本命として稼働中"
+      "reason": "買い気配トップ。特別気配で注目集中"
     },
     {
-      "code": "6522",
-      "name": "アスタリスク",
-      "pts_verdict": "ノイズ",
-      "reason": "東Ｇ気配のみ。個別材料不明で判断保留"
-    },
-    {
-      "code": "3853",
-      "name": "アステリア",
-      "pts_verdict": "ノイズ",
-      "reason": "+0.59%だが資源テーマと無関係。除外"
+      "code": "未定",
+      "name": "住石HD",
+      "pts_verdict": "補強",
+      "reason": "買い気配。レアアース・資源安保関連"
     },
     {
       "code": "6580",
       "name": "ライトアップ",
       "pts_verdict": "見送り",
-      "reason": "売り気配トップ。売り圧力強く危険"
+      "reason": "下落トップ。今日は触らない"
+    },
+    {
+      "code": "未定",
+      "name": "キオクシア",
+      "pts_verdict": "見送り",
+      "reason": "売り気配トップ。半導体リバ買い禁止ルール適用"
     }
   ],
-  "hint_for_afternoon": "SBG・INPEX気配解消後の初動確認。資源続伸なら後場追撃",
-  "hint_for_tomorrow": "蓄電池テーマの持続性検証。海外資源価格と連動性チェック必須"
+  "hint_for_afternoon": "蓄電池本命が午前利確なら後場押し目。防衛は様子見",
+  "hint_for_tomorrow": "レアアース・資源安保テーマ継続性を夜間で検証。地政学リスク確認"
 }
 ```
