@@ -164,13 +164,46 @@
         "sox_change": "+1.21%",
         "fx_change": "+0.02%"
       }
+    },
+    {
+      "date": "2026-03-27",
+      "market_tags": [
+        "NY下落",
+        "SOX弱い",
+        "為替横ばい",
+        "原油高騰"
+      ],
+      "predicted_top_theme": "海運・エネ輸送",
+      "actual_top_theme": "蓄電池・レアアース",
+      "theme_hit": false,
+      "theme_match_reason": "原油高を理由に海運本命視したが完全不発。蓄電池は朝の候補だったが優先順位を誤った。全面安458円安で川下技術・材料株に資金集中",
+      "sign_visible_at_600": "SOX急落でも原油+2%の背景に電力実需を読むべきだった。蓄電池は候補にあったが海運を過大評価",
+      "sign_hidden_at_600": "住石HD・日本コークスのエネルギー川上への急回転。小型株・材料株への逃避買い顕著化は場中判明",
+      "fake_theme": "海運・エネ輸送",
+      "fake_reason": "原油高でも海運反応薄のサインを軽視。輸送より川下技術選別",
+      "leader_stock_name": "住石HD",
+      "leader_characteristics": "エネルギー川上・コークス系で1.49倍。原油高の真の受益者は輸送でなく素材",
+      "next_ban_rule": "原油高=海運の短絡禁止。エネルギー高は川上素材・川下技術の両面チェック必須",
+      "next_focus": "蓄電池・レアアース継続性、住石HD連想のエネルギー素材系、日経先物の反発力",
+      "key_lesson": "指数大幅安では輸送株より材料株・技術株。原油高は素材と電力実需の両面で読む",
+      "tomorrow_hint": "",
+      "theme_score": 20,
+      "execution_score": 35,
+      "skip_score": 40,
+      "overall_score": 25,
+      "market_snapshot": {
+        "nikkei_change": "+0.27%",
+        "dji_change": "-1.01%",
+        "sox_change": "-4.79%",
+        "fx_change": "-0.05%"
+      }
     }
   ],
   "pattern_stats": {
     "NY下落": {
-      "count": 6,
+      "count": 7,
       "hits": 5,
-      "hit_rate": 0.8333333333333334
+      "hit_rate": 0.7142857142857143
     },
     "SOX横ばい": {
       "count": 9,
@@ -261,9 +294,9 @@
       "note": "輸出関連・訪日外客関連に恩恵"
     },
     "原油高騰": {
-      "count": 2,
+      "count": 3,
       "hits": 1,
-      "hit_rate": 0.5,
+      "hit_rate": 0.3333333333333333,
       "strong_themes": [
         "資源エネルギー",
         "海運",
@@ -320,12 +353,12 @@
       "note": "個別材料株が主役になりやすい"
     },
     "SOX弱い": {
-      "count": 1,
+      "count": 2,
       "hits": 0,
       "hit_rate": 0.0
     },
     "為替横ばい": {
-      "count": 1,
+      "count": 2,
       "hits": 0,
       "hit_rate": 0.0
     }
@@ -509,6 +542,11 @@
       "count": 1,
       "hits": 1,
       "hit_rate": 1.0
+    },
+    "海運・エネ輸送": {
+      "count": 1,
+      "hits": 0,
+      "hit_rate": 0.0
     }
   },
   "us_theme_stats": {
@@ -528,7 +566,7 @@
     }
   },
   "pts_reaction_stats": {},
-  "total_days": 5,
+  "total_days": 6,
   "hit_days": 1,
   "initialized_at": "2026-03-22 16:50:49",
   "init_note": "kabutanテーマ一覧 + 過去1年相場データから初期化"
