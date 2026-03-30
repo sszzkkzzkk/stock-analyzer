@@ -197,13 +197,46 @@
         "sox_change": "-4.79%",
         "fx_change": "-0.05%"
       }
+    },
+    {
+      "date": "2026-03-30",
+      "market_tags": [
+        "NY下落",
+        "SOX弱い",
+        "為替横ばい",
+        "原油高騰"
+      ],
+      "predicted_top_theme": "原油・商品ETF",
+      "actual_top_theme": "蓄電池・防衛・個別エネルギー株",
+      "theme_hit": false,
+      "theme_match_reason": "原油ETF集中戦略が完全空振り。実際はリスクオフ下でもテーマ性ある小型現物株（蓄電池・防衛・太平発など）に選別資金が流入した",
+      "sign_visible_at_600": "日経-3.4%急落予測時点で、ETFより個別株選好・防衛的テーマ浮上を想定すべきだった",
+      "sign_hidden_at_600": "リスクオフ環境でも蓄電池・防衛という攻めのテーマに資金が集まる市場の二面性",
+      "fake_theme": "原油・商品ETF",
+      "fake_reason": "原油高騰でも実際はETF買われず個別株選好",
+      "leader_stock_name": "太平発",
+      "leader_characteristics": "エネルギー個別株+3.21%。ETFでなく事業実態ある現物株に資金集中",
+      "next_ban_rule": "急落相場でETF集中戦略禁止。個別テーマ株の選別物色パターンを優先せよ",
+      "next_focus": "リスクオフ耐性テーマ（蓄電池・防衛・半導体）の個別銘柄継続性",
+      "key_lesson": "急落相場でも選別資金は動く。ETFより個別テーマ株を朝から精査",
+      "tomorrow_hint": "",
+      "theme_score": 15,
+      "execution_score": 20,
+      "skip_score": 85,
+      "overall_score": 25,
+      "market_snapshot": {
+        "nikkei_change": "-3.48%",
+        "dji_change": "-1.73%",
+        "sox_change": "-1.69%",
+        "fx_change": "-0.36%"
+      }
     }
   ],
   "pattern_stats": {
     "NY下落": {
-      "count": 7,
+      "count": 8,
       "hits": 5,
-      "hit_rate": 0.7142857142857143
+      "hit_rate": 0.625
     },
     "SOX横ばい": {
       "count": 9,
@@ -294,9 +327,9 @@
       "note": "輸出関連・訪日外客関連に恩恵"
     },
     "原油高騰": {
-      "count": 3,
+      "count": 4,
       "hits": 1,
-      "hit_rate": 0.3333333333333333,
+      "hit_rate": 0.25,
       "strong_themes": [
         "資源エネルギー",
         "海運",
@@ -353,12 +386,12 @@
       "note": "個別材料株が主役になりやすい"
     },
     "SOX弱い": {
-      "count": 2,
+      "count": 3,
       "hits": 0,
       "hit_rate": 0.0
     },
     "為替横ばい": {
-      "count": 2,
+      "count": 3,
       "hits": 0,
       "hit_rate": 0.0
     }
@@ -547,6 +580,11 @@
       "count": 1,
       "hits": 0,
       "hit_rate": 0.0
+    },
+    "原油・商品ETF": {
+      "count": 1,
+      "hits": 0,
+      "hit_rate": 0.0
     }
   },
   "us_theme_stats": {
@@ -563,10 +601,31 @@
       "jp_hit": 0,
       "pts_correct": 0,
       "hit_rate": 0.0
+    },
+    "energy_commodities": {
+      "label": "資源開発・エネ輸送",
+      "total": 1,
+      "jp_hit": 0,
+      "pts_correct": 0,
+      "hit_rate": 0.0
+    },
+    "rare_earth": {
+      "label": "重要鉱物・レアアース",
+      "total": 1,
+      "jp_hit": 0,
+      "pts_correct": 0,
+      "hit_rate": 0.0
+    },
+    "nuclear": {
+      "label": "原子力・電力インフラ",
+      "total": 1,
+      "jp_hit": 0,
+      "pts_correct": 0,
+      "hit_rate": 0.0
     }
   },
   "pts_reaction_stats": {},
-  "total_days": 6,
+  "total_days": 7,
   "hit_days": 1,
   "initialized_at": "2026-03-22 16:50:49",
   "init_note": "kabutanテーマ一覧 + 過去1年相場データから初期化"
