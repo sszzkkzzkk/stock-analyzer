@@ -1,29 +1,19 @@
 ```json
 {
   "verdict": "全面撤回",
-  "verdict_reason": "原油海運テーマ不発。蓄電池レアアース防衛が主戦場",
-  "actual_battlefield": "蓄電池・レアアース・防衛関連",
-  "capital_flow": "エネルギー輸送から川下電池・資源安全保障へ資金シフト",
+  "verdict_reason": "原油商品ETF不在。実際は蓄電池防衛レアアース等の中小型材料株相場",
+  "actual_battlefield": "蓄電池・防衛・レアアース等テーマ材料株",
+  "capital_flow": "商品ETF無視。中小型材料株にピンポイント資金集中",
   "theme_status": [
     {
-      "name": "海運・エネ輸送",
+      "name": "原油・商品ETF",
       "status": "終息",
       "pm_action": "撤退"
     },
     {
-      "name": "原油ETF・資源",
-      "status": "終息",
-      "pm_action": "撤退"
-    },
-    {
-      "name": "蓄電池・川下技術",
-      "status": "継続",
-      "pm_action": "継続狙い"
-    },
-    {
-      "name": "レアアース",
+      "name": "蓄電池",
       "status": "新規",
-      "pm_action": "継続狙い"
+      "pm_action": "押し目待ち"
     },
     {
       "name": "防衛",
@@ -31,43 +21,42 @@
       "pm_action": "押し目待ち"
     },
     {
-      "name": "小型原子炉",
+      "name": "レアアース",
       "status": "新規",
       "pm_action": "押し目待ち"
+    },
+    {
+      "name": "地方銀行",
+      "status": "新規",
+      "pm_action": "見送り"
     }
   ],
   "next_action": {
-    "primary": "蓄電池・レアアース関連銘柄の板監視開始",
-    "secondary": "EDP・住石HD気配値確認後エントリー判断",
-    "stop": "海運・原油ETF監視即中止"
+    "primary": "蓄電池防衛レアアース関連の板観察。追撃禁止",
+    "secondary": "住石HD・日本コークス材料確認",
+    "stop": "商品ETF監視即中止。個別株寄り買い厳守"
   },
   "watch_update": [
     {
-      "code": "未定",
-      "name": "EDP",
-      "pts_verdict": "本命維持",
-      "reason": "買い気配トップ。特別気配で注目集中"
-    },
-    {
-      "code": "未定",
-      "name": "住石HD",
+      "code": "1514",
+      "name": "住石ＨＤ",
       "pts_verdict": "補強",
-      "reason": "買い気配。レアアース・資源安保関連"
+      "reason": "レアアース関連で上昇。材料確認後判断"
     },
     {
-      "code": "6580",
-      "name": "ライトアップ",
-      "pts_verdict": "見送り",
-      "reason": "下落トップ。今日は触らない"
+      "code": "3315",
+      "name": "日本コークス",
+      "pts_verdict": "補強",
+      "reason": "素材系で値動き。肥料テーマ可能性"
     },
     {
-      "code": "未定",
-      "name": "キオクシア",
-      "pts_verdict": "見送り",
-      "reason": "売り気配トップ。半導体リバ買い禁止ルール適用"
+      "code": "8522",
+      "name": "名古屋銀",
+      "pts_verdict": "ノイズ",
+      "reason": "地銀テーマだが持続性疑問。見送り"
     }
   ],
-  "hint_for_afternoon": "蓄電池本命が午前利確なら後場押し目。防衛は様子見",
-  "hint_for_tomorrow": "レアアース・資源安保テーマ継続性を夜間で検証。地政学リスク確認"
+  "hint_for_afternoon": "材料株は利確売り警戒。新規追撃厳禁で押し目形成待ち",
+  "hint_for_tomorrow": "蓄電池防衛レアアース継続性検証。商品ETFは完全除外"
 }
 ```
