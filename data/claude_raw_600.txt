@@ -1,182 +1,213 @@
 ```json
 {
   "strategy": {
-    "market_regime": "avoid",
-    "market_regime_label": "見送り寄り",
-    "entry_style": "skip",
-    "entry_style_label": "見送り",
+    "market_regime": "selective",
+    "market_regime_label": "選別相場",
+    "entry_style": "pullback",
+    "entry_style_label": "寄り後押し目待ち",
     "danger_level": "高",
-    "battlefield": "原油集中・商品ETF",
-    "one_line": "日経-3.4%急落・原油+6.6%暴騰で買い場なし。商品ETF監視と危険株回避に徹する"
+    "battlefield": "原油実需・電力素材",
+    "one_line": "WTI105ドル突破で川下実需テーマ継続、急落相場でも個別材料株選別"
   },
   "conclusion": {
-    "battlefield": "原油集中・商品ETF",
+    "battlefield": "原油実需・電力素材",
     "top_stock": {
-      "code": "1671",
-      "name": "原油ETF"
+      "code": "9517",
+      "name": "イーレックス"
     },
     "second_stock": {
-      "code": "1699",
-      "name": "NOMURA原油"
+      "code": "5856",
+      "name": "ＬＩＥＨ"
     },
-    "watch_codes": ["1514", "3315"],
-    "avoid_summary": "蓄電池・半導体・海運",
-    "ban_summary": "個別株寄り買い全面禁止。材料不明GU追撃厳禁"
+    "watch_codes": ["8835", "2195"],
+    "avoid_summary": "半導体・米国連動株全般",
+    "ban_summary": "材料不明GU追撃禁止、SOX連動株寄り買い禁止"
   },
   "themes": [
     {
       "rank": "A",
       "rank_label": "本命",
-      "name": "原油・商品ETF",
-      "score": 78,
-      "reason": "WTI+6.6%暴騰で原油ETFに資金集中。3/19教訓で商品ETF＞個別株。地政学リスク激化",
+      "name": "電力・エネ実需",
+      "score": 82,
+      "reason": "WTI105ドル突破で電力需給逼迫テーマ継続。前日まで蓄電池・レアアース強く、今日はPTS値上がりで電力株先行。原油高の川下実需を評価",
       "continuity": "継続",
       "leader_strength": "強",
-      "ripple": "狭",
-      "leader_stock": "原油ETF",
-      "entry_hint": "寄り後急騰なら見送り。押し目待ちも危険。様子見が賢明",
+      "ripple": "中",
+      "leader_stock": "イーレックス",
+      "entry_hint": "寄り後9:15-9:30の押し目。先導株が前日比プラス維持なら連想株",
       "invalidation_signs": [
-        "9:30までに原油ETFが前日比+3%割れ",
-        "住石HD・日本コークスがマイ転",
-        "WTI先物が寄り後-2%以上反落"
+        "イーレックスが9:30までに前日比マイ転",
+        "太平発が寄り天で高値更新できず",
+        "原油が105ドル割れで上昇一服"
       ]
     },
     {
       "rank": "B",
       "rank_label": "対抗",
-      "name": "エネ素材川上",
-      "score": 62,
-      "reason": "住石HD・日本コークス前日好調。3/27教訓で川上素材が原油高で連動。小型株逃避継続",
-      "continuity": "継続",
+      "name": "リサイクル素材",
+      "score": 68,
+      "reason": "アミタHD前日急騰。エネルギー素材の川上でなく循環型素材に資金シフトの兆し。小型株選別資金の受け皿候補",
+      "continuity": "新規",
       "leader_strength": "中",
       "ripple": "狭",
-      "leader_stock": "住石HD",
-      "entry_hint": "寄り-5%以内なら監視。-10%超なら見送り。9:30後の反発確認必須",
+      "leader_stock": "アミタＨＤ",
+      "entry_hint": "寄り後の値固め確認。出来高急増と+5%以上維持が条件",
       "invalidation_signs": [
-        "寄り-10%以上のギャップダウン",
-        "9:20時点で出来高が前日比50%未満"
+        "アミタが寄り天で前日高値更新できず",
+        "9:20時点で連想株に動き見られず"
+      ]
+    },
+    {
+      "rank": "C",
+      "rank_label": "監視",
+      "name": "不動産・期末需要",
+      "score": 48,
+      "reason": "決算発表8社控えるが小粒。新年度入りで不動産関連が期末調整買いの可能性。ただし指数-1.2%環境で優先度低",
+      "continuity": "新規",
+      "leader_strength": "弱",
+      "ripple": "狭",
+      "leader_stock": "スターマイカ",
+      "entry_hint": "決算サプライズ確認後のみ。材料なければ見送り",
+      "invalidation_signs": [
+        "決算内容が市場予想範囲内",
+        "寄り後に不動産セクター全体が弱い"
       ]
     }
   ],
   "watchlist": [
     {
+      "role": "本命",
+      "name": "イーレックス",
+      "code": "9517",
+      "theme": "電力・エネ実需",
+      "purpose": "利益狙い",
+      "trigger": "寄り+1%以上維持、9:15以降押し目で前日比プラス圏、出来高通常比120%以上",
+      "invalidation": "9:30までに前日比マイ転または寄り天から-2%下落",
+      "time_window": "9:15-9:45"
+    },
+    {
       "role": "先導確認",
-      "name": "原油ETF",
-      "code": "1671",
-      "theme": "原油・商品ETF",
+      "name": "太平発",
+      "code": "8835",
+      "theme": "電力・エネ実需",
       "purpose": "先導確認",
-      "trigger": "寄り+5%以上かつ出来高前日比200%超なら本命確認",
-      "invalidation": "9:30までに+3%割れまたは出来高前日比100%未満",
-      "time_window": "9:00-9:30"
+      "trigger": "寄り+2%以上、前日高値3.17超え、出来高急増",
+      "invalidation": "寄り天で高値更新できず、9:20までに前日比+1%未満に失速",
+      "time_window": "9:00-9:20"
     },
     {
       "role": "連想本線",
-      "name": "住石HD",
-      "code": "1514",
-      "theme": "エネ素材川上",
+      "name": "ＬＩＥＨ",
+      "code": "5856",
+      "theme": "電力・エネ実需",
       "purpose": "連想本線",
-      "trigger": "寄り-5%以内で止まり9:30後プラ転なら参戦検討",
-      "invalidation": "寄り-10%超または9:30時点でVWAP-5%以上乖離",
-      "time_window": "9:00-10:00"
+      "trigger": "先導株イーレックス強い場合、寄り後9:20以降で前日比プラス維持",
+      "invalidation": "イーレックス失速または9:30時点で出来高薄い",
+      "time_window": "9:20-10:00"
+    },
+    {
+      "role": "連想補助",
+      "name": "アミタＨＤ",
+      "code": "2195",
+      "theme": "リサイクル素材",
+      "purpose": "連想補助",
+      "trigger": "寄り+5%以上維持、前日比0.99超え、出来高前日比200%超",
+      "invalidation": "寄り天で前日高値更新できず、9:15までに+3%未満に失速",
+      "time_window": "9:00-9:30"
     },
     {
       "role": "触らない",
-      "name": "商船三井",
-      "code": "9104",
-      "theme": "海運（回避）",
+      "name": "コラボス",
+      "code": "3908",
+      "theme": "前日急落株",
       "purpose": "触らない",
-      "trigger": "なし（監視のみ）",
-      "invalidation": "3/27教訓で原油高=海運の短絡禁止。指数急落で重厚長大株全面安",
+      "trigger": "監視のみ。エントリー禁止",
+      "invalidation": "常時回避",
       "time_window": "終日"
     },
     {
       "role": "触らない",
-      "name": "東京エレク",
-      "code": "8035",
-      "theme": "半導体（回避）",
+      "name": "アイスペース",
+      "code": "9348",
+      "theme": "防衛・宇宙",
       "purpose": "触らない",
-      "trigger": "なし（監視のみ）",
-      "invalidation": "SOX-1.69%で自律反発なし。日経-3.4%で半導体株全面安",
+      "trigger": "防衛・宇宙は過去的中率0%。材料出るまで回避",
+      "invalidation": "常時回避",
       "time_window": "終日"
     }
   ],
   "pts_judgments": [
     {
-      "code": "1514",
-      "name": "住石HD",
-      "pts_reaction": "弱い",
-      "judgment": "様子見",
-      "reason": "PTS情報不十分。寄り後の反応次第"
+      "code": "9517",
+      "name": "イーレックス",
+      "pts_reaction": "強い",
+      "judgment": "本命維持",
+      "reason": "PTS値上がり上位で電力テーマ先行反応確認"
+    },
+    {
+      "code": "8835",
+      "name": "太平発",
+      "pts_reaction": "強い",
+      "judgment": "補強",
+      "reason": "前日+3.17%に続きPTS注目、電力実需テーマ補強"
+    },
+    {
+      "code": "2195",
+      "name": "アミタＨＤ",
+      "pts_reaction": "反応あり",
+      "judgment": "補強",
+      "reason": "リサイクル素材の新規テーマ候補として注目"
     }
   ],
   "avoid_themes": [
     {
-      "name": "蓄電池",
-      "reason": "前日急騰後の利確売り警戒。日経-3.4%で小型株も逆風"
-    },
-    {
       "name": "半導体",
-      "reason": "SOX-1.69%微減。自律反発には不十分。日経急落で全面安リスク"
+      "reason": "SOX-4.23%急落。日本株も連動下落必至。寄り買い厳禁"
     },
     {
-      "name": "海運",
-      "reason": "3/27教訓で原油高=海運の短絡禁止。指数急落で重厚長大株全滅"
+      "name": "防衛・宇宙",
+      "reason": "過去的中率0%。アイスペース等材料不明で前日急落。継続回避"
+    },
+    {
+      "name": "海運・資源商社",
+      "reason": "米国で海運ETF-1.3%。原油高でも輸送株は弱い。過去教訓通り回避"
     }
   ],
   "danger_summary": [
-    "蓄電池前日急騰組は寄り天リスク極大",
-    "半導体・海運は指数連動で全面安",
-    "材料不明GUは即利確売り襲来"
+    "SOX-4.23%で半導体株全面安リスク",
+    "日経先物-1.21%で指数寄与度大型株危険",
+    "前日急落の防衛・宇宙・IT小型株は寄り天警戒"
   ],
   "skip_rules": [
-    "個別株の寄り買い全面禁止",
-    "材料不明GU株の追撃厳禁",
-    "海運・半導体は反発確認まで見送り"
+    "材料不明GU株の寄り成買い禁止",
+    "SOX連動半導体株の寄り買い全面禁止",
+    "防衛・宇宙は具体材料出るまで回避継続"
   ],
   "top_conclusion": {
-    "battlefield": "原油集中・商品ETF",
-    "top_theme": "原油・商品ETF",
-    "top_stocks": [
-      "1671",
-      "1514"
-    ],
-    "avoid_themes_short": [
-      "蓄電池",
-      "半導体",
-      "海運"
-    ],
+    "battlefield": "原油実需・電力素材",
+    "top_theme": "電力・エネ実需",
+    "top_stocks": ["9517", "8835", "5856"],
+    "avoid_themes_short": ["半導体", "防衛宇宙", "海運"],
     "ban_rules": [
-      "個別株寄り買い全面禁止",
-      "材料不明GU追撃厳禁"
+      "材料不明GU追撃禁止",
+      "SOX連動株寄り買い禁止",
+      "前日急落株リバ狙い禁止"
     ],
-    "yesterday_hint": "3/27・3/19教訓：急落×原油暴騰は商品ETF一極集中。個別株は小型素材のみ監視"
+    "yesterday_hint": "急落相場でも個別テーマ株の選別物色継続。ETFより電力・素材実需株"
   },
-  "summary": "日経先物-3.4%・WTI+6.6%の地政学ショック。3/19・3/27教訓から原油ETF一択、個別株は住石HD等小型素材を監視のみ。蓄電池利確売り・半導体海運の指数連動安を回避。寄り買い全面禁止、商品ETFの押し目も危険、見送りが最善手",
+  "summary": "WTI105ドル突破で原油高の川下実需テーマ継続。電力・エネルギー素材株をPTSで先行確認。イーレックス・太平発を先導株に押し目狙い。SOX急落で半導体全面回避、防衛宇宙も継続回避。急落相場でも個別材料株に選別資金が集中するパターン4日連続。",
   "us_theme_signals": [
     {
-      "theme_key": "energy_commodities",
-      "theme_label": "資源開発・エネ輸送",
-      "us_strength": "強",
-      "pts_reaction": "不明",
-      "jp_translation": "原油ETF・住石HD・日本コークス等川上素材",
+      "theme_key": "utilities",
+      "theme_label": "公益・送配電",
+      "us_strength": "中",
+      "pts_reaction": "あり",
+      "jp_translation": "東京電力HD・関西電力・イーレックス等の電力株",
       "priority": "本命"
     },
     {
-      "theme_key": "rare_earth",
-      "theme_label": "重要鉱物・レアアース",
-      "us_strength": "中",
-      "pts_reaction": "なし",
-      "jp_translation": "三菱マテ・住友鉱山（ただし指数急落で連動安警戒）",
-      "priority": "見送り"
-    },
-    {
-      "theme_key": "nuclear",
-      "theme_label": "原子力・電力インフラ",
+      "theme_key": "energy_materials",
+      "theme_label": "資源開発",
       "us_strength": "弱",
       "pts_reaction": "なし",
-      "jp_translation": "三菱重工・関電工（米国-1.4%で逆風）",
-      "priority": "見送り"
-    }
-  ]
-}
-```
+      "jp_translation": "商社・非鉄は米国
