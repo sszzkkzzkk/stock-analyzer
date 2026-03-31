@@ -230,6 +230,39 @@
         "sox_change": "-1.69%",
         "fx_change": "-0.36%"
       }
+    },
+    {
+      "date": "2026-03-31",
+      "market_tags": [
+        "NY横ばい",
+        "SOX弱い",
+        "為替横ばい",
+        "原油高騰"
+      ],
+      "predicted_top_theme": "電力・エネ実需（原油実需・川下テーマ）",
+      "actual_top_theme": "蓄電池・次世代エネルギー技術（ペロブスカイト含む）",
+      "theme_hit": false,
+      "theme_match_reason": "原油高は当たったが、実需川下ではなく技術革新側（蓄電池・ペロブスカイト）に資金集中。イラン停戦思惑で実需テーマは限定的",
+      "sign_visible_at_600": "WTI105ドル突破は確認済み。原油高なら素材実需より技術対応（蓄電池・代替エネ）が定石",
+      "sign_hidden_at_600": "生活用品株への突発資金流入、TOPIXコア30への年度末リバランス資金",
+      "fake_theme": "電力・原油実需川下",
+      "fake_reason": "イラン停戦思惑で原油関連は一過性。実需より技術側優位",
+      "leader_stock_name": "ＷＴＯＫＹＯ（蓄電池関連）",
+      "leader_characteristics": "蓄電池テーマS高。原油高対応は実需でなく技術インフラ投資先行",
+      "next_ban_rule": "原油高時は実需川下より技術対応（蓄電池・代替エネ）を優先。実需は二次的",
+      "next_focus": "新年度初日4/1の新規テーマ初動。配当落ち完了後の仕切り直し相場",
+      "key_lesson": "資源高は実需より技術対応（蓄電池・代替エネ）が先行する",
+      "tomorrow_hint": "",
+      "theme_score": 35,
+      "execution_score": 40,
+      "skip_score": 45,
+      "overall_score": 40,
+      "market_snapshot": {
+        "nikkei_change": "-0.78%",
+        "dji_change": "+0.11%",
+        "sox_change": "-4.23%",
+        "fx_change": "-0.08%"
+      }
     }
   ],
   "pattern_stats": {
@@ -327,9 +360,9 @@
       "note": "輸出関連・訪日外客関連に恩恵"
     },
     "原油高騰": {
-      "count": 4,
+      "count": 5,
       "hits": 1,
-      "hit_rate": 0.25,
+      "hit_rate": 0.2,
       "strong_themes": [
         "資源エネルギー",
         "海運",
@@ -375,9 +408,9 @@
       "note": "全面的なリスク回避、ディフェンシブのみ"
     },
     "NY横ばい": {
-      "count": 3,
+      "count": 4,
       "hits": 1,
-      "hit_rate": 0.3333333333333333,
+      "hit_rate": 0.25,
       "strong_themes": [
         "決算好材料",
         "内需・サービス"
@@ -386,12 +419,12 @@
       "note": "個別材料株が主役になりやすい"
     },
     "SOX弱い": {
-      "count": 3,
+      "count": 4,
       "hits": 0,
       "hit_rate": 0.0
     },
     "為替横ばい": {
-      "count": 3,
+      "count": 4,
       "hits": 0,
       "hit_rate": 0.0
     }
@@ -585,6 +618,11 @@
       "count": 1,
       "hits": 0,
       "hit_rate": 0.0
+    },
+    "電力・エネ実需（原油実需・川下テーマ）": {
+      "count": 1,
+      "hits": 0,
+      "hit_rate": 0.0
     }
   },
   "us_theme_stats": {
@@ -622,10 +660,17 @@
       "jp_hit": 0,
       "pts_correct": 0,
       "hit_rate": 0.0
+    },
+    "utilities": {
+      "label": "公益・送配電",
+      "total": 1,
+      "jp_hit": 0,
+      "pts_correct": 0,
+      "hit_rate": 0.0
     }
   },
   "pts_reaction_stats": {},
-  "total_days": 7,
+  "total_days": 8,
   "hit_days": 1,
   "initialized_at": "2026-03-22 16:50:49",
   "init_note": "kabutanテーマ一覧 + 過去1年相場データから初期化"
