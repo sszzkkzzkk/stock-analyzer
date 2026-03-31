@@ -1,62 +1,74 @@
 ```json
 {
-  "verdict": "全面撤回",
-  "verdict_reason": "原油商品ETF不在。実際は蓄電池防衛レアアース等の中小型材料株相場",
-  "actual_battlefield": "蓄電池・防衛・レアアース等テーマ材料株",
-  "capital_flow": "商品ETF無視。中小型材料株にピンポイント資金集中",
+  "verdict": "朝仮説維持",
+  "verdict_reason": "電力エネ実需が主戦場。太平発・イーレックスが上位で仮説的中",
+  "actual_battlefield": "電力・エネルギー実需",
+  "capital_flow": "電力株に集中。蓄電池・ペロブスカイト太陽電池にも分散",
   "theme_status": [
     {
-      "name": "原油・商品ETF",
+      "name": "電力・エネ実需",
+      "status": "継続",
+      "pm_action": "継続狙い"
+    },
+    {
+      "name": "リサイクル素材",
+      "status": "弱まり",
+      "pm_action": "押し目待ち"
+    },
+    {
+      "name": "不動産・期末需要",
       "status": "終息",
       "pm_action": "撤退"
     },
     {
       "name": "蓄電池",
       "status": "新規",
-      "pm_action": "押し目待ち"
+      "pm_action": "継続狙い"
     },
     {
-      "name": "防衛",
+      "name": "ペロブスカイト太陽電池",
       "status": "新規",
-      "pm_action": "押し目待ち"
-    },
-    {
-      "name": "レアアース",
-      "status": "新規",
-      "pm_action": "押し目待ち"
-    },
-    {
-      "name": "地方銀行",
-      "status": "新規",
-      "pm_action": "見送り"
+      "pm_action": "継続狙い"
     }
   ],
   "next_action": {
-    "primary": "蓄電池防衛レアアース関連の板観察。追撃禁止",
-    "secondary": "住石HD・日本コークス材料確認",
-    "stop": "商品ETF監視即中止。個別株寄り買い厳守"
+    "primary": "イーレックス・太平発の板監視。押し目あれば即買い",
+    "secondary": "蓄電池関連銘柄のスクリーニング実施",
+    "stop": "ＷＴＯＫＹＯ等材料不明GU株への追撃"
   },
   "watch_update": [
     {
-      "code": "1514",
-      "name": "住石ＨＤ",
-      "pts_verdict": "補強",
-      "reason": "レアアース関連で上昇。材料確認後判断"
+      "code": "9517",
+      "name": "イーレックス",
+      "pts_verdict": "本命維持",
+      "reason": "2.08%高で上位。電力実需本命継続"
     },
     {
-      "code": "3315",
-      "name": "日本コークス",
+      "code": "8835",
+      "name": "太平発",
       "pts_verdict": "補強",
-      "reason": "素材系で値動き。肥料テーマ可能性"
+      "reason": "3.17%高トップ級。電力テーマ主役格"
     },
     {
-      "code": "8522",
-      "name": "名古屋銀",
-      "pts_verdict": "ノイズ",
-      "reason": "地銀テーマだが持続性疑問。見送り"
+      "code": "2195",
+      "name": "アミタＨＤ",
+      "pts_verdict": "補強",
+      "reason": "リサイクル素材で0.99%高。弱いが継続"
+    },
+    {
+      "code": "9159",
+      "name": "ＷＴＯＫＹＯ",
+      "pts_verdict": "見送り",
+      "reason": "材料不明GU。朝の禁止ルール該当"
+    },
+    {
+      "code": "6731",
+      "name": "ピクセラ",
+      "pts_verdict": "見送り",
+      "reason": "下落転換。テーマ性不明で撤退"
     }
   ],
-  "hint_for_afternoon": "材料株は利確売り警戒。新規追撃厳禁で押し目形成待ち",
-  "hint_for_tomorrow": "蓄電池防衛レアアース継続性検証。商品ETFは完全除外"
+  "hint_for_afternoon": "電力実需の継続性確認。蓄電池新興株の初動狙い可能性",
+  "hint_for_tomorrow": "期末最終日。電力実需の持続性と4月相場転換を警戒"
 }
 ```
