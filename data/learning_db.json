@@ -263,6 +263,38 @@
         "sox_change": "-4.23%",
         "fx_change": "-0.08%"
       }
+    },
+    {
+      "date": "2026-04-01",
+      "market_tags": [
+        "NY大幅上昇",
+        "SOX強い",
+        "為替横ばい"
+      ],
+      "predicted_top_theme": "半導体・SOX連動",
+      "actual_top_theme": "蓄電池・防衛",
+      "theme_hit": false,
+      "theme_match_reason": "SOX+6.2%を根拠に半導体本命と予測したが、朝から半導体は弱く蓄電池・防衛が主導。SOX連動期待は完全に不発で中小型テーマ株分散物色相場",
+      "sign_visible_at_600": "SOX急騰後の米国市場で半導体個別株の値動きを確認すべきだった。大型半導体の出来高と値幅が伴わない兆候",
+      "sign_hidden_at_600": "新年度初日の仕切り直しで地方銀行テーマ突然浮上。PowerX等新顔の動意株化は予測不可能",
+      "fake_theme": "半導体・SOX連動",
+      "fake_reason": "指数は好調だが実際の資金流入は限定的で主導せず",
+      "leader_stock_name": "テラドローン、エクサＷｉｚ（防衛・蓄電池関連）",
+      "leader_characteristics": "ストップ高達成の中小型株。蓄電池・防衛テーマの新顔銘柄が先導",
+      "next_ban_rule": "SOX指数の大幅上昇だけで半導体本命判断禁止。米国個別半導体株の実際の値動き・出来高を必ず確認すること",
+      "next_focus": "蓄電池・防衛テーマの継続性。地方銀行テーマ背景。半導体のSOX先物との乖離",
+      "key_lesson": "指数急騰と実際の資金流入は別。中小型テーマ株分散相場では指数に惑わされるな",
+      "tomorrow_hint": "",
+      "theme_score": 25,
+      "execution_score": 40,
+      "skip_score": 30,
+      "overall_score": 32,
+      "market_snapshot": {
+        "nikkei_change": "+4.37%",
+        "dji_change": "+2.49%",
+        "sox_change": "+6.24%",
+        "fx_change": "-0.20%"
+      }
     }
   ],
   "pattern_stats": {
@@ -332,7 +364,7 @@
       "note": "半導体テーマは全面回避"
     },
     "SOX強い": {
-      "count": 0,
+      "count": 1,
       "hits": 0,
       "hit_rate": 0.0,
       "strong_themes": [
@@ -424,7 +456,12 @@
       "hit_rate": 0.0
     },
     "為替横ばい": {
-      "count": 4,
+      "count": 5,
+      "hits": 0,
+      "hit_rate": 0.0
+    },
+    "NY大幅上昇": {
+      "count": 1,
       "hits": 0,
       "hit_rate": 0.0
     }
@@ -623,6 +660,11 @@
       "count": 1,
       "hits": 0,
       "hit_rate": 0.0
+    },
+    "半導体・SOX連動": {
+      "count": 1,
+      "hits": 0,
+      "hit_rate": 0.0
     }
   },
   "us_theme_stats": {
@@ -670,7 +712,7 @@
     }
   },
   "pts_reaction_stats": {},
-  "total_days": 8,
+  "total_days": 9,
   "hit_days": 1,
   "initialized_at": "2026-03-22 16:50:49",
   "init_note": "kabutanテーマ一覧 + 過去1年相場データから初期化"
