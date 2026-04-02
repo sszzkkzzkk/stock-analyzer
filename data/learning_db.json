@@ -295,6 +295,39 @@
         "sox_change": "+6.24%",
         "fx_change": "-0.20%"
       }
+    },
+    {
+      "date": "2026-04-02",
+      "market_tags": [
+        "NY横ばい",
+        "SOX強い",
+        "為替横ばい",
+        "原油急落"
+      ],
+      "predicted_top_theme": "レアアース集中",
+      "actual_top_theme": "レアアース・資源系（リサイクル含む）",
+      "theme_hit": true,
+      "theme_match_reason": "レアアース予想は的中。大阪チタ、アミタHD（リサイクル）などが急騰。ただし防衛・蓄電池など派生テーマへの資金分散を予測できず、集中度は想定以下",
+      "sign_visible_at_600": "米国レアアース急騰、原材料調達難のニュース、資源選別相場の兆候",
+      "sign_hidden_at_600": "トランプ対イラン攻撃警告という地政学リスク急拡大、防衛関連への急速な資金シフト",
+      "fake_theme": "半導体製造装置",
+      "fake_reason": "東京エレクトロン等は期待外れ、SOX急騰も国内には波及せず",
+      "leader_stock_name": "アミタHD",
+      "leader_characteristics": "レアアースリサイクル、改正資源有効利用促進法施行という法規制追い風でストップ高",
+      "next_ban_rule": "地政学リスク発生時は防衛・資源の複合テーマとして扱い、単一テーマ集中予想を避ける",
+      "next_focus": "対イラン情勢の進展、防衛・資源テーマの持続性、日経先物リバウンドの有無と蓄電池継続性",
+      "key_lesson": "資源テーマは地政学リスクで防衛・エネルギー安全保障に即座に拡散する",
+      "tomorrow_hint": "",
+      "theme_score": 75,
+      "execution_score": 60,
+      "skip_score": 50,
+      "overall_score": 62,
+      "market_snapshot": {
+        "nikkei_change": "-2.35%",
+        "dji_change": "+0.48%",
+        "sox_change": "+2.82%",
+        "fx_change": "+0.46%"
+      }
     }
   ],
   "pattern_stats": {
@@ -364,9 +397,9 @@
       "note": "半導体テーマは全面回避"
     },
     "SOX強い": {
-      "count": 1,
-      "hits": 0,
-      "hit_rate": 0.0,
+      "count": 2,
+      "hits": 1,
+      "hit_rate": 0.5,
       "strong_themes": [
         "半導体",
         "電線・ケーブル",
@@ -407,9 +440,9 @@
       "note": "資源株・エネルギー輸送に資金集中"
     },
     "原油急落": {
-      "count": 2,
-      "hits": 0,
-      "hit_rate": 0.0,
+      "count": 3,
+      "hits": 1,
+      "hit_rate": 0.3333333333333333,
       "strong_themes": [
         "航空",
         "化学・素材",
@@ -440,9 +473,9 @@
       "note": "全面的なリスク回避、ディフェンシブのみ"
     },
     "NY横ばい": {
-      "count": 4,
-      "hits": 1,
-      "hit_rate": 0.25,
+      "count": 5,
+      "hits": 2,
+      "hit_rate": 0.4,
       "strong_themes": [
         "決算好材料",
         "内需・サービス"
@@ -456,9 +489,9 @@
       "hit_rate": 0.0
     },
     "為替横ばい": {
-      "count": 5,
-      "hits": 0,
-      "hit_rate": 0.0
+      "count": 6,
+      "hits": 1,
+      "hit_rate": 0.16666666666666666
     },
     "NY大幅上昇": {
       "count": 1,
@@ -665,6 +698,11 @@
       "count": 1,
       "hits": 0,
       "hit_rate": 0.0
+    },
+    "レアアース集中": {
+      "count": 1,
+      "hits": 1,
+      "hit_rate": 1.0
     }
   },
   "us_theme_stats": {
@@ -677,7 +715,7 @@
     },
     "semiconductor": {
       "label": "半導体",
-      "total": 1,
+      "total": 2,
       "jp_hit": 0,
       "pts_correct": 0,
       "hit_rate": 0.0
@@ -690,11 +728,11 @@
       "hit_rate": 0.0
     },
     "rare_earth": {
-      "label": "重要鉱物・レアアース",
-      "total": 1,
-      "jp_hit": 0,
+      "label": "レアアース",
+      "total": 2,
+      "jp_hit": 1,
       "pts_correct": 0,
-      "hit_rate": 0.0
+      "hit_rate": 0.5
     },
     "nuclear": {
       "label": "原子力・電力インフラ",
@@ -709,11 +747,18 @@
       "jp_hit": 0,
       "pts_correct": 0,
       "hit_rate": 0.0
+    },
+    "resources": {
+      "label": "資源開発",
+      "total": 1,
+      "jp_hit": 1,
+      "pts_correct": 0,
+      "hit_rate": 1.0
     }
   },
   "pts_reaction_stats": {},
-  "total_days": 9,
-  "hit_days": 1,
+  "total_days": 10,
+  "hit_days": 2,
   "initialized_at": "2026-03-22 16:50:49",
   "init_note": "kabutanテーマ一覧 + 過去1年相場データから初期化"
 }
