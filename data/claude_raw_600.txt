@@ -1,218 +1,209 @@
 ```json
 {
   "strategy": {
-    "market_regime": "selective",
-    "market_regime_label": "選別相場",
+    "market_regime": "attack",
+    "market_regime_label": "攻めやすい",
     "entry_style": "breakout",
     "entry_style_label": "初動ブレイク狙い",
     "danger_level": "中",
-    "battlefield": "レアアース集中",
-    "one_line": "原油急落とSOX急騰の綱引き。米国レアアース急騰を受け資源選別相場"
+    "battlefield": "原油暴騰エネ技術",
+    "one_line": "WTI+6.74%で111ドル突破→蓄電池・代替エネ技術に資金一極集中"
   },
   "conclusion": {
-    "battlefield": "レアアース集中",
+    "battlefield": "原油暴騰エネ技術",
     "top_stock": {
-      "code": "5711",
-      "name": "三菱マテリアル"
+      "code": "6937",
+      "name": "古河電池"
     },
     "second_stock": {
-      "code": "5713",
-      "name": "住友金属鉱山"
+      "code": "5714",
+      "name": "DOWA"
     },
-    "watch_codes": ["5711", "5713", "8001"],
-    "avoid_summary": "半導体・原油実需・防衛",
-    "ban_summary": "SOX急騰だけで半導体追撃禁止。前日急騰テーマ追い禁止"
+    "watch_codes": ["6937", "5714", "3126", "4080"],
+    "avoid_summary": "防衛・素材実需・半導体",
+    "ban_summary": "原油高で素材実需追い禁止。技術対応優先"
   },
   "themes": [
     {
       "rank": "A",
       "rank_label": "本命",
-      "name": "レアアース",
-      "score": 88,
-      "reason": "米国+3.6%急騰。三菱マテのリサイクル報道。過去的中率100%テーマ",
-      "continuity": "新規",
+      "name": "蓄電池技術",
+      "score": 92,
+      "reason": "WTI111ドル台突破で3日連続高騰。過去教訓で原油高は実需より技術対応が定石。蓄電池は3日連続的中テーマ",
+      "continuity": "継続",
       "leader_strength": "強",
-      "ripple": "中",
-      "leader_stock": "三菱マテリアル",
-      "entry_hint": "三菱マテ寄り+3%超で初動買い。住友鉱も連動確認後追随",
+      "ripple": "広",
+      "leader_stock": "古河電池",
+      "entry_hint": "先導株の寄り+3%以上で初動追随。9:10までの連想株連鎖確認",
       "invalidation_signs": [
-        "三菱マテが寄り後9:30までに+1%未満に失速",
-        "住友鉱が前日比マイナス圏で推移",
-        "商社セクター全般が無反応"
+        "古河電池が寄り後30分以内にマイ転",
+        "9:30時点で連想1軍（DOWA、エンビプロ）が前日比プラス圏維持できず",
+        "原油が寄り付き後に急落しWTI105ドル割れ"
       ]
     },
     {
       "rank": "B",
       "rank_label": "対抗",
-      "name": "資源開発",
-      "score": 72,
-      "reason": "米国資源株+3.7%。原油急落だが金+1.7%と非鉄選別買い優勢",
+      "name": "レアアース",
+      "score": 68,
+      "reason": "米国レアアース+1.6%で続伸。過去的中率100%。ただし原油暴騰時は蓄電池に資金優先される傾向",
       "continuity": "継続",
       "leader_strength": "中",
       "ripple": "中",
-      "leader_stock": "住友金属鉱山",
-      "entry_hint": "住友鉱・INPEX連動確認。商社は伊藤忠が先導なら追随",
+      "leader_stock": "双日",
+      "entry_hint": "9:20以降、蓄電池が一巡後に商社セクター連鎖確認してから",
       "invalidation_signs": [
-        "住友鉱が9:20時点でマイナス圏",
-        "WTI原油が欧州時間で-5%超に拡大"
+        "双日・伊藤忠が寄り天形成で9:30までに失速",
+        "米国レアアース関連の続報なく材料枯れ判断"
       ]
     },
     {
       "rank": "C",
       "rank_label": "監視",
-      "name": "半導体製造装置",
-      "score": 52,
-      "reason": "SOX+2.8%だが前日も強いのに無反応。米個別出来高要確認",
-      "continuity": "終息",
+      "name": "ペロブスカイト",
+      "score": 48,
+      "reason": "代替エネルギー技術の一角。原油高で注目されるが、蓄電池より格下。選別相場で個別材料次第",
+      "continuity": "継続",
       "leader_strength": "弱",
       "ripple": "狭",
-      "leader_stock": "東京エレクトロン",
-      "entry_hint": "東エレ寄り+2%超かつ9:15に上昇継続なら様子見追随可",
+      "leader_stock": "積水化学",
+      "entry_hint": "蓄電池・レアアースが飽和後、9:45以降に個別材料確認して慎重に",
       "invalidation_signs": [
-        "東エレが寄り後即失速",
-        "アドバンテストが無反応",
-        "9:30時点でSOX先物が反落"
+        "積水化学が出来高薄く寄り後すぐに値動き停滞",
+        "エネルギー技術全体の資金が蓄電池に一極集中し波及せず"
       ]
     }
   ],
   "watchlist": [
     {
       "role": "本命",
-      "name": "三菱マテリアル",
-      "code": "5711",
-      "theme": "レアアース",
+      "name": "古河電池",
+      "code": "6937",
+      "theme": "蓄電池技術",
       "purpose": "利益狙い",
-      "trigger": "寄り+3%以上かつ出来高前日比200%超で初動買い",
-      "invalidation": "9:30までに+1%未満に失速または前日高値割れ",
+      "trigger": "寄り+3%以上かつ出来高前日比200%超で初動ブレイク",
+      "invalidation": "寄り後30分以内に前日比マイ転または寄り天形成でVWAP割れ",
       "time_window": "9:00-9:30"
     },
     {
       "role": "先導確認",
-      "name": "住友金属鉱山",
-      "code": "5713",
-      "theme": "資源開発",
+      "name": "DOWA",
+      "code": "5714",
+      "theme": "蓄電池技術",
       "purpose": "連想本線",
-      "trigger": "寄り+2%以上かつ三菱マテ連動確認後",
-      "invalidation": "9:20時点でマイナス圏または三菱マテと逆行",
-      "time_window": "9:00-9:30"
+      "trigger": "古河電池が先導確認後、9:10までに+2%以上で連鎖開始",
+      "invalidation": "9:30までに前日比プラス圏維持できず失速",
+      "time_window": "9:10-9:40"
     },
     {
       "role": "連想本線",
-      "name": "伊藤忠商事",
-      "code": "8001",
-      "theme": "資源開発",
-      "purpose": "連想補助",
-      "trigger": "寄り+1%以上かつ非鉄2社の上昇継続確認後",
-      "invalidation": "9:30までに前日比マイ転",
+      "name": "エンビプロHD",
+      "code": "5698",
+      "theme": "蓄電池技術",
+      "purpose": "連想本線",
+      "trigger": "蓄電池テーマ拡散確認後、9:15までに+1.5%以上で参戦",
+      "invalidation": "出来高が前日比150%未満で薄商い判断",
       "time_window": "9:15-9:45"
     },
     {
-      "role": "監視のみ",
-      "name": "東京エレクトロン",
-      "code": "8035",
-      "theme": "半導体製造装置",
+      "role": "連想本線",
+      "name": "双日",
+      "code": "2768",
+      "theme": "レアアース",
+      "purpose": "連想本線",
+      "trigger": "9:20以降、商社セクター全体が堅調で+1%以上",
+      "invalidation": "寄り天形成で9:30までに+0.5%未満に失速",
+      "time_window": "9:20-10:00"
+    },
+    {
+      "role": "連想本線",
+      "name": "伊藤忠",
+      "code": "8001",
+      "theme": "レアアース",
+      "purpose": "連想本線",
+      "trigger": "双日連動確認後、9:25以降に商社全体買いで+1%以上",
+      "invalidation": "9:40までにプラス圏維持できず商社セクター失速",
+      "time_window": "9:25-10:00"
+    },
+    {
+      "role": "連想補助",
+      "name": "積水化学",
+      "code": "4204",
+      "theme": "ペロブスカイト",
+      "purpose": "連想補助",
+      "trigger": "9:45以降、蓄電池一巡後に個別材料ニュース確認で+1%以上",
+      "invalidation": "出来高薄く10:00時点で値動き停滞し前日比+0.5%未満",
+      "time_window": "9:45-10:30"
+    },
+    {
+      "role": "連想補助",
+      "name": "東京電力HD",
+      "code": "9501",
+      "theme": "電力",
       "purpose": "監視のみ",
-      "trigger": "寄り+2%以上かつ9:15時点で上昇継続なら様子見",
-      "invalidation": "寄り後即失速または9:30までに前日比マイ転",
+      "trigger": "原油暴騰でコスト懸念浮上なら逆に売られる可能性。監視のみ",
+      "invalidation": "寄りからマイナス圏推移で電力セクター全体が逆行安",
       "time_window": "9:00-9:30"
     },
     {
+      "role": "連想2軍",
+      "name": "三菱マテリアル",
+      "code": "5711",
+      "theme": "レアアース",
+      "purpose": "連想補助",
+      "trigger": "商社連鎖後、非鉄セクター全体が堅調で+1%以上",
+      "invalidation": "9:40までに出来高薄く値動き鈍い",
+      "time_window": "9:30-10:00"
+    },
+    {
       "role": "触らない",
-      "name": "PowerX",
-      "code": "9276",
-      "theme": "蓄電池",
+      "name": "石川製作所",
+      "code": "6208",
+      "theme": "防衛",
       "purpose": "触らない",
-      "trigger": "前日急騰のため本日は見送り",
-      "invalidation": "寄りGUなら即回避。押し目待ちも禁止",
+      "trigger": "防衛は過去的中率0%。トランプ報道あるも原油暴騰時は資金分散",
+      "invalidation": "寄りから材料不明の急騰でも追撃禁止。寄り天リスク大",
       "time_window": "終日"
     },
     {
       "role": "触らない",
-      "name": "三菱重工",
-      "code": "7011",
-      "theme": "防衛",
+      "name": "東京エレクトロン",
+      "code": "8035",
+      "theme": "半導体",
       "purpose": "触らない",
-      "trigger": "前日高値更新かつ出来高急増なら例外的に検討",
-      "invalidation": "通常は見送り。過去的中率0%テーマ",
+      "trigger": "SOX+0.4%は微増。過去教訓でSOX微増では半導体本命判断禁止",
+      "invalidation": "個別半導体株の実際の値動き確認必須。SOXだけで判断せず",
       "time_window": "終日"
     }
   ],
   "pts_judgments": [
     {
-      "code": "5711",
-      "name": "三菱マテリアル",
+      "code": "6937",
+      "name": "古河電池",
       "pts_reaction": "反応なし",
       "judgment": "本命維持",
-      "reason": "米国報道が材料。PTS薄商いは無視可"
-    },
-    {
-      "code": "8035",
-      "name": "東京エレクトロン",
-      "pts_reaction": "薄い",
-      "judgment": "見送り",
-      "reason": "SOX急騰でもPTS無反応。様子見優先"
+      "reason": "PTSなしでも原油暴騰材料で本命確定"
     }
   ],
   "avoid_themes": [
     {
-      "name": "蓄電池",
-      "reason": "前日PowerX等急騰。本日は寄り天リスク高く利確売り警戒"
-    },
-    {
       "name": "防衛",
-      "reason": "過去的中率0%。米国+2.1%も日本株での連動実績なし"
+      "reason": "過去的中率0%。トランプ報道あるも原油暴騰時は蓄電池に資金集中。防衛は二次的"
     },
     {
-      "name": "原油実需",
-      "reason": "WTI-3.9%急落。川下実需より技術対応が定石だが蓄電池は前日急騰済"
+      "name": "半導体",
+      "reason": "SOX+0.4%は微増。過去教訓でSOX微増だけで半導体本命判断禁止。米個別株確認必須"
+    },
+    {
+      "name": "素材実需",
+      "reason": "原油高は素材実需より技術対応が定石。3/31の教訓で実需は二次的と確定"
     }
   ],
   "danger_summary": [
-    "前日急騰テーマ（蓄電池・地銀）→寄り天警戒",
-    "SOX急騰も日本半導体は前日無反応→様子見"
+    "防衛株は材料不明GUでも寄り天リスク大",
+    "半導体はSOX微増のみで本命判断禁止",
+    "電力株は原油高でコスト懸念浮上し逆行安リスク"
   ],
   "skip_rules": [
-    "SOX急騰だけで半導体追撃禁止",
-    "前日急騰テーマ（蓄電池・地銀）追い禁止",
-    "防衛は過去的中率0%で原則見送り"
-  ],
-  "top_conclusion": {
-    "battlefield": "レアアース集中",
-    "top_theme": "レアアース",
-    "top_stocks": ["5711", "5713", "8001"],
-    "avoid_themes_short": ["蓄電池", "防衛", "半導体"],
-    "ban_rules": [
-      "SOX急騰だけで半導体追撃禁止",
-      "前日急騰テーマ追い禁止"
-    ],
-    "yesterday_hint": "指数急騰と実資金流入は別。テーマ的中率100%のレアアースに集中"
-  },
-  "summary": "米国レアアース+3.6%急騰と三菱マテ報道で資金集中。過去的中率100%テーマを本命視。SOX急騰も日本半導体は前日無反応で様子見。原油急落だが金高で非鉄選別買い。前日急騰の蓄電池・地銀は寄り天警戒",
-  "us_theme_signals": [
-    {
-      "theme_key": "rare_earth",
-      "theme_label": "レアアース",
-      "us_strength": "強",
-      "pts_reaction": "なし",
-      "jp_translation": "三菱マテリアル・住友金属鉱山・伊藤忠商事",
-      "priority": "本命"
-    },
-    {
-      "theme_key": "resources",
-      "theme_label": "資源開発",
-      "us_strength": "強",
-      "pts_reaction": "なし",
-      "jp_translation": "住友金属鉱山・INPEX・三井物産",
-      "priority": "対抗"
-    },
-    {
-      "theme_key": "semiconductor",
-      "theme_label": "半導体",
-      "us_strength": "強",
-      "pts_reaction": "薄い",
-      "jp_translation": "東京エレクトロン・アドバンテスト",
-      "priority": "様子見"
-    }
-  ]
-}
-```
+    "原油高で素材実需追い禁止。技術対応（蓄電池・代替エネ）優先",
+    "SOX微増だけで半導体本命判断
