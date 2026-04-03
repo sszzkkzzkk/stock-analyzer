@@ -328,6 +328,39 @@
         "sox_change": "+2.82%",
         "fx_change": "+0.46%"
       }
+    },
+    {
+      "date": "2026-04-03",
+      "market_tags": [
+        "NY横ばい",
+        "SOX横ばい",
+        "為替横ばい",
+        "原油高騰"
+      ],
+      "predicted_top_theme": "蓄電池技術",
+      "actual_top_theme": "防衛・鉄鋼",
+      "theme_hit": false,
+      "theme_match_reason": "原油高を蓄電池・代替エネに直結させたが、実際は素材（鉄鋼のコスト転嫁期待）と韓国防衛株高の国内波及に資金が集中。連想の方向性を誤った",
+      "sign_visible_at_600": "WTI+6.74%は素材高騰→鉄鋼等のコスト転嫁シナリオが可視。韓国地政学リスクは前日から存在",
+      "sign_hidden_at_600": "韓国防衛株の具体的な上昇率。稀元素急落の材料。地銀・肥料の突発テーマ化の前兆",
+      "fake_theme": "レアアース",
+      "fake_reason": "朝の予測リストに入れたが稀元素急落で逆回転、AM敗者テーマに",
+      "leader_stock_name": "東京製鉄",
+      "leader_characteristics": "原油高→製造コスト上昇→価格転嫁期待の素直な連想。中型で流動性確保",
+      "next_ban_rule": "原油高は「代替エネ」より「素材コスト転嫁」「防衛」の連想を優先する",
+      "next_focus": "韓国市場の前日動向（特に防衛株）。商品市況の急変動（稀元素等）を確認",
+      "key_lesson": "原油暴騰は省エネより素材・防衛の直接連想が先行する",
+      "tomorrow_hint": "",
+      "theme_score": 30,
+      "execution_score": 45,
+      "skip_score": 20,
+      "overall_score": 32,
+      "market_snapshot": {
+        "nikkei_change": "+1.40%",
+        "dji_change": "-0.13%",
+        "sox_change": "+0.40%",
+        "fx_change": "+0.08%"
+      }
     }
   ],
   "pattern_stats": {
@@ -337,9 +370,9 @@
       "hit_rate": 0.625
     },
     "SOX横ばい": {
-      "count": 9,
+      "count": 10,
       "hits": 6,
-      "hit_rate": 0.6666666666666666
+      "hit_rate": 0.6
     },
     "円高": {
       "count": 7,
@@ -425,9 +458,9 @@
       "note": "輸出関連・訪日外客関連に恩恵"
     },
     "原油高騰": {
-      "count": 5,
+      "count": 6,
       "hits": 1,
-      "hit_rate": 0.2,
+      "hit_rate": 0.16666666666666666,
       "strong_themes": [
         "資源エネルギー",
         "海運",
@@ -473,9 +506,9 @@
       "note": "全面的なリスク回避、ディフェンシブのみ"
     },
     "NY横ばい": {
-      "count": 5,
+      "count": 6,
       "hits": 2,
-      "hit_rate": 0.4,
+      "hit_rate": 0.3333333333333333,
       "strong_themes": [
         "決算好材料",
         "内需・サービス"
@@ -489,9 +522,9 @@
       "hit_rate": 0.0
     },
     "為替横ばい": {
-      "count": 6,
+      "count": 7,
       "hits": 1,
-      "hit_rate": 0.16666666666666666
+      "hit_rate": 0.14285714285714285
     },
     "NY大幅上昇": {
       "count": 1,
@@ -703,6 +736,11 @@
       "count": 1,
       "hits": 1,
       "hit_rate": 1.0
+    },
+    "蓄電池技術": {
+      "count": 1,
+      "hits": 0,
+      "hit_rate": 0.0
     }
   },
   "us_theme_stats": {
@@ -757,7 +795,7 @@
     }
   },
   "pts_reaction_stats": {},
-  "total_days": 10,
+  "total_days": 11,
   "hit_days": 2,
   "initialized_at": "2026-03-22 16:50:49",
   "init_note": "kabutanテーマ一覧 + 過去1年相場データから初期化"
