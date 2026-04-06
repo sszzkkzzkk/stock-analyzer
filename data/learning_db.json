@@ -361,6 +361,39 @@
         "sox_change": "+0.40%",
         "fx_change": "+0.08%"
       }
+    },
+    {
+      "date": "2026-04-06",
+      "market_tags": [
+        "NY横ばい",
+        "SOX横ばい",
+        "為替横ばい",
+        "原油高騰"
+      ],
+      "predicted_top_theme": "原油関連素材・海運集中",
+      "actual_top_theme": "蓄電池・半導体・データセンター・指数構成株",
+      "theme_hit": false,
+      "theme_match_reason": "WTI+7%から素材海運を予測したが、中東懸念後退で防衛蓄電池等の実需テーマと指数構成大型株への資金移動が主流となり完全に外れた",
+      "sign_visible_at_600": "韓国株上昇と供給懸念緩和の報道から、原油高でも素材海運より防衛実需株へ資金流入の可能性を読むべきだった",
+      "sign_hidden_at_600": "JPX400・TOPIXコア30のリバランス思惑による指数構成大型株への静かな買い戻し開始は朝6時点で不可視",
+      "fake_theme": "原油関連素材・海運",
+      "fake_reason": "WTI+7%でも中東懸念後退で需要消滅、見送られた",
+      "leader_stock_name": "IGS・VNX（蓄電池・データセンター関連小型株）",
+      "leader_characteristics": "ストップ高、実需テーマの中小型成長株に資金集中、指数関係なく個別材料で急騰",
+      "next_ban_rule": "原油高単独での素材海運予測禁止。地政学リスク後退局面では防衛実需株優先ルール設定",
+      "next_focus": "中国市場再開後の反応、指数構成大型株の継続性、海外半導体株の週末動向を最優先確認",
+      "key_lesson": "商品高騰理由が地政学リスクの場合、懸念後退時は素材でなく実需株へ資金移動",
+      "tomorrow_hint": "",
+      "theme_score": 15,
+      "execution_score": 30,
+      "skip_score": 70,
+      "overall_score": 25,
+      "market_snapshot": {
+        "nikkei_change": "+0.56%",
+        "dji_change": "-0.13%",
+        "sox_change": "+0.40%",
+        "fx_change": "-0.04%"
+      }
     }
   ],
   "pattern_stats": {
@@ -370,9 +403,9 @@
       "hit_rate": 0.625
     },
     "SOX横ばい": {
-      "count": 10,
+      "count": 11,
       "hits": 6,
-      "hit_rate": 0.6
+      "hit_rate": 0.5454545454545454
     },
     "円高": {
       "count": 7,
@@ -458,9 +491,9 @@
       "note": "輸出関連・訪日外客関連に恩恵"
     },
     "原油高騰": {
-      "count": 6,
+      "count": 7,
       "hits": 1,
-      "hit_rate": 0.16666666666666666,
+      "hit_rate": 0.14285714285714285,
       "strong_themes": [
         "資源エネルギー",
         "海運",
@@ -506,9 +539,9 @@
       "note": "全面的なリスク回避、ディフェンシブのみ"
     },
     "NY横ばい": {
-      "count": 6,
+      "count": 7,
       "hits": 2,
-      "hit_rate": 0.3333333333333333,
+      "hit_rate": 0.2857142857142857,
       "strong_themes": [
         "決算好材料",
         "内需・サービス"
@@ -522,9 +555,9 @@
       "hit_rate": 0.0
     },
     "為替横ばい": {
-      "count": 7,
+      "count": 8,
       "hits": 1,
-      "hit_rate": 0.14285714285714285
+      "hit_rate": 0.125
     },
     "NY大幅上昇": {
       "count": 1,
@@ -741,6 +774,11 @@
       "count": 1,
       "hits": 0,
       "hit_rate": 0.0
+    },
+    "原油関連素材・海運集中": {
+      "count": 1,
+      "hits": 0,
+      "hit_rate": 0.0
     }
   },
   "us_theme_stats": {
@@ -795,7 +833,7 @@
     }
   },
   "pts_reaction_stats": {},
-  "total_days": 11,
+  "total_days": 12,
   "hit_days": 2,
   "initialized_at": "2026-03-22 16:50:49",
   "init_note": "kabutanテーマ一覧 + 過去1年相場データから初期化"
