@@ -1,5 +1,5 @@
 {
-  "date": "2026-04-06",
+  "date": "2026-04-07",
   "session": "905",
   "generated_at": "09:05",
   "data_sources": [
@@ -10,79 +10,20 @@
     "SOX1件",
     "原油1件",
     "値上がり12件",
-    "値下がり11件",
+    "値下がり12件",
     "テーマ10件",
     "かぶたんニュース14件",
     "NHKニュース10件"
   ],
-  "verdict": "半分修正",
-  "verdict_reason": "鉄鋼は的中も、海運・商社不発。半導体・蓄電池が主戦場",
-  "actual_battlefield": "蓄電池・半導体・防衛",
-  "capital_flow": "素材から電子部品・防衛へ。小型株は個別材料で分散",
-  "theme_status": [
-    {
-      "name": "海運・資源素材",
-      "status": "弱まり",
-      "pm_action": "見送り"
-    },
-    {
-      "name": "鉄鋼・非鉄素材",
-      "status": "継続",
-      "pm_action": "押し目待ち"
-    },
-    {
-      "name": "レアアース商社",
-      "status": "弱まり",
-      "pm_action": "見送り"
-    },
-    {
-      "name": "蓄電池",
-      "status": "新規",
-      "pm_action": "継続狙い"
-    },
-    {
-      "name": "半導体",
-      "status": "新規",
-      "pm_action": "継続狙い"
-    },
-    {
-      "name": "防衛",
-      "status": "新規",
-      "pm_action": "継続狙い"
-    }
-  ],
-  "next_action": {
-    "primary": "蓄電池・半導体関連の板確認、出来高急増銘柄を特定",
-    "secondary": "東京製鉄・太陽誘電の値動き監視",
-    "stop": "海運・商社の新規エントリー停止"
-  },
-  "watch_update": [
-    {
-      "code": "5423",
-      "name": "東京製鉄",
-      "pts_verdict": "本命維持",
-      "reason": "2.63%高、鉄鋼セクター唯一の勝ち組"
-    },
-    {
-      "code": "6976",
-      "name": "太陽誘電",
-      "pts_verdict": "補強",
-      "reason": "2.06%高、半導体テーマで急浮上"
-    },
-    {
-      "code": "9417",
-      "name": "スマバ",
-      "pts_verdict": "ノイズ",
-      "reason": "2.60%高も出来高データなく個別材料"
-    },
-    {
-      "code": "6597",
-      "name": "ＨＰＣシス",
-      "pts_verdict": "ノイズ",
-      "reason": "データセンター関連だが板薄で追えず"
-    }
-  ],
-  "hint_for_afternoon": "蓄電池・半導体の継続性確認。鉄鋼は押し目あれば拾い",
-  "hint_for_tomorrow": "原油素材テーマ失速原因を分析。電子部品物色継続か検証",
-  "summary": ""
+  "verdict": "分析失敗",
+  "verdict_reason": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZoS9E8PY2GAzS66wNiaz'}",
+  "actual_battlefield": "",
+  "capital_flow": "",
+  "theme_status": [],
+  "next_action": {},
+  "watch_update": [],
+  "hint_for_afternoon": "",
+  "hint_for_tomorrow": "",
+  "summary": "AI分析に失敗しました: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZoS9E8PY2GAzS66wNiaz'}",
+  "analysis_status": "failed"
 }
