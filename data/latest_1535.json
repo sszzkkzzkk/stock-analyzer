@@ -1,5 +1,5 @@
 {
-  "date": "2026-04-06",
+  "date": "2026-04-07",
   "session": "1535",
   "generated_at": "15:35",
   "data_sources": [
@@ -9,39 +9,14 @@
     "ドル円1件",
     "SOX1件",
     "原油1件",
-    "値上がり12件",
-    "値下がり12件",
+    "値上がり14件",
+    "値下がり10件",
     "テーマ10件",
     "かぶたんニュース14件",
     "NHKニュース10件",
     "ロイター10件"
   ],
-  "review": {
-    "theme_hit": false,
-    "predicted_top_theme": "原油関連素材・海運集中",
-    "actual_top_theme": "蓄電池・半導体・データセンター・指数構成株",
-    "theme_match_reason": "WTI+7%から素材海運を予測したが、中東懸念後退で防衛蓄電池等の実需テーマと指数構成大型株への資金移動が主流となり完全に外れた",
-    "sign_visible_at_600": "韓国株上昇と供給懸念緩和の報道から、原油高でも素材海運より防衛実需株へ資金流入の可能性を読むべきだった",
-    "sign_hidden_at_600": "JPX400・TOPIXコア30のリバランス思惑による指数構成大型株への静かな買い戻し開始は朝6時点で不可視",
-    "fake_theme": "原油関連素材・海運",
-    "fake_reason": "WTI+7%でも中東懸念後退で需要消滅、見送られた",
-    "leader_stock_name": "IGS・VNX（蓄電池・データセンター関連小型株）",
-    "leader_characteristics": "ストップ高、実需テーマの中小型成長株に資金集中、指数関係なく個別材料で急騰",
-    "next_ban_rule": "原油高単独での素材海運予測禁止。地政学リスク後退局面では防衛実需株優先ルール設定",
-    "next_focus": "中国市場再開後の反応、指数構成大型株の継続性、海外半導体株の週末動向を最優先確認",
-    "key_lesson": "商品高騰理由が地政学リスクの場合、懸念後退時は素材でなく実需株へ資金移動",
-    "pattern_tags": [
-      "WTI+7%",
-      "中東懸念後退",
-      "日経先物+1.35%",
-      "指数リバランス思惑",
-      "韓国株上昇"
-    ],
-    "theme_score": 15,
-    "execution_score": 30,
-    "skip_score": 70,
-    "overall_score": 25
-  },
-  "tomorrow_hint": "中国市場再開後の半導体・データセンター関連の反応を最優先確認。JPX400・コア30等指数構成株の継続買い有無と、蓄電池防衛関連の実需テーマ継続性を同時チェック",
-  "summary": "原油高から素材海運を予測も完全外れ。中東懸念後退で蓄電池・半導体データセンター等の実需株とJPX400等指数構成大型株に資金集中。地政学リスク後退局面では商品高でも実需テーマ優先の法則を学習"
+  "review": {},
+  "summary": "AI分析に失敗しました: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZowt93sfUgikeE6oeiS1'}",
+  "analysis_status": "failed"
 }
