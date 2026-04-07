@@ -1,5 +1,5 @@
 {
-  "date": "2026-04-06",
+  "date": "2026-04-07",
   "session": "1200",
   "generated_at": "12:01",
   "data_sources": [
@@ -9,135 +9,26 @@
     "ドル円1件",
     "SOX1件",
     "原油1件",
-    "値上がり13件",
-    "値下がり13件",
+    "値上がり14件",
+    "値下がり10件",
     "テーマ10件",
     "かぶたんニュース14件",
     "NHKニュース10件"
   ],
   "log": {
-    "am_winner_theme": "蓄電池・半導体・データセンター",
-    "am_loser_theme": "バイオ・小型グロース株",
-    "new_theme_emerged": "JPX日経400・TOPIXコア30（指数寄り物色）",
-    "hypothesis_correction": "原油素材海運は期待外れ。実際は中東懸念後退で防衛蓄電池等の実需テーマへ資金移動。指数構成大型株にも買い戻し。",
-    "capital_flow_am": "商社資源は見送られ、半導体データセンター蓄電池の中型実需株へ集中。地銀TOPIXコア30等の指数買い戻しも顕著。",
-    "sign_that_was_visible": "韓国株上昇・供給懸念緩和ニュースで素材弱含み予兆",
-    "sign_that_was_hidden": "JPX400・コア30が静かに上昇開始していた指数リバランス思惑",
-    "hint_for_tomorrow_600": "明日朝は中国市場再開後の反応確認。指数構成大型株の継続性と半導体関連の海外半導体株動向を最優先チェック。"
+    "am_winner_theme": "",
+    "am_loser_theme": "",
+    "new_theme_emerged": "",
+    "hypothesis_correction": "",
+    "capital_flow_am": "",
+    "sign_that_was_visible": "",
+    "sign_that_was_hidden": "",
+    "hint_for_tomorrow_600": "AI分析失敗: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZofWbqTSzvPcE6Ufk1Ps'}"
   },
-  "pm_plan": {
-    "pm_regime": "selective",
-    "pm_regime_label": "選別相場",
-    "summary": "蓄電池半導体の継続監視。指数買い戻し警戒で大型は様子見優先"
-  },
-  "theme_pm_verdict": [
-    {
-      "name": "蓄電池",
-      "verdict": "継続狙い",
-      "reason": "前場トップテーマ。実需背景強く継続性高い"
-    },
-    {
-      "name": "防衛",
-      "verdict": "押し目待ち",
-      "reason": "中東緩和で一服。下げ過ぎなら反発狙い"
-    },
-    {
-      "name": "データセンター",
-      "verdict": "継続狙い",
-      "reason": "半導体連動で資金流入継続。本命テーマ"
-    },
-    {
-      "name": "半導体",
-      "verdict": "継続狙い",
-      "reason": "レーザーテク等話題株多数。午後も主戦場"
-    },
-    {
-      "name": "宇宙開発関連",
-      "verdict": "押し目待ち",
-      "reason": "防衛テーマと連動。様子見が賢明"
-    },
-    {
-      "name": "レアアース",
-      "verdict": "前場限り",
-      "reason": "朝の期待テーマだが不発。資金入らず"
-    },
-    {
-      "name": "地方銀行",
-      "verdict": "見送り",
-      "reason": "指数買い戻しの副産物。能動的には触らず"
-    },
-    {
-      "name": "JPX日経400",
-      "verdict": "見送り",
-      "reason": "大型分散買い。個別で狙うテーマでない"
-    },
-    {
-      "name": "ペロブスカイト太陽電池",
-      "verdict": "押し目待ち",
-      "reason": "蓄電池の派生。本命優先で余力あれば"
-    },
-    {
-      "name": "TOPIXコア30",
-      "verdict": "見送り",
-      "reason": "指数パッシブ買い。個別参戦不要"
-    }
-  ],
-  "pm_watchlist": [
-    {
-      "bucket": "本命",
-      "name": "巴川コーポ",
-      "code": "3878",
-      "theme": "蓄電池",
-      "reason": "前場+1.62%で上昇率3位。蓄電池主力で勢い継続",
-      "trigger": "12:45以降も+1.5%以上維持かつ出来高増加で追撃",
-      "invalidation": "13:00時点で+0.5%未満に縮小または出来高激減",
-      "time_window": "12:45-13:30"
-    },
-    {
-      "bucket": "本命",
-      "name": "ダイトーケミ",
-      "code": "4366",
-      "theme": "半導体",
-      "reason": "前場+1.87%で9位。半導体材料で資金流入中",
-      "trigger": "12:40以降+2%突破で買い参戦",
-      "invalidation": "VWAP割れまたは13:15時点でマイ転",
-      "time_window": "12:40-13:45"
-    },
-    {
-      "bucket": "先導確認",
-      "name": "レーザーテク",
-      "code": "6920",
-      "theme": "半導体",
-      "reason": "昼刊話題株。半導体検査装置主力で先導株",
-      "trigger": "後場寄り+2%以上で始まれば追随銘柄狙い",
-      "invalidation": "後場寄りマイナススタートまたは12:40でプラ転せず",
-      "time_window": "12:30-12:50"
-    },
-    {
-      "bucket": "連想本線",
-      "name": "古河電工",
-      "code": "5801",
-      "theme": "データセンター",
-      "reason": "昼刊話題株。データセンター銅線需要で注目",
-      "trigger": "13:00以降前場高値更新+出来高前場比1.3倍で参戦",
-      "invalidation": "13:30時点で前場高値届かずまたは出来高細る",
-      "time_window": "13:00-14:00"
-    },
-    {
-      "bucket": "連想補助",
-      "name": "竹田iPホールディングス",
-      "code": "7875",
-      "theme": "蓄電池",
-      "reason": "前場+2.68%で8位。蓄電池連想で急騰中",
-      "trigger": "12:50以降+3%到達で短期順張り",
-      "invalidation": "13:20時点で+1.5%未満に失速",
-      "time_window": "12:50-13:30"
-    }
-  ],
-  "do_not_do_pm": [
-    "レアアース商社への新規参戦",
-    "地銀JPX400の指数銘柄追い",
-    "前場S高銘柄の飛びつき買い"
-  ],
-  "summary": "蓄電池半導体データセンターの3テーマ継続監視。巴川・ダイトーケミ本命、レーザーテク先導確認。指数大型株と不発素材は触らず選別徹底。"
+  "pm_plan": {},
+  "theme_pm_verdict": [],
+  "pm_watchlist": [],
+  "do_not_do_pm": [],
+  "summary": "AI分析に失敗しました: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZofWbqTSzvPcE6Ufk1Ps'}",
+  "analysis_status": "failed"
 }
