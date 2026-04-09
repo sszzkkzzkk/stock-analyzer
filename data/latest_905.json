@@ -1,5 +1,5 @@
 {
-  "date": "2026-04-08",
+  "date": "2026-04-09",
   "session": "905",
   "generated_at": "09:05",
   "data_sources": [
@@ -9,14 +9,14 @@
     "ドル円1件",
     "SOX1件",
     "原油1件",
-    "値上がり14件",
-    "値下がり10件",
+    "値上がり13件",
+    "値下がり15件",
     "テーマ10件",
     "かぶたんニュース14件",
     "NHKニュース10件"
   ],
   "verdict": "分析失敗",
-  "verdict_reason": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZqKxnixB4RT1LogxAvsW'}",
+  "verdict_reason": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZsDmGiB87iYqxyBHeVWi'}",
   "actual_battlefield": "",
   "capital_flow": "",
   "theme_status": [],
@@ -24,6 +24,6 @@
   "watch_update": [],
   "hint_for_afternoon": "",
   "hint_for_tomorrow": "",
-  "summary": "AI分析に失敗しました: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZqKxnixB4RT1LogxAvsW'}",
+  "summary": "AI分析に失敗しました: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZsDmGiB87iYqxyBHeVWi'}",
   "analysis_status": "failed"
 }
