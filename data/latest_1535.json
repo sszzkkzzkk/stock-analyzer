@@ -1,5 +1,5 @@
 {
-  "date": "2026-04-08",
+  "date": "2026-04-09",
   "session": "1535",
   "generated_at": "15:35",
   "data_sources": [
@@ -10,13 +10,13 @@
     "SOX1件",
     "原油1件",
     "値上がり13件",
-    "値下がり15件",
+    "値下がり14件",
     "テーマ10件",
     "かぶたんニュース14件",
     "NHKニュース10件",
     "ロイター10件"
   ],
   "review": {},
-  "summary": "AI分析に失敗しました: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZqqhsXkkNtB2wT1usy6M'}",
+  "summary": "AI分析に失敗しました: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZsjXJzwkWsSPRy7jCDai'}",
   "analysis_status": "failed"
 }
